@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Abonați-vă la Oferte Locale | HaiAcolo</title>
+    <!-- SEO Meta Tags -->
+    <meta name="description"
+        content="Primește cele mai bune oferte de la afaceri locale din Cluj direct pe WhatsApp. Simplu, fără spam și gratuit. Abonează-te acum! Găsește reduceri la restaurante, cafenele și multe altele.">
+    <link rel="canonical" href="https://www.haiacolo.ro/user.html" />
+    <!-- Open Graph (Facebook, LinkedIn) -->
+    <meta property="og:title" content="Abonați-vă la Oferte Locale | HaiAcolo" />
+    <meta property="og:description"
+        content="Primește cele mai bune oferte de la afaceri locale din Cluj direct pe WhatsApp. Simplu, fără spam și gratuit." />
+    <meta property="og:image" content="https://www.haiacolo.ro/public/logo.png" />
+    <meta property="og:url" content="https://www.haiacolo.ro/user.html" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="HaiAcolo" />
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Abonați-vă la Oferte Locale | HaiAcolo" />
+    <meta name="twitter:description"
+        content="Primește cele mai bune oferte de la afaceri locale din Cluj direct pe WhatsApp. Simplu, fără spam și gratuit." />
+    <meta name="twitter:image" content="https://www.haiacolo.ro/public/logo.png" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            200: '#ddd6fe',
+                            300: '#c4b5fd',
+                            400: '#a78bfa',
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                            800: '#5b21b6',
+                            900: '#4c1d95',
+                        },
+                        secondary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="/public/logo.png" type="image/png" sizes="32x32">
+    <link rel="icon" href="/public/logo.png" type="image/png" sizes="16x16">
+    <link rel="apple-touch-icon" sizes="180x180" href="/public/logo.png">
+    <link rel="icon" href="/public/logo.svg" type="image/svg+xml" sizes="any">
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebPage",
+          "name": "Abonați-vă la Oferte Locale | HaiAcolo",
+          "description": "Primește cele mai bune oferte de la afaceri locale din Cluj direct pe WhatsApp. Simplu, fără spam și gratuit. Abonează-te acum!",
+          "url": "https://www.haiacolo.ro/user.html",
+          "publisher": {
+            "@type": "Organization",
+            "name": "HaiAcolo",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://www.haiacolo.ro/public/logo.png"
+            }
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "🔒 Datele mele sunt în siguranță?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Da, folosim numărul tău de telefon doar pentru a-ți trimite ofertele noastre săptămânale și adresa de email pentru confirmare. Nu le vom împărtăși niciodată cu terțe părți. Poți consulta politica de confidențialitate."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "📅 Cât de des primesc mesaje?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Vei primi un singur mesaj pe săptămână, de obicei joia. Fără mesaje suplimentare, fără spam."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "🚪 Cum mă dezabonez?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Te poți dezabona oricând, răspunzând cu textul \"STOP\" la orice mesaj primit de la noi."
+              }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e7f1 100%);
+            min-height: 100vh;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        .logo-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8b5cf6 0%, #0ea5e9 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 4px 6px rgba(139, 92, 246, 0.2);
+            border: 2px solid #8b5cf6;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #8b5cf6 0%, #0ea5e9 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        #mobile-menu {
+            transition: all 0.3s ease;
+        }
+
+        /* Counter Styles */
+        .scarcity-counter {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.02);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+    </style>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+</head>
+
+<body class="bg-gray-50 text-gray-900 flex flex-col min-h-screen">
+    <header class="bg-gradient-to-r from-secondary-600 to-primary-600 shadow-lg sticky top-0 z-50">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" aria-label="Main navigation">
+            <div class="flex justify-between items-center py-4">
+                <a href="/index" title="HaiAcolo Home" class="hover:opacity-90 transition-opacity flex items-center">
+                    <div class="logo-circle mr-3 floating" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-5 h-5 fill-white">
+                            <path
+                                d="M505 174.8l-39.6-39.6c-9.4-9.4-24.6-9.4-33.9 0L192 374.7 80.6 263.2c-9.4-9.4-24.6-9.4-33.9 0L7 302.9c-9.4 9.4-9.4 24.6 0 34L175 505c9.4 9.4 24.6 9.4 33.9 0l296-296.2c9.4-9.5 9.4-24.7 .1-34zm-324.3 106c6.2 6.3 16.4 6.3 22.6 0l208-208.2c6.2-6.3 6.2-16.4 0-22.6L366.1 4.7c-6.2-6.3-16.4-6.3-22.6 0L192 156.2l-55.4-55.5c-6.2-6.3-16.4-6.3-22.6 0L68.7 146c-6.2 6.3-6.2 16.4 0 22.6l112 112.2z" />
+                        </svg>
+                    </div>
+                    <span class="text-xl font-bold text-white italic">HaiAcolo</span>
+                </a>
+                <div class="hidden md:flex space-x-8">
+                    <a href="/user" class="font-bold text-secondary-200 transition-colors nav-link">Vreau
+                        Oferte</a>
+                    <a href="/founder" class="text-white hover:text-secondary-200 transition-colors nav-link">Pentru
+                        Afaceri</a>
+                    <a href="/directory"
+                        class="text-white hover:text-secondary-200 transition-colors nav-link">Parteneri</a>
+                    <a href="mailto:contact@haiacolo.ro"
+                        class="text-white hover:text-secondary-200 nav-link">Contact</a>
+                </div>
+                <button id="mobile-menu-button" class="md:hidden text-white">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <div id="mobile-menu" class="hidden fixed inset-0 bg-white z-50 pt-20">
+        <button id="close-mobile-menu" class="absolute top-4 right-4 text-gray-600">
+            <i class="fas fa-times text-2xl"></i>
+        </button>
+        <div class="space-y-8 text-center">
+            <a href="mailto:contact@haiacolo.ro"
+                class="block text-2xl font-medium text-gray-900 hover:text-indigo-600">Contact</a>
+            <a href="/directory" class="block text-2xl font-medium text-gray-900 hover:text-indigo-600">Parteneri</a>
+            <a href="/user" class="block text-2xl font-medium text-gray-900 hover:text-indigo-600">Vreau Oferte</a>
+            <a href="/founder" class="block text-2xl font-medium text-gray-900 hover:text-indigo-600">Pentru
+                Afacere</a>
+            <a href="/privacy"
+                class="block text-2xl font-medium text-gray-900 hover:text-indigo-600">Confidențialitate</a>
+        </div>
+    </div>
+    <section class="bg-white py-20 px-6 text-center">
+        <h1 class="text-5xl font-bold mb-4 gradient-text">Oferte Locale, Direct pe WhatsApp.</h1>
+        <p class="text-xl mb-8 max-w-3xl mx-auto text-gray-700">
+            Descoperă cele mai tari reduceri și promoții de la afacerile din Cluj, livrate săptămânal, direct pe
+            telefonul tău. Fără spam, fără costuri.
+        </p>
+        <!-- Main Urania Offer -->
+        <div class="my-16">
+            <h2 class="text-3xl font-bold text-center mb-4">Prima Noastră Ofertă Exclusivă</h2>
+            <p class="text-xl text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+                Ne lansăm cu o ofertă specială de la partenerul nostru fondator, Urania Social Hub!
+            </p>
+            <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden border-2 border-primary-500">
+                <div class="p-8">
+                    <div class="flex flex-col md:flex-row md:items-center text-center md:text-left mb-6">
+                        <img src="/public/urania.png" alt="Urania Social Hub Logo"
+                            class="w-48 md:w-64 h-auto mx-auto md:mx-0 mb-4 md:mb-0 md:mr-6 rounded-lg shadow-md"
+                            loading="lazy">
+                        <div>
+                            <p class="text-sm font-semibold text-primary-600">OFERTĂ DE LANSARE</p>
+                            <h3 class="text-3xl font-bold text-gray-800">Urania Social Hub</h3>
+                            <p
+                                class="text-md font-medium text-gray-600 mt-1 flex items-center justify-center md:justify-start">
+                                <i class="fas fa-map-marker-alt text-primary-500 mr-2" aria-hidden="true"></i>
+                                <span>Zona <strong class="font-bold">Centru</strong></span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="text-center my-8">
+                        <p class="text-2xl text-gray-700">Cumpără 2 băuturi calde (Latte, Flat White, Ceai) și primești
+                        </p>
+                        <p class="text-4xl font-extrabold gradient-text my-2">2 produse de patiserie la 50% reducere!
+                        </p>
+                        <p class="text-sm text-gray-500">(Croissant sau echivalent. Ofertă valabilă exclusiv pentru
+                            abonații HaiAcolo. Doar la pachet/To-go.)</p>
+                    </div>
+                    <div class="mt-8 text-center">
+                        <a href="#signup-form-container"
+                            class="inline-block px-8 py-4 font-semibold text-white bg-secondary-600 rounded-full shadow-lg hover:bg-secondary-700 transition duration-300 text-lg scroll-to-form">
+                            Abonează-mă pentru oferte ca asta!
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Scarcity Counter (MOVED) -->
+        <div id="scarcity-counter-display"
+            class="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 my-10 rounded-lg shadow-md flex justify-center items-center scarcity-counter max-w-lg mx-auto"
+            role="alert">
+            <i class="fas fa-fire text-xl mr-3" aria-hidden="true"></i>
+            <p class="font-bold text-md leading-none">
+                Au mai rămas doar <span id="counter-value" class="text-2xl font-extrabold text-red-800 mx-1">65</span>
+                vouchere Urania Social Hub!
+            </p>
+        </div>
+        <!-- Signup Form -->
+        <div id="signup-form-container" class="max-w-lg mx-auto text-left mt-16">
+            <form id="user-signup-form" class="bg-gray-50 p-8 rounded-xl shadow-md border border-gray-200">
+                <div class="space-y-4">
+                    <div class="relative">
+                        <label for="full_name" class="block text-sm font-medium text-gray-700">
+                            Numele tău (opțional)
+                        </label>
+                        <input type="text" id="full_name" name="full_name"
+                            class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                            autocomplete="name">
+                        <span id="full_name-validation-icon"
+                            class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+                            aria-live="polite"></span>
+                    </div>
+                    <div class="relative">
+                        <label for="email" class="block text-sm font-medium text-gray-700">
+                            Email (opțional)
+                        </label>
+                        <input type="email" id="email" name="email"
+                            class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                            placeholder="Email (Opțional)" autocomplete="email">
+                        <span id="email-validation-icon"
+                            class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+                            aria-live="polite"></span>
+                    </div>
+                    <div class="relative">
+                        <label for="phone_number" class="block text-sm font-medium text-gray-700">
+                            Număr de telefon WhatsApp <span class="text-red-500" aria-label="obligatoriu">*</span>
+                        </label>
+                        <input type="tel" id="phone_number" name="phone_number" required
+                            class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                            autocomplete="tel">
+                        <span id="phone_number-validation-icon"
+                            class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+                            aria-live="polite"></span>
+                    </div>
+                    <div class="relative">
+                        <label class="block text-sm font-medium text-gray-700">
+                            Ce zone te interesează? <span class="text-red-500" aria-label="obligatoriu">*</span>
+                        </label>
+                        <div id="zone-checkboxes"
+                            class="mt-2 grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-2 border border-gray-300 rounded-md"
+                            role="group" aria-labelledby="zone-label">
+                            <label class="flex items-center">
+                                <input type="checkbox" name="zone" value="Centru"
+                                    class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                <span class="ml-2 text-sm text-gray-700">Centru</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" name="zone" value="Grigorescu"
+                                    class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                <span class="ml-2 text-sm text-gray-700">Grigorescu</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" name="zone" value="Mănăștur"
+                                    class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                <span class="ml-2 text-sm text-gray-700">Mănăștur</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" name="zone" value="Mărăști"
+                                    class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                <span class="ml-2 text-sm text-gray-700">Mărăști</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" name="zone" value="Gheorgheni"
+                                    class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                <span class="ml-2 text-sm text-gray-700">Gheorgheni</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" name="zone" value="Zorilor"
+                                    class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                <span class="ml-2 text-sm text-gray-700">Zorilor</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" name="zone" value="Buna Ziua"
+                                    class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                <span class="ml-2 text-sm text-gray-700">Buna Ziua</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" name="zone" value="Andrei Mureșanu"
+                                    class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                <span class="ml-2 text-sm text-gray-700">Andrei Mureșanu</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" name="zone" value="Gruia"
+                                    class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                <span class="ml-2 text-sm text-gray-700">Gruia</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" name="zone" value="Dâmbul Rotund"
+                                    class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                <span class="ml-2 text-sm text-gray-700">Dâmbul Rotund</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" name="zone" value="Iris"
+                                    class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                <span class="ml-2 text-sm text-gray-700">Iris</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" name="zone" value="Someșeni"
+                                    class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                <span class="ml-2 text-sm text-gray-700">Someșeni</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" name="zone" value="Florești"
+                                    class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                <span class="ml-2 text-sm text-gray-700">Florești</span>
+                            </label>
+                        </div>
+                        <p id="zone-validation-status" class="text-xs text-gray-500 mt-1" aria-live="polite">
+                            Selectează cel puțin o zonă.
+                        </p>
+                    </div>
+                    <div class="relative">
+                        <label class="block text-sm font-medium text-gray-700">
+                            Ce te interesează? <span class="text-red-500" aria-label="obligatoriu">*</span>
+                        </label>
+                        <div id="interests-checkboxes" class="mt-2 space-y-4">
+                            <!-- Food & Drink Category -->
+                            <div>
+                                <h4 class="font-semibold text-gray-800">Mâncare și Băutură</h4>
+                                <div class="pl-4 mt-2 space-y-2">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="interests" value="Restaurante"
+                                            class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                        <span class="ml-2 text-sm text-gray-700">Restaurante</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="interests" value="Cafenele"
+                                            class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                        <span class="ml-2 text-sm text-gray-700">Cafenele</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="interests" value="Brutării și Cofetării"
+                                            class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                        <span class="ml-2 text-sm text-gray-700">Brutării și Cofetării</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <!-- Entertainment Category -->
+                            <div>
+                                <h4 class="font-semibold text-gray-800">Divertisment și Cultură</h4>
+                                <div class="pl-4 mt-2 space-y-2">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="interests" value="Muzee și Expoziții"
+                                            class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                        <span class="ml-2 text-sm text-gray-700">Muzee și Expoziții</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <p id="interests-validation-status" class="text-xs text-gray-500 mt-1" aria-live="polite">
+                            Selectează cel puțin un interes.
+                        </p>
+                    </div>
+                </div>
+                <p class="text-sm text-center text-gray-600 my-4 p-3 bg-white border border-gray-300 rounded-md">
+                    Prin abonare, ești de acord să primești maximum un mesaj pe săptămână pe
+                    WhatsApp de la HaiAcolo.
+                    Te poți dezabona oricând.
+                </p>
+                <div class="g-recaptcha my-4 mx-auto max-w-xs" data-sitekey="6Le9i8krAAAAAFtGhvT1vauj1j2MXxDnJTFU_D7s">
+                </div>
+                <div id="form-feedback" aria-live="polite"></div>
+                <div class="mt-6">
+                    <button type="submit" id="submit-button" disabled
+                        class="w-full px-4 py-2 font-medium text-white bg-secondary-600 rounded-md hover:bg-secondary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-500 disabled:bg-gray-400 disabled:cursor-not-allowed transition duration-300">
+                        Abonează-te Acum
+                    </button>
+                </div>
+            </form>
+        </div>
+    </section>
+    <!-- Coming Soon Partners - Side by Side Grid (MOVED) -->
+    <div class="my-16 px-6">
+        <h2 class="text-3xl font-bold text-center mb-8">Parteneri În Curând</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+            <!-- Nish Card -->
+            <div class="bg-white rounded-2xl shadow-2xl overflow-hidden border-2 border-primary-500">
+                <div class="p-6">
+                    <div class="flex flex-col items-center text-center mb-4">
+                        <img src="/public/nish.png" alt="Nish Logo" class="w-24 h-auto mb-4 rounded-full shadow-md"
+                            loading="lazy">
+                        <div>
+                            <p class="text-xs font-semibold text-primary-600">OFERTĂ DE LANSARE</p>
+                            <h3 class="text-2xl font-bold text-gray-800">Nish</h3>
+                            <p class="text-sm font-medium text-gray-600 mt-1 flex items-center justify-center">
+                                <i class="fas fa-map-marker-alt text-primary-500 mr-2" aria-hidden="true"></i>
+                                <span>Zona <strong class="font-bold">Centru</strong></span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="text-center my-4">
+                        <p class="text-3xl font-extrabold gradient-text">în curând!</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Steampunk Card -->
+            <div class="bg-white rounded-2xl shadow-2xl overflow-hidden border-2 border-primary-500">
+                <div class="p-6">
+                    <div class="flex flex-col items-center text-center mb-4">
+                        <img src="/public/steampunk.png" alt="Steampunk Transylvania Logo"
+                            class="w-40 h-auto mb-4 rounded-lg shadow-md" loading="lazy">
+                        <div>
+                            <p class="text-xs font-semibold text-primary-600">OFERTĂ DE LANSARE</p>
+                            <h3 class="text-2xl font-bold text-gray-800">Steampunk Transylvania</h3>
+                            <p class="text-sm font-medium text-gray-600 mt-1 flex items-center justify-center">
+                                <i class="fas fa-map-marker-alt text-primary-500 mr-2" aria-hidden="true"></i>
+                                <span>Zona <strong class="font-bold">Centru</strong></span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="text-center my-4">
+                        <p class="text-3xl font-extrabold gradient-text">în curând!</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Community Bakery Card -->
+            <div class="bg-white rounded-2xl shadow-2xl overflow-hidden border-2 border-primary-500">
+                <div class="p-6">
+                    <div class="flex flex-col items-center text-center mb-4">
+                        <img src="/public/community_bakery.png" alt="Community Bakery Logo"
+                            class="w-40 h-auto mb-4 rounded-lg shadow-md" loading="lazy">
+                        <div>
+                            <p class="text-xs font-semibold text-primary-600">OFERTĂ DE LANSARE</p>
+                            <h3 class="text-2xl font-bold text-gray-800">Community Bakery</h3>
+                            <p class="text-sm font-medium text-gray-600 mt-1 flex items-center justify-center">
+                                <i class="fas fa-map-marker-alt text-primary-500 mr-2" aria-hidden="true"></i>
+                                <span>Zona <strong class="font-bold">Centru</strong></span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="text-center my-4">
+                        <p class="text-3xl font-extrabold gradient-text">în curând!</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Berrak Kebap Card -->
+            <div class="bg-white rounded-2xl shadow-2xl overflow-hidden border-2 border-primary-500">
+                <div class="p-6">
+                    <div class="flex flex-col items-center text-center mb-4">
+                        <img src="/public/berrak_kebap.png" alt="Berrak Kebap Logo"
+                            class="w-24 h-auto mb-4 rounded-lg shadow-md" loading="lazy">
+                        <div>
+                            <p class="text-xs font-semibold text-primary-600">OFERTĂ DE LANSARE</p>
+                            <h3 class="text-2xl font-bold text-gray-800">Berrak Kebap</h3>
+                            <p class="text-sm font-medium text-gray-600 mt-1 flex items-center justify-center">
+                                <i class="fas fa-map-marker-alt text-primary-500 mr-2" aria-hidden="true"></i>
+                                <span>Zona <strong class="font-bold">Centru</strong></span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="text-center my-4">
+                        <p class="text-3xl font-extrabold gradient-text">în curând!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- NEW CTA Button -->
+        <div class="mt-12 text-center">
+            <a href="#signup-form-container"
+                class="inline-block px-10 py-4 font-semibold text-white bg-secondary-600 rounded-full shadow-lg hover:bg-secondary-700 transition duration-300 text-xl scroll-to-form">
+                Primește Oferte Exclusive!
+            </a>
+        </div>
+    </div>
+    <section id="cum-functioneaza" class="py-20 px-6 bg-gray-100">
+        <h2 class="text-3xl font-bold text-center mb-12">Cum funcționează?</h2>
+        <div class="grid md:grid-cols-3 gap-10 max-w-5xl mx-auto">
+            <div class="bg-white p-6 rounded-lg shadow-md text-center border border-gray-200">
+                <div class="text-secondary-600 text-5xl mb-4" aria-label="Formular">📝</div>
+                <h3 class="font-semibold text-xl mb-2">1. Te abonezi rapid</h3>
+                <p>Introduci numărul tău de telefon în formularul securizat. Nu cerem alte date.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md text-center border border-gray-200">
+                <div class="text-green-600 text-5xl mb-4" aria-label="Verificare">✅</div>
+                <h3 class="font-semibold text-xl mb-2">2. Primești oferte verificate</h3>
+                <p>Selectăm manual cele mai relevante oferte din Cluj și le trimitem o dată pe
+                    săptămână.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md text-center border border-gray-200">
+                <div class="text-primary-600 text-5xl mb-4" aria-label="Promovare">🎁</div>
+                <h3 class="font-semibold text-xl mb-2">3. Te bucuri de reduceri</h3>
+                <p>Profiti de promoții exclusive și descoperi locuri noi și faine în orașul tău.</p>
+            </div>
+        </div>
+    </section>
+    <section class="py-20 px-6 bg-secondary-50">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-3xl font-bold mb-4 text-secondary-800">Gata să descoperi Clujul altfel?
+            </h2>
+            <p class="text-gray-700 mb-8">Abonează-te în mai puțin de 30 de secunde și primește cele
+                mai bune oferte
+                locale.</p>
+            <div class="flex justify-center gap-6 mb-12">
+                <a href="#signup-form-container"
+                    class="bg-secondary-600 text-white px-8 py-4 rounded-lg shadow-lg hover:bg-secondary-700 transition-transform transform hover:scale-105 text-lg font-semibold">
+                    Vreau Oferte!
+                </a>
+            </div>
+            <div class="text-left mt-16">
+                <h3 class="text-2xl font-semibold mb-6 text-center">Întrebări frecvente</h3>
+                <div class="space-y-6 text-gray-800 max-w-2xl mx-auto">
+                    <div>
+                        <p class="font-bold text-lg">🔒 Datele mele sunt în siguranță?</p>
+                        <p>Da, folosim numărul tău de telefon pentru a-ți trimite ofertele noastre
+                            săptămânale și adresa de email pentru a-ți trimite o confirmare. Nu le vom împărtăși
+                            niciodată cu terțe părți. Te
+                            rugăm să consulți <a href="/privacy" class="text-secondary-600 hover:underline">politica de
+                                confidențialitate</a>.</p>
+                    </div>
+                    <div>
+                        <p class="font-bold text-lg">📅 Cât de des primesc mesaje?</p>
+                        <p>O singură dată pe săptămână, de obicei joia. Fără mesaje suplimentare,
+                            fără spam.</p>
+                    </div>
+                    <div>
+                        <p class="font-bold text-lg">📍 Este doar pentru Cluj?</p>
+                        <p>Da, momentan serviciul este disponibil doar în Cluj-Napoca și Florești.
+                        </p>
+                    </div>
+                    <div>
+                        <p class="font-bold text-lg">🚪 Cum mă dezabonez?</p>
+                        <p>Poți să te dezabonezi oricând, răspunzând cu textul "STOP" la orice mesaj
+                            primit de la noi.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <footer class="bg-gradient-to-r from-primary-800 to-secondary-800 text-white py-10 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-3 gap-8">
+                <div>
+                    <div class="flex items-center mb-4">
+                        <div class="logo-circle mr-3" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-5 h-5 fill-white">
+                                <path
+                                    d="M505 174.8l-39.6-39.6c-9.4-9.4-24.6-9.4-33.9 0L192 374.7 80.6 263.2c-9.4-9.4-24.6-9.4-33.9 0L7 302.9c-9.4 9.4-9.4 24.6 0 34L175 505c9.4 9.4 24.6 9.4 33.9 0l296-296.2c9.4-9.5 9.4-24.7 .1-34zm-324.3 106c6.2 6.3 16.4 6.3 22.6 0l208-208.2c6.2-6.3 6.2-16.4 0-22.6L366.1 4.7c-6.2-6.3-16.4-6.3-22.6 0L192 156.2l-55.4-55.5c-6.2-6.3-16.4-6.3-22.6 0L68.7 146c-6.2 6.3-6.2 16.4 0 22.6l112 112.2z" />
+                            </svg>
+                        </div>
+                        <span class="text-xl font-bold text-white italic">HaiAcolo</span>
+                    </div>
+                    <p class="text-primary-200 mb-4">Promovare locală simplificată</p>
+                </div>
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Navigare</h4>
+                    <ul class="space-y-2">
+                        <li><a href="/user" class="text-primary-200 hover:text-white transition-colors">Vreau
+                                Oferte</a>
+                        </li>
+                        <li><a href="/founder" class="text-primary-200 hover:text-white transition-colors">Pentru
+                                Afaceri</a>
+                        </li>
+                        <li><a href="/directory"
+                                class="text-primary-200 hover:text-white transition-colors">Parteneri</a>
+                        </li>
+                        <li><a href="mailto:contact@haiacolo.ro"
+                                class="text-primary-200 hover:text-white transition-colors">Contact</a>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Legal</h4>
+                    <ul class="space-y-2">
+                        <li><a href="/privacy"
+                                class="text-primary-200 hover:text-white transition-colors">Confidențialitate</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-10 pt-8 border-t border-primary-700 text-center text-sm text-primary-200">
+                <p>&copy; 2025 HaiAcolo. Toate drepturile rezervate.</p>
+            </div>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1/build/qrcode.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const signupFormContainer = document.getElementById('signup-form-container');
+            const signupForm = document.getElementById('user-signup-form');
+            const feedbackDiv = document.getElementById('form-feedback');
+            const submitButton = document.getElementById('submit-button');
+            const emailInput = signupForm.querySelector('#email');
+            const emailValidationIcon = document.getElementById('email-validation-icon');
+            const phoneInput = signupForm.querySelector('#phone_number');
+            const phoneValidationIcon = document.getElementById('phone_number-validation-icon');
+            const zoneCheckboxes = signupForm.querySelectorAll('input[name="zone"]');
+            const zoneValidationStatus = document.getElementById('zone-validation-status');
+            const interestCheckboxes = signupForm.querySelectorAll('input[name="interests"]');
+            const interestsValidationStatus = document.getElementById('interests-validation-status');
+            const counterDisplay = document.getElementById('scarcity-counter-display');
+            const counterValueElement = document.getElementById('counter-value');
+
+            function handleSuccessfulSubmission(qrData, codeString, emailProvided) {
+                window.location.href = `/offer.html?code=${codeString}&email=${emailProvided}`;
+            }
+
+            signupForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if (!validateForm(true)) {
+                    feedbackDiv.innerHTML = `<p class="mb-4 p-4 rounded-md bg-red-100 text-red-700">Te rugăm să completezi toate câmpurile obligatorii corect.</p>`;
+                    return;
+                }
+                submitButton.disabled = true;
+                submitButton.textContent = 'Se trimite...';
+                const formData = new FormData(signupForm);
+                const customerEmail = formData.get('email')?.trim() || null;
+                const interests = Array.from(formData.getAll('interests'));
+                const zones = Array.from(formData.getAll('zone'));
+                const recaptchaResponse = formData.get('g-recaptcha-response');
+                if (!recaptchaResponse) {
+                    feedbackDiv.innerHTML = `<p class="mb-4 p-4 rounded-md bg-red-100 text-red-700">Te rugăm să completezi verificarea reCAPTCHA.</p>`;
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Abonează-te Acum';
+                    return;
+                }
+                const customerData = {
+                    full_name: formData.get('full_name')?.trim() || null,
+                    email: customerEmail,
+                    phone_number: formData.get('phone_number').trim(),
+                    zone: zones,
+                    interests: interests,
+                    'g-recaptcha-response': recaptchaResponse,
+                };
+                try {
+                    const response = await fetch('/api.php?route=/api/user-signup', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(customerData),
+                    });
+                    const responseData = await response.json();
+                    if (response.ok && responseData.success) {
+                        handleSuccessfulSubmission(responseData.qr_data, responseData.code_string, !!customerEmail);
+                    } else {
+                        const errorMessage = responseData.error || 'A apărut o eroare. Te rugăm să încerci din nou mai târziu.';
+                        feedbackDiv.innerHTML = `<p class="mb-4 p-4 rounded-md bg-red-100 text-red-700">${errorMessage}</p>`;
+                        grecaptcha.reset();
+                    }
+                } catch (err) {
+                    console.error('Fetch error:', err);
+                    feedbackDiv.innerHTML = `<p class="mb-4 p-4 rounded-md bg-red-100 text-red-700">A apărut o eroare neașteptată. Te rugăm să încerci din nou mai târziu. Detalii: ${err.message || err}</p>`;
+                    grecaptcha.reset();
+                } finally {
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Abonează-te Acum';
+                }
+            });
+
+            // --- Live Form Validation ---
+            function sanitizePhoneNumber() {
+                const start = this.selectionStart;
+                const end = this.selectionEnd;
+                const originalLength = this.value.length;
+                let sanitized = this.value.replace(/[^\d+]/g, '');
+                if (sanitized.lastIndexOf('+') > 0) {
+                    sanitized = sanitized.replace(/(?!^)\+/g, '');
+                }
+                this.value = sanitized;
+                const newLength = this.value.length;
+                const offset = originalLength - newLength;
+                this.setSelectionRange(Math.max(0, start - offset), Math.max(0, end - offset));
+            }
+
+            function validateForm(isFinalCheck = false) {
+                let allValid = true;
+                const phoneRegex = /^(?:\+?4?0)?(7\d{8}|[23]\d{8})$/;
+                const isPhoneValid = phoneRegex.test(phoneInput.value);
+                if (isPhoneValid) {
+                    phoneValidationIcon.innerHTML = `<i class="fas fa-check-circle text-green-500"></i>`;
+                } else if (phoneInput.value.length > 0 || isFinalCheck) {
+                    phoneValidationIcon.innerHTML = `<i class="fas fa-times-circle text-red-500"></i>`;
+                } else {
+                    phoneValidationIcon.innerHTML = '';
+                }
+                if (!isPhoneValid) allValid = false;
+
+                const emailValue = emailInput.value.trim();
+                const emailRegex = /^[^'s@]+@[^'s@]+\.[^'s@]+$/;
+                const isEmailValid = emailValue === '' || emailRegex.test(emailValue);
+                if (emailValue === '') {
+                    emailValidationIcon.innerHTML = '';
+                } else if (isEmailValid) {
+                    emailValidationIcon.innerHTML = `<i class="fas fa-check-circle text-green-500"></i>`;
+                } else {
+                    emailValidationIcon.innerHTML = `<i class="fas fa-times-circle text-red-500"></i>`;
+                }
+                if (!isEmailValid) allValid = false;
+
+                const isZoneSelected = Array.from(zoneCheckboxes).some(cb => cb.checked);
+                if (isZoneSelected) {
+                    zoneValidationStatus.innerHTML = `<span class="text-green-600 font-medium"><i class="fas fa-check"></i> Selectat.</span>`;
+                } else {
+                    zoneValidationStatus.innerHTML = `<span class="text-red-500 font-medium">Selectează cel puțin o zonă.</span>`;
+                    allValid = false;
+                }
+
+                const isInterestSelected = Array.from(interestCheckboxes).some(cb => cb.checked);
+                if (isInterestSelected) {
+                    interestsValidationStatus.innerHTML = `<span class="text-green-600 font-medium"><i class="fas fa-check"></i> Selectat.</span>`;
+                } else {
+                    interestsValidationStatus.innerHTML = `<span class="text-red-500 font-medium">Selectează cel puțin un interes.</span>`;
+                    allValid = false;
+                }
+
+                submitButton.disabled = !allValid;
+                if (counterValueElement && counterValueElement.textContent === '0') {
+                    submitButton.disabled = true;
+                }
+                return allValid;
+            }
+
+            emailInput.addEventListener('input', validateForm);
+            phoneInput.addEventListener('input', sanitizePhoneNumber);
+            phoneInput.addEventListener('input', validateForm);
+            zoneCheckboxes.forEach(checkbox => checkbox.addEventListener('change', validateForm));
+            interestCheckboxes.forEach(checkbox => checkbox.addEventListener('change', validateForm));
+            validateForm();
+
+            const mobileMenuButton = document.getElementById("mobile-menu-button");
+            const closeMobileMenu = document.getElementById("close-mobile-menu");
+            const mobileMenu = document.getElementById("mobile-menu");
+            mobileMenuButton.addEventListener("click", function () {
+                mobileMenu.classList.remove("hidden");
+                document.body.style.overflow = "hidden";
+            });
+            closeMobileMenu.addEventListener("click", function () {
+                mobileMenu.classList.add("hidden");
+                document.body.style.overflow = "";
+            });
+            const mobileLinks = mobileMenu.querySelectorAll("a");
+            mobileLinks.forEach(link => {
+                link.addEventListener("click", function (e) {
+                    if (!this.href.startsWith("mailto:")) {
+                        e.preventDefault();
+                    }
+                    mobileMenu.classList.add("hidden");
+                    document.body.style.overflow = "";
+                    if (!this.href.startsWith("mailto:")) {
+                        setTimeout(() => {
+                            window.location.href = this.href;
+                        }, 300);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

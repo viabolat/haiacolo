@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Formular Partener Fondator | HaiAcolo</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description"
+        content="Aplică la programul de Parteneri Fondatori HaiAcolo în Cluj. Promovează-ți afacerea locală și plătește doar pentru rezultate. Fără costuri fixe, comision bazat pe performanță.">
+    <link rel="canonical" href="https://www.haiacolo.ro/business" />
+
+    <!-- Open Graph (Facebook, LinkedIn) -->
+    <meta property="og:title" content="HaiAcolo - Crește-ți Vânzările Locale (Plată pe Performanță)" />
+    <meta property="og:description"
+        content="Atrage clienți noi în Cluj prin newsletter-ul nostru. Sistem de comisionare pe bază de rezultat. Aplică acum pentru a deveni partener fondator!" />
+    <meta property="og:image" content="https://www.haiacolo.ro/public/logo.png" />
+    <meta property="og:url" content="https://www.haiacolo.ro/business" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="HaiAcolo" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="HaiAcolo - Crește-ți Vânzările Locale (Plată pe Performanță)" />
+    <meta name="twitter:description"
+        content="Atrage clienți noi în Cluj prin newsletter-ul nostru. Sistem de comisionare pe bază de rezultat. Aplică acum!" />
+    <meta name="twitter:image" content="https://www.haiacolo.ro/public/logo.png" />
+
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            200: '#ddd6fe',
+                            300: '#c4b5fd',
+                            400: '#a78bfa',
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                            800: '#5b21b6',
+                            900: '#4c1d95',
+                        },
+                        secondary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Optional Favicon -->
+    <link rel="icon" href="/public/logo.png" type="image/png" sizes="32x32">
+    <link rel="icon" href="/public/logo.png" type="image/png" sizes="16x16">
+    <link rel="apple-touch-icon" sizes="180x180" href="/public/logo.png">
+    <link rel="icon" href="/public/logo.svg" type="image/svg+xml" sizes="any">
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "Formular Partener Fondator | HaiAcolo",
+      "description": "Aplică la programul de Parteneri Fondatori HaiAcolo în Cluj. Promovează-ți afacerea locală și plătește doar pentru rezultate.",
+      "url": "https://www.haiacolo.ro/business",
+      "publisher": {
+        "@type": "Organization",
+        "name": "HaiAcolo",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://www.haiacolo.ro/public/logo.png"
+        }
+      }
+    }
+    </script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e7f1 100%);
+            min-height: 100vh;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        .logo-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8b5cf6 0%, #0ea5e9 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 4px 6px rgba(139, 92, 246, 0.2);
+            border: 2px solid #8b5cf6;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #8b5cf6 0%, #0ea5e9 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        #mobile-menu {
+            transition: all 0.3s ease;
+        }
+
+        .error-message {
+            color: #ef4444;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+            display: block;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 flex flex-col min-h-screen">
+
+    <header class="bg-gradient-to-r from-secondary-600 to-primary-600 shadow-lg sticky top-0 z-50">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" aria-label="Main navigation">
+            <div class="flex justify-between items-center py-4">
+                <a href="/index" title="HaiAcolo Home" class="hover:opacity-90 transition-opacity flex items-center">
+                    <div class="logo-circle mr-3 floating" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-5 h-5 fill-white">
+                            <path
+                                d="M505 174.8l-39.6-39.6c-9.4-9.4-24.6-9.4-33.9 0L192 374.7 80.6 263.2c-9.4-9.4-24.6-9.4-33.9 0L7 302.9c-9.4 9.4-9.4 24.6 0 34L175 505c9.4 9.4 24.6 9.4 33.9 0l296-296.2c9.4-9.5 9.4-24.7 .1-34zm-324.3 106c6.2 6.3 16.4 6.3 22.6 0l208-208.2c6.2-6.3 6.2-16.4 0-22.6L366.1 4.7c-6.2-6.3-16.4-6.3-22.6 0L192 156.2l-55.4-55.5c-6.2-6.3-16.4-6.3-22.6 0L68.7 146c-6.2 6.3-6.2 16.4 0 22.6l112 112.2z" />
+                        </svg>
+                    </div>
+                    <span class="text-xl font-bold text-white italic">HaiAcolo</span>
+                </a>
+                <div class="hidden md:flex space-x-8">
+                    <a href="/user" class="text-white hover:text-secondary-200 transition-colors nav-link">Vreau
+                        Oferte</a>
+                    <a href="/founder" class="font-bold text-secondary-200 transition-colors nav-link">Pentru
+                        Afaceri</a>
+                    <a href="/directory"
+                        class="text-white hover:text-secondary-200 transition-colors nav-link">Parteneri</a>
+                    <a href="mailto:contact@haiacolo.ro"
+                        class="text-white hover:text-secondary-200 nav-link">Contact</a>
+                </div>
+                <button id="mobile-menu-button" class="md:hidden text-white">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden fixed inset-0 bg-white z-50 flex-col items-center pt-20">
+        <button id="close-mobile-menu" class="absolute top-4 right-4 text-gray-600">
+            <i class="fas fa-times text-2xl"></i>
+        </button>
+        <div class="space-y-8 text-center">
+            <a href="mailto:contact@haiacolo.ro"
+                class="block text-2xl font-medium text-gray-900 hover:text-indigo-600">Contact</a>
+            <a href="/directory" class="block text-2xl font-medium text-gray-900 hover:text-indigo-600">Parteneri</a>
+            <a href="/user" class="block text-2xl font-medium text-gray-900 hover:text-indigo-600">Vreau Oferte</a>
+            <a href="/founder" class="block text-2xl font-medium text-gray-900 hover:text-indigo-600">Pentru
+                Afacere</a>
+            <a href="/privacy"
+                class="block text-2xl font-medium text-gray-900 hover:text-indigo-600">Confidențialitate</a>
+        </div>
+    </div>
+
+    <main class="py-16 px-6">
+        <div class="max-w-lg mx-auto">
+            <div class="text-center mb-10">
+                <h1 class="text-4xl font-bold gradient-text">Formular Partener Fondator</h1>
+                <p class="text-lg text-gray-700 mt-4">Completează formularul pentru a aplica la programul de Parteneri
+                    Fondatori. Locuri limitate.</p>
+            </div>
+            <div id="business-signup-container">
+                <form id="business-signup-form" class="bg-white p-8 rounded-xl shadow-2xl border-2 border-primary-100">
+                    <h2 class="text-2xl font-bold mb-6 text-primary-800 text-center">Aplică pentru Partener Fondator
+                    </h2>
+                    <div class="space-y-4">
+                        <div class="relative">
+                            <label for="business_name" class="block text-sm font-medium text-gray-700">Numele Afacerii
+                                <span class="text-red-500">*</span></label>
+                            <input type="text" id="business_name" name="business_name" required
+                                class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500"
+                                placeholder="Ex: Cafeneaua Centrală">
+                            <span id="business_name-validation-icon"
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-xl leading-5 pointer-events-none"
+                                style="height: 100%; top: 0;">
+                            </span>
+                        </div>
+
+                        <div class="relative">
+                            <label for="contact_person" class="block text-sm font-medium text-gray-700">Nume Persoană de
+                                Contact <span class="text-red-500">*</span></label>
+                            <input type="text" id="contact_person" name="contact_person" required
+                                class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500"
+                                placeholder="Ex: Ion Popescu">
+                            <span id="contact_person-validation-icon"
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-xl leading-5 pointer-events-none"
+                                style="height: 100%; top: 0;">
+                            </span>
+                        </div>
+
+                        <div class="relative">
+                            <label for="contact_email" class="block text-sm font-medium text-gray-700">Email de Contact
+                                <span class="text-red-500">*</span></label>
+                            <input type="email" id="contact_email" name="contact_email" required
+                                class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500"
+                                placeholder="adresa@exemplu.ro">
+                            <span id="contact_email-validation-icon"
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-xl leading-5 pointer-events-none"
+                                style="height: 100%; top: 0;">
+                            </span>
+                        </div>
+
+                        <div class="relative">
+                            <label for="contact_phone" class="block text-sm font-medium text-gray-700">Număr de Telefon
+                                Contact <span class="text-red-500">*</span></label>
+                            <input type="tel" id="contact_phone" name="contact_phone" required
+                                class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500"
+                                placeholder="Ex: 07xx xxx xxx">
+                            <span id="contact_phone-validation-icon"
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-xl leading-5 pointer-events-none"
+                                style="height: 100%; top: 0;">
+                            </span>
+                        </div>
+
+                        <div class="relative">
+                            <label for="business_type" class="block text-sm font-medium text-gray-700">Tipul Afacerii
+                                <span class="text-red-500">*</span></label>
+                            <select id="business_type" name="business_type" required
+                                class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500">
+                                <option value="" disabled selected>Alege tipul afacerii</option>
+                                <option value="Cafenea">Cafenea</option>
+                                <option value="Restaurant">Restaurante</option>
+                                <option value="Alt tip de Afacere">Alt tip de Afacere</option>
+                            </select>
+                            <span id="business_type-validation-icon"
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-xl leading-5 pointer-events-none"
+                                style="height: 100%; top: 0;">
+                            </span>
+                        </div>
+
+                        <div class="relative">
+                            <label for="business_location" class="block text-sm font-medium text-gray-700">Zona Afacerii
+                                <span class="text-red-500">*</span></label>
+                            <select id="business_location" name="business_location" required
+                                class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500">
+                                <option value="" disabled selected>Alege o zonă</option>
+                                <option value="Centru">Centru</option>
+                                <option value="Grigorescu">Grigorescu</option>
+                                <option value="Mănăștur">Mănăștur</option>
+                                <option value="Mărăști">Mărăști</option>
+                                <option value="Gheorgheni">Gheorgheni</option>
+                                <option value="Zorilor">Zorilor</option>
+                                <option value="Buna Ziua">Buna Ziua</option>
+                                <option value="Andrei Mureșanu">Andrei Mureșanu</option>
+                                <option value="Gruia">Gruia</option>
+                                <option value="Dâmbul Rotund">Dâmbul Rotund</option>
+                                <option value="Iris">Iris</option>
+                                <option value="Someșeni">Someșeni</option>
+                                <option value="Florești">Florești</option>
+                                <option value="Altele">Altele/Județul Cluj</option>
+                            </select>
+                            <span id="business_location-validation-icon"
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-xl leading-5 pointer-events-none"
+                                style="height: 100%; top: 0;">
+                            </span>
+                        </div>
+
+                        <div class="relative">
+                            <label for="business_address" class="block text-sm font-medium text-gray-700">Adresa Fizică
+                                Completă <span class="text-red-500">*</span></label>
+                            <input type="text" id="business_address" name="business_address" required
+                                class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500"
+                                placeholder="Adresa completă">
+                            <span id="business_address-validation-icon"
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-xl leading-5 pointer-events-none"
+                                style="height: 100%; top: 0;">
+                            </span>
+                        </div>
+
+                        <div class="relative">
+                            <label for="offer_description" class="block text-sm font-medium text-gray-700">Propunere de
+                                Ofertă Exclusivă <span class="text-red-500">*</span></label>
+                            <textarea id="offer_description" name="offer_description" rows="3" required
+                                class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500"
+                                placeholder="Ex: 20% reducere, 1+1 gratis la cafea, etc."></textarea>
+                            <span id="offer_description-validation-icon"
+                                class="absolute top-8 right-0 pr-3 flex items-start pt-2 text-xl leading-5 pointer-events-none">
+                            </span>
+                        </div>
+
+                        <div>
+                            <label for="business_description" class="block text-sm font-medium text-gray-700">De ce vrei
+                                să fii partener fondator? (opțional)</label>
+                            <textarea id="business_description" name="business_description" rows="3"
+                                class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500"
+                                placeholder="Spune-ne pe scurt despre afacerea ta și de ce ești interesat."></textarea>
+                        </div>
+
+                        <div class="g-recaptcha" data-sitekey="6Le9i8krAAAAAFtGhvT1vauj1j2MXxDnJTFU_D7s"></div>
+
+                        <p class="text-xs text-gray-500 text-center mb-4">
+                            Prin trimitere, accepți să fii contactat pentru a finaliza înscrierea în program.
+                        </p>
+                        <div class="mt-6">
+                            <p id="mandatory-fields-message" class="text-sm text-center text-red-500 mb-3 font-medium">
+                                * Completează toate câmpurile obligatorii pentru a activa butonul.
+                            </p>
+                            <div id="form-feedback"></div>
+                            <button type="submit" id="submit-business-button" disabled
+                                class="w-full px-4 py-3 font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700 focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-primary-500 disabled:bg-gray-400 disabled:cursor-not-allowed text-xl">
+                                Aplică Acum
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-gradient-to-r from-primary-800 to-secondary-800 text-white py-10 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-3 gap-8">
+                <div>
+                    <div class="flex items-center mb-4">
+                        <div class="logo-circle mr-3" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-5 h-5 fill-white">
+                                <path
+                                    d="M505 174.8l-39.6-39.6c-9.4-9.4-24.6-9.4-33.9 0L192 374.7 80.6 263.2c-9.4-9.4-24.6-9.4-33.9 0L7 302.9c-9.4 9.4-9.4 24.6 0 34L175 505c9.4 9.4 24.6 9.4 33.9 0l296-296.2c9.4-9.5 9.4-24.7 .1-34zm-324.3 106c6.2 6.3 16.4 6.3 22.6 0l208-208.2c6.2-6.3 6.2-16.4 0-22.6L366.1 4.7c-6.2-6.3-16.4-6.3-22.6 0L192 156.2l-55.4-55.5c-6.2-6.3-16.4-6.3-22.6 0L68.7 146c-6.2 6.3-6.2 16.4 0 22.6l112 112.2z" />
+                            </svg>
+                        </div>
+                        <span class="text-xl font-bold text-white italic">HaiAcolo</span>
+                    </div>
+                    <p class="text-primary-200 mb-4">Promovare locală simplificată</p>
+                </div>
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Navigare</h4>
+                    <ul class="space-y-2">
+                        <li><a href="/user" class="text-primary-200 hover:text-white transition-colors">Vreau Oferte</a>
+                        </li>
+                        <li><a href="/founder" class="text-primary-200 hover:text-white transition-colors">Pentru
+                                Afaceri</a>
+                        </li>
+                        <li><a href="/directory"
+                                class="text-primary-200 hover:text-white transition-colors">Parteneri</a>
+                        </li>
+                        <li><a href="mailto:contact@haiacolo.ro"
+                                class="text-primary-200 hover:text-white transition-colors">Contact</a>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Legal</h4>
+                    <ul class="space-y-2">
+                        <li><a href="/privacy"
+                                class="text-primary-200 hover:text-white transition-colors">Confidențialitate</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-10 pt-8 border-t border-primary-700 text-center text-sm text-primary-200">
+                <p>&copy; 2025 HaiAcolo. Toate drepturile rezervate.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const signupForm = document.getElementById('business-signup-form');
+            const submitButton = document.getElementById('submit-business-button');
+            const mandatoryMessage = document.getElementById('mandatory-fields-message');
+            const feedbackDiv = document.getElementById('form-feedback');
+
+            // Define field IDs
+            const fieldIds = {
+                name: 'business_name',
+                contact: 'contact_person',
+                email: 'contact_email',
+                phone: 'contact_phone',
+                type: 'business_type',
+                location: 'business_location',
+                address: 'business_address',
+                offer: 'offer_description'
+            };
+
+            // Regex for Romanian phone number (accepts 07xx xxx xxx or 407xx xxx xxx or +407xx xxx xxx, etc. for 10 digits)
+            const phoneRegex = /^(?:\+?4?0)?(7\d{8}|[23]\d{8})$/;
+            // Simple Email Regex
+            const emailRegex = /^\S+@\S+\.\S+$/;
+
+            // Define all required fields and their specific validation logic
+            const fields = [
+                { id: fieldIds.name, validation: (val) => val.length > 2 },
+                { id: fieldIds.contact, validation: (val) => val.length > 2 },
+                { id: fieldIds.email, validation: (val) => emailRegex.test(val) },
+                { id: fieldIds.phone, validation: (val) => phoneRegex.test(val) },
+                { id: fieldIds.type, validation: (val) => val.length > 0 }, // Check if an option is selected
+                { id: fieldIds.location, validation: (val) => val.length > 0 }, // Check if an option is selected
+                { id: fieldIds.address, validation: (val) => val.length > 5 },
+                { id: fieldIds.offer, validation: (val) => val.length > 4 }
+            ];
+
+            /**
+             * Renders a red or green icon next to an input based on its validity.
+             * @param {boolean} isValid - Whether the input value is valid.
+             * @param {string} fieldId - The ID of the field (used to find the icon element).
+             */
+            function renderIcon(isValid, fieldId) {
+                const iconElement = document.getElementById(`${fieldId}-validation-icon`);
+                const inputElement = document.getElementById(fieldId);
+
+                // Remove old validation classes/messages
+                inputElement.classList.remove('input-error');
+                if (iconElement) iconElement.innerHTML = '';
+
+                if (!iconElement || !inputElement) return;
+
+                const value = inputElement.value.trim();
+
+                if (value.length === 0 || (inputElement.tagName === 'SELECT' && value === "")) {
+                    // Hide icon if empty or default selected
+                    iconElement.innerHTML = '';
+                    return;
+                }
+
+                if (isValid) {
+                    // Green checkmark
+                    iconElement.innerHTML = `<i class="fas fa-check-circle text-green-500"></i>`;
+                } else {
+                    // Red cross
+                    iconElement.innerHTML = `<i class="fas fa-times-circle text-red-500"></i>`;
+                }
+            }
+
+            /**
+             * Checks all fields, updates icons, and controls the submit button state.
+             */
+            function validateForm() {
+                let allValid = true;
+
+                fields.forEach(field => {
+                    const inputElement = document.getElementById(field.id);
+                    const value = inputElement.value.trim();
+                    const isValid = field.validation(value);
+
+                    // Render the icon live
+                    renderIcon(isValid, field.id);
+
+                    if (!isValid) {
+                        allValid = false;
+                    }
+                });
+
+                // Control Submit Button and Mandatory Message
+                submitButton.disabled = !allValid;
+                mandatoryMessage.style.display = allValid ? 'none' : 'block';
+
+                return allValid;
+            }
+
+            // Attach the live validation function to all input/change events for real-time feedback
+            fields.forEach(field => {
+                const inputElement = document.getElementById(field.id);
+                if (inputElement) {
+                    // Use 'input' for text/tel, 'change' for select/textarea
+                    const eventType = (inputElement.tagName === 'SELECT' || inputElement.tagName === 'TEXTAREA') ? 'change' : 'input';
+                    inputElement.addEventListener(eventType, validateForm);
+                }
+            });
+
+            // Run initial validation on page load to set button state and mandatory message visibility
+            validateForm();
+
+            // Function to convert string to Title Case (retained from original)
+            function toTitleCase(str) {
+                if (!str) return '';
+                return str.replace(/\w\S*/g, function (txt) {
+                    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+                });
+            }
+
+            // Form Submission Logic
+            signupForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                // Rerun validation to ensure all icons and button/message states are current
+                const formIsValid = validateForm();
+
+                if (!formIsValid) {
+                    // If client-side validation fails, simply focus the first invalid field and stop.
+                    // The live icons already showed the errors, and the button is disabled.
+                    const firstInvalidField = fields.find(field => !field.validation(document.getElementById(field.id).value.trim()));
+                    if (firstInvalidField) {
+                        document.getElementById(firstInvalidField.id).focus();
+                    }
+                    feedbackDiv.innerHTML = '';
+                    return; // Stop submission
+                }
+
+                // --- Start Server Submission Logic (Only runs if formIsValid is true) ---
+                submitButton.disabled = true;
+                submitButton.textContent = 'Se trimite...';
+
+                // Clear any old server-side feedback message before submitting
+                feedbackDiv.innerHTML = '';
+
+                const formData = new FormData(signupForm);
+                const recaptchaResponse = formData.get('g-recaptcha-response');
+
+                if (!recaptchaResponse) {
+                    feedbackDiv.innerHTML = `<p class="mb-4 p-4 rounded-md bg-red-100 text-red-700">Te rugăm să completezi verificarea reCAPTCHA. 🤖</p>`;
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Aplică Acum';
+                    return;
+                }
+
+                // Data mapping for POST request
+                const businessData = {
+                    business_name: toTitleCase(formData.get('business_name').trim()),
+                    contact_person: formData.get('contact_person').trim(),
+                    contact_email: formData.get('contact_email').trim(),
+                    contact_phone: formData.get('contact_phone').trim(),
+                    business_type: formData.get('business_type'),
+                    business_location: formData.get('business_location'),
+                    business_address: formData.get('business_address').trim(),
+                    business_description: formData.get('business_description').trim() || 'Nu a fost furnizată.',
+                    offer_description: formData.get('offer_description').trim(),
+                    'g-recaptcha-response': recaptchaResponse,
+                };
+
+                try {
+                    const response = await fetch('/api.php?route=/api/business-signup', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(businessData),
+                    });
+
+                    if (response.ok) {
+                        // SUCCESS STATE
+                        document.getElementById('business-signup-container').innerHTML = `
+                        <div class="bg-green-100 text-green-700 p-6 rounded-xl shadow-md text-center border-green-300 border-2">
+                            <p class="font-bold text-2xl mb-2">Aplicația a fost trimisă! 🎉</p>
+                            <p class="text-lg">Mulțumim pentru interes! Te vom contacta pe email în cel mai scurt timp (maxim 24h) pentru a discuta pașii următori.</p>
+                        </div>
+                        `;
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                    else {
+                        // SERVER ERROR STATE
+                        let errorMessage = 'A apărut o eroare. Te rugăm să încerci din nou mai târziu.';
+                        try {
+                            const errorData = await response.json();
+                            errorMessage = errorData.error || errorMessage;
+                        } catch (jsonError) {
+                            console.error('Failed to parse JSON error response:', jsonError);
+                            errorMessage = `A apărut o eroare. Răspunsul serverului nu a fost un JSON valid. Status: ${response.status}`;
+                        }
+                        feedbackDiv.innerHTML = `<p class="mb-4 p-4 rounded-md bg-red-100 text-red-700">${errorMessage}</p>`;
+                    }
+                } catch (err) {
+                    // NETWORK ERROR STATE
+                    console.error('Fetch error:', err);
+                    feedbackDiv.innerHTML = `<p class="mb-4 p-4 rounded-md bg-red-100 text-red-700">A apărut o eroare neașteptată. Te rugăm să încerci din nou. Detalii: ${err.message || err}</p>`;
+                } finally {
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Aplică Acum';
+                    if (typeof grecaptcha !== 'undefined' && grecaptcha.getResponse()) {
+                        grecaptcha.reset();
+                    }
+                }
+            });
+        });
+    </script>
+
+    <script>
+        // Mobile Menu Functionality
+        document.addEventListener("DOMContentLoaded", function () {
+            const mobileMenuButton = document.getElementById("mobile-menu-button");
+            const closeMobileMenu = document.getElementById("close-mobile-menu");
+            const mobileMenu = document.getElementById("mobile-menu");
+
+            // Open mobile menu
+            mobileMenuButton.addEventListener("click", function () {
+                mobileMenu.classList.remove("hidden");
+                document.body.style.overflow = "hidden";
+            });
+
+            // Close mobile menu
+            closeMobileMenu.addEventListener("click", function () {
+                mobileMenu.classList.add("hidden");
+                document.body.style.overflow = "";
+            });
+
+            // Close menu when clicking on links
+            const mobileLinks = mobileMenu.querySelectorAll("a");
+            mobileLinks.forEach(link => {
+                link.addEventListener("click", function (e) {
+                    // Don't prevent default for mailto links
+                    if (!this.href.startsWith("mailto:")) {
+                        e.preventDefault();
+                    }
+
+                    mobileMenu.classList.add("hidden");
+                    document.body.style.overflow = "";
+
+                    if (!this.href.startsWith("mailto:")) {
+                        setTimeout(() => {
+                            window.location.href = this.href;
+                        }, 300);
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,33 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # 1. Redirect .html URLs to clean versions (SEO-friendly)
+  RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s/+(.+?)\.html[\s?] [NC]
+  RewriteRule ^ %1 [R=301,L]
+
+  # 2. Serve .html files when clean URL is requested
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{DOCUMENT_ROOT}/$1.html -f
+  RewriteRule ^(.*)$ $1.html [L]
+
+  # 3. Enforce HTTPS
+  RewriteCond %{HTTPS} off
+  RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
+
+# 4. Optional: Upgrade insecure requests
+<IfModule mod_headers.c>
+  Header always set Content-Security-Policy "upgrade-insecure-requests;"
+</IfModule>
+
+# 5. Custom 404 fallback
+ErrorDocument 404 /404.html
+
+# 6. PHP handler (cPanel-managed)
+# php -- BEGIN cPanel-generated handler, do not edit
+<IfModule mime_module>
+  AddHandler application/x-httpd-ea-php83___lsphp .php .php8 .phtml
+</IfModule>
+# php -- END cPanel-generated handler, do not edit

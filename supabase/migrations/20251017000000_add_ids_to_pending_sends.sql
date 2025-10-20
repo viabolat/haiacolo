@@ -1,0 +1,4 @@
+-- Add customer_id and merchant_id to the pending_sends table
+-- This migration has been intentionally emptied.
+-- The changes were merged into the initial 20251016225717_clean_schema.sql migration.
+-- This file is kept to maintain the migration history.

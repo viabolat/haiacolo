@@ -1,0 +1,25 @@
+# Ignore environment-specific server configuration
+.gemini
+
+# Ignore sensitive information
+.env
+ignore
+qrcodes
+
+# Files
+push_test.html
+send_push.py
+commands.md
+future_changes.md
+GEMINI.md
+github_commands.md
+misc.html
+next_steps.md
+# secrets.php
+sitemap_workflow.md
+supabase.md
+test_api.php
+test.html
+
+# Python Virtual Environment
+/.venv/

@@ -1,0 +1,4 @@
+-- Allow authenticated users (like the sender.html console user)
+-- This migration has been intentionally emptied.
+-- The policy was merged into the initial 20251016225717_clean_schema.sql migration.
+-- This file is kept to maintain the migration history.

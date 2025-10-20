@@ -1,0 +1,19 @@
+User-agent: *
+Allow: /
+
+# Clarify business purpose to crawlers and reduce confusion
+# HaiAcolo.ro is NOT a travel agency. We serve local Cluj businesses via WhatsApp-based offers.
+
+Disallow: /admin.html
+Disallow: /merchant_dashboard.html
+Disallow: /merchant_demo.html
+Disallow: /sender.html
+Disallow: /verify.html
+Disallow: /.venv/
+Disallow: /.git/
+Disallow: /.github/
+Disallow: /node_modules/
+Disallow: /supabase/functions/
+
+
+Sitemap: https://haiacolo.ro/sitemap.xml

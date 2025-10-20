@@ -1,0 +1,4 @@
+supabase
+qrcode[pil]
+Pillow
+python-dotenv

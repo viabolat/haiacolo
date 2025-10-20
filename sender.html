@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HaiAcolo Sending Console</title>
+    <style>
+        :root {
+            --bg-color: #1a1a1a;
+            --card-bg: #2a2a2a;
+            --text-color: #e0e0e0;
+            --primary-color: #00bfa5;
+            --grey-color: #555;
+            --red-color: #e57373;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+        }
+
+        /* Login Form Styles */
+        .login-form {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .login-form h2 {
+            text-align: center;
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+
+        .login-form .input-group {
+            margin-bottom: 20px;
+        }
+
+        .login-form label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--grey-color);
+        }
+
+        .login-form input {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--bg-color);
+            border: 1px solid var(--grey-color);
+            border-radius: 4px;
+            color: var(--text-color);
+            font-size: 1em;
+        }
+
+        .login-form .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            background-color: var(--primary-color);
+            color: #111;
+        }
+
+        .login-form .btn:disabled {
+            background-color: var(--grey-color);
+        }
+
+        #login-error {
+            color: var(--red-color);
+            text-align: center;
+            margin-top: 15px;
+            display: none;
+        }
+
+        /* Console Styles */
+        .console {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--grey-color);
+            padding: 15px 20px;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+
+        #logout-btn {
+            background: none;
+            border: 1px solid var(--text-color);
+            color: var(--text-color);
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .no-deals {
+            text-align: center;
+            padding: 50px 20px;
+            font-size: 1.1em;
+            color: var(--primary-color);
+        }
+
+        .deal-info {
+            margin-bottom: 20px;
+        }
+
+        .deal-info h3 {
+            margin-top: 0;
+            font-size: 1em;
+            color: var(--grey-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .info-box {
+            background-color: var(--bg-color);
+            border-radius: 4px;
+            padding: 15px;
+            font-size: 1.1em;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            position: relative;
+        }
+
+        .info-box.message {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .qr-code {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+        }
+
+        .qr-code img {
+            max-width: 200px;
+            height: auto;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .btn {
+            flex-grow: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-copy {
+            background-color: var(--grey-color);
+            color: var(--text-color);
+        }
+
+        .btn-sent {
+            background-color: var(--primary-color);
+            color: #111;
+        }
+
+        .copy-feedback {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: var(--primary-color);
+            color: #111;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <!-- Login Form -->
+        <div id="login-container">
+            <form id="login-form" class="login-form">
+                <h2>Console Login</h2>
+                <div class="input-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit" id="login-btn" class="btn">Login</button>
+                <p id="login-error"></p>
+            </form>
+        </div>
+
+        <!-- Sending Console -->
+        <div id="console-container" class="console" style="display: none;">
+            <div class="header">
+                <span>HaiAcolo Sending Console</span>
+                <button id="logout-btn">Logout</button>
+            </div>
+            <div class="content">
+                <div id="loader" class="no-deals">Loading next deal...</div>
+                <div id="no-more-deals" class="no-deals" style="display: none;">
+                    &#x2728; All deals have been sent! &#x2728;
+                </div>
+
+                <div id="deal-card" style="display: none;">
+                    <div class="deal-info">
+                        <h3>Phone Number</h3>
+                        <div id="phone-number" class="info-box"></div>
+                        <div class="actions">
+                            <button id="copy-number-btn" class="btn btn-copy">Copy Number</button>
+                        </div>
+                    </div>
+
+                    <div class="deal-info">
+                        <h3>Message</h3>
+                        <div id="message" class="info-box message"></div>
+                        <div class="actions">
+                            <button id="copy-message-btn" class="btn btn-copy">Copy Message</button>
+                        </div>
+                    </div>
+
+                    <div class="deal-info">
+                        <h3>QR Code</h3>
+                        <div class="qr-code">
+                            <img id="qr-code-img" src="" alt="QR Code">
+                        </div>
+                    </div>
+
+                    <div class="actions">
+                        <button id="sent-btn" class="btn btn-sent">Mark as Sent & Get Next</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+        // --- DOM Elements ---
+        const loginContainer = document.getElementById('login-container');
+        const consoleContainer = document.getElementById('console-container');
+        const loginForm = document.getElementById('login-form');
+        const loginBtn = document.getElementById('login-btn');
+        const loginError = document.getElementById('login-error');
+        const logoutBtn = document.getElementById('logout-btn');
+
+        const loader = document.getElementById('loader');
+        const noMoreDeals = document.getElementById('no-more-deals');
+        const dealCard = document.getElementById('deal-card');
+        const sentBtn = document.getElementById('sent-btn');
+        const phoneNumberEl = document.getElementById('phone-number');
+        const messageEl = document.getElementById('message');
+        const qrCodeImgEl = document.getElementById('qr-code-img');
+        const copyNumberBtn = document.getElementById('copy-number-btn');
+        const copyMessageBtn = document.getElementById('copy-message-btn');
+
+        let currentDeal = null;
+        let supabase = null;
+
+        // --- Functions ---
+        function showLogin() {
+            consoleContainer.style.display = 'none';
+            loginContainer.style.display = 'block';
+        }
+
+        function showConsole() {
+            loginContainer.style.display = 'none';
+            consoleContainer.style.display = 'block';
+            loadNextDeal();
+        }
+
+        async function loadNextDeal() {
+            dealCard.style.display = 'none';
+            loader.style.display = 'block';
+            noMoreDeals.style.display = 'none';
+            sentBtn.disabled = true;
+
+            const { data, error } = await supabase
+                .from('pending_sends')
+                .select('*')
+                .eq('status', 'pending')
+                .order('created_at', { ascending: true })
+                .limit(1)
+                .single();
+
+            loader.style.display = 'none';
+
+            if (error || !data) {
+                if (error && error.code !== 'PGRST116') { // PGRST116 = "No rows found"
+                    console.error('Error fetching deal:', error);
+                    loader.textContent = `Error fetching deal: ${error.message}`;
+                    loader.style.display = 'block';
+                }
+                noMoreDeals.style.display = 'block';
+                return;
+            }
+
+            currentDeal = data;
+            phoneNumberEl.textContent = currentDeal.phone_number;
+            messageEl.textContent = currentDeal.message;
+            qrCodeImgEl.src = currentDeal.qr_code_url;
+
+            dealCard.style.display = 'block';
+            sentBtn.disabled = false;
+        }
+
+        async function markAsSent() {
+            if (!currentDeal) return;
+            sentBtn.disabled = true;
+            sentBtn.textContent = 'Updating...';
+
+            // First, log the deal as sent in the sent_deals_log table.
+            // This is the source of truth to prevent re-sending deals.
+            const { error: logError } = await supabase
+                .from('sent_deals_log')
+                .insert({
+                    customer_id: currentDeal.customer_id,
+                    merchant_id: currentDeal.merchant_id
+                });
+
+            // If logging fails (e.g., unique constraint violation if already logged),
+            // we still proceed to update the status, as the main goal is to prevent re-sends.
+            if (logError && logError.code !== '23505') { // 23505 is unique_violation
+                alert(`Warning: Could not log deal to sent_deals_log: ${logError.message}`);
+            }
+
+            // Second, update the status in the pending_sends table.
+            const { error: updateError } = await supabase
+                .from('pending_sends')
+                .update({ status: 'sent' })
+                .eq('id', currentDeal.id);
+
+            sentBtn.textContent = 'Mark as Sent & Get Next';
+            if (updateError) {
+                alert(`Error updating deal status: ${updateError.message}`);
+                sentBtn.disabled = false;
+                return;
+            }
+            loadNextDeal();
+        }
+
+        function copyToClipboard(text, feedbackEl) {
+            navigator.clipboard.writeText(text).then(() => {
+                const feedback = document.createElement('div');
+                feedback.className = 'copy-feedback';
+                feedback.textContent = 'Copied!';
+                feedbackEl.parentElement.style.position = 'relative';
+                feedbackEl.parentElement.appendChild(feedback);
+                feedback.style.display = 'block';
+                setTimeout(() => { feedback.remove(); }, 1500);
+            }).catch(err => {
+                alert('Failed to copy text.');
+            });
+        }
+
+        async function initializeApp() {
+            try {
+                const response = await fetch('api.php?route=/api/get-sender-config');
+                if (!response.ok) throw new Error(`Network error: Could not load configuration (Status: ${response.status})`);
+                const config = await response.json();
+                if (!config.supabaseUrl || !config.supabaseAnonKey) throw new Error('Invalid configuration received from server.');
+
+                supabase = createClient(config.supabaseUrl, config.supabaseAnonKey);
+
+                // Check for existing session
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session) {
+                    showConsole();
+                } else {
+                    showLogin();
+                }
+
+                // Handle login
+                loginForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    loginBtn.disabled = true;
+                    loginBtn.textContent = 'Logging in...';
+                    loginError.style.display = 'none';
+
+                    const email = document.getElementById('email').value;
+                    const password = document.getElementById('password').value;
+
+                    const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+                    if (error) {
+                        loginError.textContent = error.message;
+                        loginError.style.display = 'block';
+                        loginBtn.disabled = false;
+                        loginBtn.textContent = 'Login';
+                    } else {
+                        showConsole();
+                    }
+                });
+
+                // Handle logout
+                logoutBtn.addEventListener('click', async () => {
+                    await supabase.auth.signOut();
+                    showLogin();
+                });
+
+                // Add other event listeners
+                sentBtn.addEventListener('click', markAsSent);
+                copyNumberBtn.addEventListener('click', () => copyToClipboard(phoneNumberEl.textContent, phoneNumberEl));
+                copyMessageBtn.addEventListener('click', () => copyToClipboard(messageEl.textContent, messageEl));
+
+            } catch (error) {
+                loginContainer.innerHTML = `<div class="no-deals" style="color: var(--red-color)">FATAL: ${error.message}</div>`;
+            }
+        }
+
+        initializeApp();
+
+    </script>
+</body>
+
+</html>

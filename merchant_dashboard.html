@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panou de Bord - Merchant | HaiAcolo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 text-gray-800">
+
+    <header class="bg-white shadow-md">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-purple-700">HaiAcolo</h1>
+            <h2 id="merchant-name-header" class="text-xl font-semibold">Panou de Bord Merchant</h2>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-8">
+
+        <div id="loading-state" class="text-center">
+            <p class="text-lg">Se încarcă datele...</p>
+        </div>
+
+        <div id="dashboard-content" class="hidden">
+            <h3 class="text-2xl font-semibold mb-6">Istoric Oferte</h3>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Data Trimiterii</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Descriere Ofertă</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Clienți Atinși</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Răscumpărări Raportate</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Acțiuni</th>
+                        </tr>
+                    </thead>
+                    <tbody id="deal-history-table-body" class="bg-white divide-y divide-gray-200">
+                        <!-- Rows will be inserted here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="error-state" class="hidden mt-8 p-4 bg-red-100 text-red-700 rounded-lg">
+            <p>A apărut o eroare la încărcarea datelor. Vă rugăm să reîncărcați pagina.</p>
+        </div>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const loadingState = document.getElementById('loading-state');
+            const dashboardContent = document.getElementById('dashboard-content');
+            const errorState = document.getElementById('error-state');
+            const merchantNameHeader = document.getElementById('merchant-name-header');
+            const tableBody = document.getElementById('deal-history-table-body');
+
+            const getMerchantId = () => {
+                const params = new URLSearchParams(window.location.search);
+                return params.get('merchant_id');
+            };
+
+            const fetchDealHistory = async (merchantId) => {
+                try {
+                    const response = await fetch(`/api.php?route=/api/merchant-history&merchant_id=${merchantId}`); // This one is already correct
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    const result = await response.json();
+
+                    if (result.data && result.data.length > 0) {
+                        const merchantName = result.data[0].merchants.name;
+                        merchantNameHeader.textContent = `Panou de Bord - ${merchantName}`;
+                        renderTable(result.data);
+                    } else {
+                        merchantNameHeader.textContent = `Panou de Bord - Merchant`;
+                        tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4">Nu există istoric de oferte.</td></tr>';
+                    }
+
+                    loadingState.classList.add('hidden');
+                    dashboardContent.classList.remove('hidden');
+
+                } catch (error) {
+                    console.error('Fetch error:', error);
+                    loadingState.classList.add('hidden');
+                    errorState.classList.remove('hidden');
+                }
+            };
+
+            const renderTable = (deals) => {
+                tableBody.innerHTML = ''; // Clear existing rows
+                deals.forEach(deal => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap">${new Date(deal.created_at).toLocaleDateString('ro-RO')}</td>
+                        <td class="px-6 py-4">${deal.offer_description}</td>
+                        <td class="px-6 py-4">${deal.reach_count}</td>
+                        <td class="px-6 py-4">${deal.reported_redemptions}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <input type="number" min="0" id="redemptions-input-${deal.id}" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-24 sm:text-sm border-gray-300 rounded-md" placeholder="Număr">
+                                <button data-deal-id="${deal.id}" class="update-btn ml-2 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">Actualizează</button>
+                            </div>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            };
+
+            const updateRedemptions = async (dealId, count) => {
+                try {
+                    const response = await fetch('/api.php?route=/api/update-redemptions', { // This one is also correct
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ deal_id: dealId, redemptions: count })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Update failed');
+                    }
+
+                    alert('Actualizare reușită!');
+                    // Refresh data
+                    location.reload();
+
+                } catch (error) {
+                    console.error('Update error:', error);
+                    alert('Eroare la actualizare. Vă rugăm încercați din nou.');
+                }
+            };
+
+            // Event delegation for update buttons
+            tableBody.addEventListener('click', (e) => {
+                if (e.target.classList.contains('update-btn')) {
+                    const dealId = e.target.dataset.dealId;
+                    const input = document.getElementById(`redemptions-input-${dealId}`);
+                    const count = parseInt(input.value, 10);
+
+                    if (!isNaN(count) && count >= 0) {
+                        updateRedemptions(dealId, count);
+                    } else {
+                        alert('Vă rugăm introduceți un număr valid.');
+                    }
+                }
+            });
+
+
+            // Initial fetch
+            const merchantId = getMerchantId();
+            if (merchantId) {
+                fetchDealHistory(merchantId);
+            } else {
+                loadingState.classList.add('hidden');
+                errorState.textContent = 'ID-ul de merchant lipsește din URL. Asigurați-vă că adresa URL este de forma: merchant_dashboard.html?merchant_id=YOUR_ID';
+                errorState.classList.remove('hidden');
+            }
+        });
+    </script>
+
+</body>
+
+</html>

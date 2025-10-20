@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oferta Ta | HaiAcolo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1/build/qrcode.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <main id="offer-card" class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-sm text-center">
+        <h1 class="text-2xl font-bold text-gray-800 mb-4">Cadoul tău de bun venit!</h1>
+        <div id="offer-details">
+            <!-- This content will be populated by the script -->
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const offerDetailsContainer = document.getElementById('offer-details');
+            const urlParams = new URLSearchParams(window.location.search);
+            const codeString = urlParams.get('code');
+
+            if (!codeString) {
+                offerDetailsContainer.innerHTML = `<p class="text-red-500">Codul ofertei lipsește din URL.</p>`;
+                return;
+            }
+
+            const verificationUrl = `https://haiacolo.ro/verify.html?code=${codeString}`;
+
+            const emailProvided = urlParams.get('email') === 'true';
+
+            let emailMessage = '';
+            if (emailProvided) {
+                emailMessage = '<p class="text-sm text-gray-500 mt-4">Un email de confirmare a fost trimis la adresa dumneavoastră.</p>';
+            }
+
+            offerDetailsContainer.innerHTML = `
+                <p class="text-gray-600 mb-4">Prezintă acest voucher partenerului pentru a beneficia de ofertă.</p>
+                <div id="qrcode-container" class="flex justify-center my-6"></div>
+                <div>
+                    <p class="text-3xl font-mono tracking-widest bg-gray-200 text-gray-800 rounded-md p-3 inline-block mt-1">${codeString}</p>
+                </div>
+                <p class="text-xs text-gray-400 mt-6">Acest cod este unic și valabil pentru o singură utilizare.</p>
+                <div class="mt-6">
+                    <p class="text-sm text-gray-600 font-bold">Salvează această ofertă! O poți descărca sau îi poți face o captură de ecran.</p>
+                    <a id="download-offer-link" class="mt-2 w-full py-3 px-6 bg-green-600 text-white font-bold text-lg rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center" target="_blank">
+                        <svg class="w-6 h-6 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
+                        Descarcă Oferta
+                    </a>
+                </div>
+                ${emailMessage}
+            `;
+
+            const qrContainer = document.getElementById('qrcode-container');
+            QRCode.toCanvas(verificationUrl, { errorCorrectionLevel: 'H', width: 240, margin: 1 }, function (err, canvas) {
+                if (err) {
+                    console.error(err);
+                    qrContainer.innerHTML = "<p class='text-red-500'>Eroare la generarea codului QR.</p>";
+                    return;
+                }
+                qrContainer.appendChild(canvas);
+                canvas.classList.add("rounded-lg", "shadow-md");
+
+                const isInstagram = navigator.userAgent.includes("Instagram");
+                const downloadLink = document.getElementById('download-offer-link');
+
+                if (downloadLink) {
+                    if (isInstagram) {
+                        downloadLink.innerHTML = '<svg class="w-6 h-6 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-4.5 4.5V3m0 0l3.75 3.75M13.5 3L9.75 6.75" /></svg> Deschide în Browser';
+                        downloadLink.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            alert("Pentru a descărca oferta, te rugăm să deschizi pagina în browser-ul telefonului (ex: Chrome, Safari). Poți face asta apăsând pe iconița de avion de hârtie (share) și selectând 'Deschide în browser'.");
+                        });
+                    } else {
+                        const image = canvas.toDataURL("image/png");
+                        downloadLink.href = image;
+                        downloadLink.download = `haiacolo-oferta-${codeString}.png`;
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
