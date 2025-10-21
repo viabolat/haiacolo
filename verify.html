@@ -26,6 +26,11 @@
             <p class="text-sm mt-1">Asigurați-vă că ați acordat permisiuni în browser pentru acest site.</p>
         </div>
 
+        <div id="qr-reader-custom-error" class="hidden text-center p-4 bg-red-100 text-red-800 rounded-lg">
+            <p class="font-bold">Codul QR nu a putut fi citit.</p>
+            <p class="text-sm mt-1">Vă rugăm să încercați din nou.</p>
+        </div>
+
         <div id="initial-state" class="text-center">
             <div class="space-y-4">
                 <button type="button" id="start-scan-button"
@@ -91,6 +96,7 @@
 
     </main>
 
+    <script src="/src/verify_helper.js"></script>
     <script src="/src/verify.js"></script>
 </body>
 

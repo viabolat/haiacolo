@@ -35,7 +35,10 @@
                 return;
             }
 
-            const verificationUrl = `https://haiacolo.ro/verify.html?code=${codeString}`;
+            // Use the 'qr' parameter if it exists, otherwise reconstruct the URL.
+            // This makes the page more robust and respects the data from the API.
+            const qrParam = urlParams.get('qr');
+            const qrData = qrParam ? decodeURIComponent(qrParam) : `haiacolo://verify?code=${codeString}`;
 
             const emailProvided = urlParams.get('email') === 'true';
 
@@ -45,7 +48,7 @@
             }
 
             offerDetailsContainer.innerHTML = `
-                <p class="text-gray-600 mb-4">Prezintă acest voucher partenerului pentru a beneficia de ofertă.</p>
+                <p class="text-gray-600 mb-4">Arată acest ecran la kasă pentru a beneficia de ofertă.</p>
                 <div id="qrcode-container" class="flex justify-center my-6"></div>
                 <div>
                     <p class="text-3xl font-mono tracking-widest bg-gray-200 text-gray-800 rounded-md p-3 inline-block mt-1">${codeString}</p>
@@ -62,14 +65,19 @@
             `;
 
             const qrContainer = document.getElementById('qrcode-container');
-            QRCode.toCanvas(verificationUrl, { errorCorrectionLevel: 'H', width: 240, margin: 1 }, function (err, canvas) {
+            // Create a canvas element for the QR code
+            const canvasElement = document.createElement('canvas');
+            qrContainer.appendChild(canvasElement);
+
+            QRCode.toCanvas(canvasElement, qrData, { errorCorrectionLevel: 'H', width: 240, margin: 1 }, function (err) {
                 if (err) {
                     console.error(err);
                     qrContainer.innerHTML = "<p class='text-red-500'>Eroare la generarea codului QR.</p>";
                     return;
                 }
-                qrContainer.appendChild(canvas);
-                canvas.classList.add("rounded-lg", "shadow-md");
+                if (canvasElement) {
+                    canvasElement.classList.add("rounded-lg", "shadow-md");
+                }
 
                 const isInstagram = navigator.userAgent.includes("Instagram");
                 const downloadLink = document.getElementById('download-offer-link');
@@ -82,7 +90,7 @@
                             alert("Pentru a descărca oferta, te rugăm să deschizi pagina în browser-ul telefonului (ex: Chrome, Safari). Poți face asta apăsând pe iconița de avion de hârtie (share) și selectând 'Deschide în browser'.");
                         });
                     } else {
-                        const image = canvas.toDataURL("image/png");
+                        const image = canvasElement.toDataURL("image/png");
                         downloadLink.href = image;
                         downloadLink.download = `haiacolo-oferta-${codeString}.png`;
                     }

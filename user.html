@@ -302,14 +302,27 @@
                     </div>
                     <div class="relative">
                         <label for="phone_number" class="block text-sm font-medium text-gray-700">
-                            Număr de telefon WhatsApp <span class="text-red-500" aria-label="obligatoriu">*</span>
+                            Număr de telefon<span class="text-red-500" aria-label="obligatoriu">*</span>
                         </label>
-                        <input type="tel" id="phone_number" name="phone_number" required
-                            class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                            autocomplete="tel">
+                        <div class="flex mt-1">
+                            <select id="phone_country_code" name="phone_country_code"
+                                class="border border-gray-300 rounded-l-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50 text-gray-700 px-2">
+                                <option value="+40" data-length="9" selected>+40 (RO)</option>
+                                <option value="+1" data-length="10">+1 (US)</option>
+                                <option value="+44" data-length="10">+44 (UK)</option>
+                                <option value="+49" data-length="10-11">+49 (DE)</option>
+                                <option value="+33" data-length="9">+33 (FR)</option>
+                                <option value="+39" data-length="9-10">+39 (IT)</option>
+                                <option value="+34" data-length="9">+34 (ES)</option>
+                            </select>
+                            <input type="tel" id="phone_number_local" name="phone_number_local" required
+                                class="w-full px-3 py-2 border-t border-b border-r border-gray-300 rounded-r-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                autocomplete="tel-local" placeholder="712 345 678">
+                        </div>
+                        <input type="hidden" id="phone_number" name="phone_number">
                         <span id="phone_number-validation-icon"
                             class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
-                            aria-live="polite"></span>
+                            style="top: 2.25rem;" aria-live="polite"></span>
                     </div>
                     <div class="relative">
                         <label class="block text-sm font-medium text-gray-700">
@@ -661,7 +674,9 @@
             const submitButton = document.getElementById('submit-button');
             const emailInput = signupForm.querySelector('#email');
             const emailValidationIcon = document.getElementById('email-validation-icon');
-            const phoneInput = signupForm.querySelector('#phone_number');
+            const phoneCountryCodeInput = document.getElementById('phone_country_code');
+            const phoneLocalInput = document.getElementById('phone_number_local');
+            const fullPhoneInput = document.getElementById('phone_number');
             const phoneValidationIcon = document.getElementById('phone_number-validation-icon');
             const zoneCheckboxes = signupForm.querySelectorAll('input[name="zone"]');
             const zoneValidationStatus = document.getElementById('zone-validation-status');
@@ -671,7 +686,7 @@
             const counterValueElement = document.getElementById('counter-value');
 
             function handleSuccessfulSubmission(qrData, codeString, emailProvided) {
-                window.location.href = `/offer.html?code=${codeString}&email=${emailProvided}`;
+                window.location.href = `/offer.html?code=${codeString}&qr=${encodeURIComponent(qrData)}&email=${emailProvided}`;
             }
 
             signupForm.addEventListener('submit', async (e) => {
@@ -729,26 +744,35 @@
 
             // --- Live Form Validation ---
             function sanitizePhoneNumber() {
-                const start = this.selectionStart;
-                const end = this.selectionEnd;
-                const originalLength = this.value.length;
-                let sanitized = this.value.replace(/[^\d+]/g, '');
-                if (sanitized.lastIndexOf('+') > 0) {
-                    sanitized = sanitized.replace(/(?!^)\+/g, '');
-                }
-                this.value = sanitized;
-                const newLength = this.value.length;
-                const offset = originalLength - newLength;
-                this.setSelectionRange(Math.max(0, start - offset), Math.max(0, end - offset));
+                phoneLocalInput.value = phoneLocalInput.value.replace(/[^\d]/g, '');
             }
 
             function validateForm(isFinalCheck = false) {
                 let allValid = true;
-                const phoneRegex = /^(?:\+?4?0)?(7\d{8}|[23]\d{8})$/;
-                const isPhoneValid = phoneRegex.test(phoneInput.value);
+
+                // Phone Number Validation
+                sanitizePhoneNumber();
+                const selectedOption = phoneCountryCodeInput.options[phoneCountryCodeInput.selectedIndex];
+                const expectedLength = selectedOption.getAttribute('data-length');
+                const localNumber = phoneLocalInput.value;
+                let isPhoneValid = false;
+
+                if (expectedLength.includes('-')) {
+                    const [min, max] = expectedLength.split('-').map(Number);
+                    isPhoneValid = localNumber.length >= min && localNumber.length <= max;
+                } else {
+                    isPhoneValid = localNumber.length === parseInt(expectedLength, 10);
+                }
+
+                if (isPhoneValid) {
+                    fullPhoneInput.value = phoneCountryCodeInput.value + localNumber;
+                } else {
+                    fullPhoneInput.value = '';
+                }
+
                 if (isPhoneValid) {
                     phoneValidationIcon.innerHTML = `<i class="fas fa-check-circle text-green-500"></i>`;
-                } else if (phoneInput.value.length > 0 || isFinalCheck) {
+                } else if (phoneLocalInput.value.length > 0 || isFinalCheck) {
                     phoneValidationIcon.innerHTML = `<i class="fas fa-times-circle text-red-500"></i>`;
                 } else {
                     phoneValidationIcon.innerHTML = '';
@@ -756,7 +780,7 @@
                 if (!isPhoneValid) allValid = false;
 
                 const emailValue = emailInput.value.trim();
-                const emailRegex = /^[^'s@]+@[^'s@]+\.[^'s@]+$/;
+                const emailRegex = /^[^'@]+@[^'@]+\.[^'@]+$/;
                 const isEmailValid = emailValue === '' || emailRegex.test(emailValue);
                 if (emailValue === '') {
                     emailValidationIcon.innerHTML = '';
@@ -791,8 +815,9 @@
             }
 
             emailInput.addEventListener('input', validateForm);
-            phoneInput.addEventListener('input', sanitizePhoneNumber);
-            phoneInput.addEventListener('input', validateForm);
+            phoneCountryCodeInput.addEventListener('change', validateForm);
+            phoneLocalInput.addEventListener('input', validateForm);
+
             zoneCheckboxes.forEach(checkbox => checkbox.addEventListener('change', validateForm));
             interestCheckboxes.forEach(checkbox => checkbox.addEventListener('change', validateForm));
             validateForm();

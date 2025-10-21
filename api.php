@@ -28,18 +28,12 @@ function validate_email($email) {
     return filter_var($email, FILTER_VALIDATE_EMAIL);
 }
 
-function validate_romanian_phone($phone) {
-    $cleanedPhone = preg_replace('/[^0-9]/', '', $phone);
-
-    // Mobile
-    if (strlen($cleanedPhone) === 10 && strpos($cleanedPhone, '07') === 0) return true;
-    if (strlen($cleanedPhone) === 11 && strpos($cleanedPhone, '407') === 0) return true;
-
-    // Landline
-    if ((strlen($cleanedPhone) === 9 || strlen($cleanedPhone) === 10) && (strpos($cleanedPhone, '02') === 0 || strpos($cleanedPhone, '03') === 0)) return true;
-    if ((strlen($cleanedPhone) === 10 || strlen($cleanedPhone) === 11) && (strpos($cleanedPhone, '402') === 0 || strpos($cleanedPhone, '403') === 0)) return true;
-
-    return false;
+function validate_phone($phone) {
+    // A more universal phone number validation.
+    // It requires a '+' at the beginning, followed by 7 to 15 digits.
+    // This is a good practice for storing international numbers.
+    $cleanedPhone = preg_replace('/[^\d+]/', '', $phone);
+    return preg_match('/^\+\d{7,15}$/', $cleanedPhone);
 }
 
 // --- reCAPTCHA Verification ---
@@ -180,7 +174,7 @@ function check_deal_code_status($code, $supabaseUrl, $supabaseAnonKey, $supabase
 
     $query_params = [
         'select' => 'id,status,used_at,merchants(offer_description)',
-        'code_string' => 'eq.' . $code,
+        'code_string' => 'eq.' . $code, // $code is already decoded
         'limit' => 1
     ];
     // Use the Service Role Key ($supabaseKey) here for reliable RLS bypass
@@ -312,7 +306,7 @@ if ($method === 'POST' && $route === '/api/user-signup') {
     }
 
     $phone_number = htmlspecialchars($data['phone_number']);
-    if (!validate_romanian_phone($phone_number)) {
+    if (!validate_phone($phone_number)) {
         http_response_code(400);
         echo json_encode(['error' => 'Formatul numărului de telefon este invalid.']);
         exit;
@@ -433,7 +427,7 @@ if ($method === 'POST' && $route === '/api/user-signup') {
         echo json_encode([
             'success' => true,
             'message' => 'Utilizator înregistrat cu succes.',
-            'qr_data' => 'https://haiacolo.ro/verify.html?code=' . $code_string,
+            'qr_data' => 'haiacolo://verify?code=' . $code_string,
             'code_string' => $code_string
         ]);
 
@@ -475,7 +469,7 @@ if ($method === 'POST' && $route === '/api/business-signup') {
         exit;
     }
 
-    if (!validate_romanian_phone($data['contact_phone'])) {
+    if (!validate_phone($data['contact_phone'])) {
         http_response_code(400);
         echo json_encode(['error' => 'Formatul numărului de telefon este invalid.']);
         exit;
@@ -682,7 +676,7 @@ if ($method === 'POST' && $route === '/api/send-outreach') {
 if ($method === 'GET' && $route === '/api/check-code') {
     // CRITICAL FIX: URL-decode the code parameter to correctly handle special characters
     // like '+' or '-' that might be part of the code string.
-    $code = isset($_GET['code']) ? urldecode($_GET['code']) : '';
+    $code = isset($_GET['code']) ? $_GET['code'] : '';
 
     $status_result = check_deal_code_status($code, $supabaseUrl, $supabaseAnonKey, $supabaseKey);
 

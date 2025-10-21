@@ -25,6 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
   elements.resetButton = document.getElementById("reset-button");
   elements.qrReader = document.getElementById("qr-reader");
   elements.qrReaderError = document.getElementById("qr-reader-error");
+  elements.qrReaderCustomError = document.getElementById("qr-reader-custom-error");
   elements.cancelScanButton = document.getElementById("cancel-scan-button");
   elements.manualEntrySection = document.getElementById("manual-entry-section");
   elements.manualCodeInput = document.getElementById("manual-code-input");
@@ -57,7 +58,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function getCodeFromUrl() {
   const urlParams = new URLSearchParams(window.location.search);
-  return urlParams.get("code") ? urlParams.get("code").toUpperCase() : null;
+  const codeParam = urlParams.get("code");
+  if (!codeParam) {
+    return null;
+  }
+
+  // Attempt to parse the code parameter using our helper.
+  // This handles cases where the full haiacolo:// string might be in the URL.
+  const parsedCode = getCodeFromQrData(codeParam);
+  return parsedCode ? parsedCode.toUpperCase() : codeParam.toUpperCase();
 }
 
 async function processRedemption(codeId, offer) {
@@ -107,7 +116,9 @@ async function checkCode(directCode) {
   updateUi("loading");
 
   try {
-    const response = await fetch(`/api.php?route=/api/check-code&code=${code}`);
+    const response = await fetch(
+      `/api.php?route=/api/check-code&code=${encodeURIComponent(code)}`
+    );
     if (!response.ok)
       throw new Error(`API request failed with status ${response.status}`);
     const result = await response.json();
@@ -204,32 +215,37 @@ function startScanner() {
       appState.scanner
         .stop()
         .then(() => {
-          let cleanCode;
-          try {
-            if (decodedText.toLowerCase().startsWith("http")) {
-              const url = new URL(decodedText);
-              cleanCode = url.searchParams.get("code") || decodedText;
-            } else {
-              cleanCode = decodedText;
-            }
-          } catch (e) {
-            cleanCode = decodedText;
+          const code = getCodeFromQrData(decodedText);
+
+          if (code) {
+            const cleanCode = code.trim().toUpperCase();
+            checkCode(cleanCode);
+          } else {
+            // If the QR code is not in a format we recognize, show an invalid code error.
+            displayResult(
+              "COD NECUNOSCUT",
+              "Acest cod QR nu este un voucher HaiAcolo valid.",
+              "bg-red-100 text-red-800"
+            );
           }
-          cleanCode = cleanCode.trim().toUpperCase();
-          window.history.pushState({}, "", `/verify?code=${cleanCode}`);
-          checkCode(cleanCode);
         })
         .catch((err) => {
           console.error("Error stopping scanner after success:", err);
-          checkCode(decodedText); // Process code anyway
+          // Fallback in case of error, but still try to parse
+          // The scanner was already stopped, but we can still process the code.
+          // The 'decodedText' is still available in this scope.
         });
     }
+  };
+
+  const onScanFailure = (error) => {
+    elements.qrReaderCustomError.classList.remove("hidden");
   };
 
   const config = { fps: 10, qrbox: { width: 250, height: 250 } };
   appState.scanner = new Html5Qrcode("qr-reader");
   appState.scanner
-    .start({ facingMode: "environment" }, config, onScanSuccess)
+    .start({ facingMode: "environment" }, config, onScanSuccess, onScanFailure)
     .catch((err) => {
       console.error("Unable to start QR scanner", err);
       elements.qrReader.classList.add("hidden");
@@ -239,7 +255,13 @@ function startScanner() {
     });
 }
 
-function displayResult(title, message, colorClasses, offer = null) {
+function displayResult(
+  title,
+  message,
+  colorClasses,
+  offer = null,
+  showConfirmButton = false
+) {
   const possibleColorClasses = [
     "bg-green-100",
     "text-green-800",
@@ -247,6 +269,8 @@ function displayResult(title, message, colorClasses, offer = null) {
     "text-yellow-800",
     "bg-red-100",
     "text-red-800",
+    "bg-blue-100",
+    "text-blue-800",
   ];
   elements.card.classList.remove(...possibleColorClasses);
   elements.card.classList.add(...colorClasses.split(" "));
@@ -269,6 +293,7 @@ function updateUi(newUiState) {
     elements.qrReaderError,
     elements.manualEntrySection,
     elements.cancelScanButton,
+    elements.qrReaderCustomError,
   ];
   allSections.forEach((el) => el.classList.add("hidden"));
 
