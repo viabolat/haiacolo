@@ -45,6 +45,15 @@ MESSAGE_GREETINGS = [
     "Bună! Avem o ofertă excelentă pentru tine de la HaiAcolo:",
 ]
 
+# --- WHATSAPP WEB SELECTORS ---
+# These selectors are based on the HTML structure of WhatsApp Web.
+# If the script fails to find elements, these are the first things to check and update.
+SELECTORS = {
+    "main_chat_panel": (By.ID, "pane-side"),
+    "attach_button": (By.CSS_SELECTOR, 'div[title="Attach"]'),
+    "image_video_input": (By.XPATH, '//input[@accept="image/*,video/mp4,video/3gpp,video/quicktime"]'),
+    "send_button": (By.CSS_SELECTOR, 'span[data-icon="send-light"]'),
+}
 # --- SELENIUM WEBDRIVER SETUP ---
 
 
@@ -107,31 +116,22 @@ def send_whatsapp_message(driver, phone: str, message: str, image_path: Path):
 
         # 2. Wait for the attach button and click it
         # Using a more specific selector by 'title' which is less likely to change.
-        attach_button = WebDriverWait(driver, 30).until(
-            EC.element_to_be_clickable((By.CSS_SELECTOR, 'div[title="Attach"]'))
-        )
+        attach_button = WebDriverWait(driver, 30).until(EC.element_to_be_clickable(SELECTORS["attach_button"]))
         attach_button.click()
         # Wait for the 'Photos & videos' input to be present
         WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located(
-                (
-                    By.XPATH,
-                    '//input[@accept="image/*,video/mp4,video/3gpp,video/quicktime"]',
-                )
-            )
+            EC.presence_of_element_located(SELECTORS["image_video_input"])
         )
 
         # 3. Find the 'Photos & videos' input and upload the file
         image_input = driver.find_element(
-            By.XPATH, '//input[@accept="image/*,video/mp4,video/3gpp,video/quicktime"]'
+            *SELECTORS["image_video_input"]
         )
         image_input.send_keys(str(image_path.resolve()))  # Use absolute path
 
         # 4. Wait for the send button in the image preview and click it
         send_button = WebDriverWait(driver, 20).until(
-            EC.element_to_be_clickable(
-                (By.CSS_SELECTOR, 'span[data-icon="send-light"]')
-            )
+            EC.element_to_be_clickable(SELECTORS["send_button"])
         )
         send_button.click()
         logger.info(f"🚀 Message and QR code sent to {phone}.")
@@ -182,9 +182,7 @@ def main():
     # Instead of pausing, we wait for the main chat panel to appear.
     try:
         logger.info("⏳ Waiting for WhatsApp Web to load and log in...")
-        WebDriverWait(driver, 60).until(
-            EC.presence_of_element_located((By.ID, "pane-side"))
-        )
+        WebDriverWait(driver, 60).until(EC.presence_of_element_located(SELECTORS["main_chat_panel"]))
         logger.info("✅ Login successful, proceeding with sending.")
     except TimeoutException:
         logger.error(

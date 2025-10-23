@@ -409,8 +409,8 @@
                 offer: 'offer_description'
             };
 
-            // Regex for Romanian phone number (accepts 07xx xxx xxx or 407xx xxx xxx or +407xx xxx xxx, etc. for 10 digits)
-            const phoneRegex = /^(?:\+?4?0)?(7\d{8}|[23]\d{8})$/;
+            // Stricter international phone regex to match backend. Requires '+' and country code.
+            const phoneRegex = /^\+\d{7,15}$/;
             // Simple Email Regex
             const emailRegex = /^\S+@\S+\.\S+$/;
 

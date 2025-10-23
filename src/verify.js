@@ -69,43 +69,6 @@ function getCodeFromUrl() {
   return parsedCode ? parsedCode.toUpperCase() : codeParam.toUpperCase();
 }
 
-async function processRedemption(codeId, offer) {
-  updateUi("loading"); // Show loading indicator during redemption
-
-  try {
-    const response = await fetch("/api.php?route=/api/redeem-code", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code_id: codeId }),
-    });
-    if (!response.ok)
-      throw new Error(`API request failed with status ${response.status}`);
-    const result = await response.json();
-
-    if (result.status === "SUCCESS") {
-      displayResult(
-        "REDUCERE CONFIRMATĂ!",
-        `Codul a fost validat și înregistrat.`,
-        "bg-green-100 text-green-800",
-        offer
-      );
-    } else {
-      displayResult(
-        "EROARE LA CONFIRMARE",
-        `A apărut o eroare la înregistrarea tranzacției. Status: ${result.status}`,
-        "bg-red-100 text-red-800"
-      );
-    }
-  } catch (error) {
-    console.error("Redemption failed unexpectedly:", error);
-    displayResult(
-      "EROARE DE SISTEM",
-      "A apărut o eroare de rețea sau de bază de date la confirmare. Vă rugăm să încercați din nou.",
-      "bg-red-100 text-red-800"
-    );
-  }
-}
-
 async function checkCode(directCode) {
   const code = directCode || getCodeFromUrl();
   if (!code) {
@@ -116,20 +79,25 @@ async function checkCode(directCode) {
   updateUi("loading");
 
   try {
+    // This single API call now checks and redeems the code atomically.
     const response = await fetch(
-      `/api.php?route=/api/check-code&code=${encodeURIComponent(code)}`
+      `/api.php?route=/api/process-redemption&code=${encodeURIComponent(code)}`
     );
     if (!response.ok)
       throw new Error(`API request failed with status ${response.status}`);
     const result = await response.json();
 
     switch (result.status) {
-      case "VALID":
+      case "SUCCESS":
         appState.currentCodeId = result.code_id;
         appState.currentCodeString = code;
         appState.currentOffer = result.offer;
-        // Automatically process redemption for valid codes
-        await processRedemption(appState.currentCodeId, appState.currentOffer);
+        displayResult(
+          "REDUCERE CONFIRMATĂ!",
+          `Codul a fost validat și înregistrat.`,
+          "bg-green-100 text-green-800",
+          appState.currentOffer
+        );
         break;
       case "ALREADY_USED":
         const usedDate = new Date(result.used_at).toLocaleString("ro-RO", {

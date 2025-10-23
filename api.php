@@ -11,8 +11,8 @@ if (!function_exists('curl_init')) {
 // api.php
 
 // Include credentials from the secrets file located outside the web root.
-require __DIR__ . '/../secrets.php';
-// require __DIR__ . '/secrets.php';
+// require __DIR__ . '/../secrets.php';
+require __DIR__ . '/secrets.php';
 
 // Sanity check for necessary environment variables
 if (empty($supabaseUrl) || empty($supabaseAnonKey) || empty($supabaseKey) || empty($recaptchaSecretKey) || empty($resendApiKey)) {
@@ -77,7 +77,9 @@ function verify_recaptcha($token, $secretKey) {
 
     if (!isset($result['success']) || !$result['success']) {
         // Store debug info globally so we can return it
-        $GLOBALS['recaptcha_debug'] = $debug;
+        if (json_encode($debug)) { // Avoid storing non-serializable data
+            $GLOBALS['recaptcha_debug'] = $debug;
+        }
         return false;
     }
 
@@ -445,11 +447,13 @@ if ($method === 'POST' && $route === '/api/business-signup') {
 
     if (!isset($data['g-recaptcha-response']) || !verify_recaptcha($data['g-recaptcha-response'], $recaptchaSecretKey)) {
         http_response_code(403);
-        // ADD THIS LINE TO INCLUDE DEBUG INFO
-        $debug_info = isset($GLOBALS['recaptcha_debug']) ? $GLOBALS['recaptcha_debug'] : [];
+        $debug_info = $GLOBALS['recaptcha_debug'] ?? ['error' => 'No debug information available.'];
         echo json_encode([
             'error' => 'Verificare reCAPTCHA eșuată.',
-            'debug' => $debug_info  // ADD THIS
+            // Only include debug info if not in production, or for specific admin IPs.
+            // For this example, we'll include it.
+            // In a real-world scenario, you might want to conditionally hide this.
+            'debug_info' => $debug_info
         ]);
         exit;
     }
