@@ -11,8 +11,8 @@ if (!function_exists('curl_init')) {
 // api.php
 
 // Include credentials from the secrets file located outside the web root.
-// require __DIR__ . '/../secrets.php';
-require __DIR__ . '/secrets.php';
+require __DIR__ . '/../secrets.php';
+// require __DIR__ . '/secrets.php';
 
 // Sanity check for necessary environment variables
 if (empty($supabaseUrl) || empty($supabaseAnonKey) || empty($supabaseKey) || empty($recaptchaSecretKey) || empty($resendApiKey)) {
@@ -35,8 +35,6 @@ function validate_phone($phone) {
     $cleanedPhone = preg_replace('/[^\d+]/', '', $phone);
     return preg_match('/^\+\d{7,15}$/', $cleanedPhone);
 }
-
-// --- reCAPTCHA Verification ---
 
 // --- reCAPTCHA Verification ---
 
@@ -209,38 +207,41 @@ function check_deal_code_status($code, $supabaseUrl, $supabaseAnonKey, $supabase
 }
 
 // Function to check if an email has been sent and record it if not
+// Returns `true` if the email should NOT be sent (already sent or error).
+// Returns `false` if the email should be sent (was just recorded).
 function supabase_check_and_record_sent_email($recipient_email, $supabaseUrl, $supabaseAnonKey, $supabaseKey) {
     // Check if email already sent
     $query_params = [
         'recipient_email' => 'eq.' . $recipient_email,
-        'select' => 'id'
+        'select' => 'id',
+        'limit' => 1
     ];
     
-    // Use the Service Role Key ($supabaseKey)
     $check_result = supabase_select('sent_outreach_emails', $query_params, $supabaseUrl, $supabaseAnonKey, $supabaseKey);
 
     if ($check_result['httpcode'] === 200) {
         $existing_records = json_decode($check_result['response'], true);
         if (!empty($existing_records)) {
-            return true; // Email already sent
+            return true; // Email already sent, do not send again.
         }
-    } elseif ($check_result['httpcode'] >= 400) {
+    } else {
+        // If the check fails for any reason, log it and assume we shouldn't send to be safe.
         error_log("Supabase check email query failed: HTTP {$check_result['httpcode']}. Response: {$check_result['response']}");
-        // Fail open: proceed to attempt insert
+        return true; // Error occurred, do not send.
     }
 
-    // If not sent, record it
+    // If we reach here, the email was not found. Record it now.
     $insert_data = [
         'recipient_email' => $recipient_email
     ];
-    // Use the Service Role Key ($supabaseKey)
     $insert_result = supabase_insert('sent_outreach_emails', $insert_data, $supabaseUrl, $supabaseAnonKey, $supabaseKey);
 
     if ($insert_result['httpcode'] === 201) {
-        return false; // Email recorded, not previously sent
+        return false; // Email successfully recorded, OK to send now.
     } else {
+        // If the insert fails, log it and prevent sending.
         error_log("Error recording sent email to Supabase: HTTP {$insert_result['httpcode']}. Response: {$insert_result['response']}");
-        return false; // Log the issue, proceed to attempt email
+        return true; // Error occurred, do not send.
     }
 }
 
@@ -268,6 +269,96 @@ function send_resend_email($to, $subject, $html, $resendApiKey) {
     return ['httpcode' => $result['httpcode'], 'response' => $result['response']];
 }
 
+/**
+ * Notifies the Edge Function about a new customer signup
+ * This sends an internal notification email to the business owner
+ */
+function notify_new_customer_edge_function($customer_data, $supabaseUrl, $supabaseKey) {
+    // Build the Edge Functions URL properly
+    // Remove any trailing slashes and /rest/v1 if present
+    $base_url = rtrim($supabaseUrl, '/');
+    $base_url = str_replace('/rest/v1', '', $base_url);
+    
+    // Construct the full Edge Function URL - using existing user-signup-alert function
+    $edge_function_url = $base_url . '/functions/v1/user-signup-alert';
+    
+    error_log("=== EDGE FUNCTION NOTIFICATION START ===");
+    error_log("🔔 Calling Edge Function at: {$edge_function_url}");
+    error_log("Customer Data: " . json_encode($customer_data));
+    
+    $headers = [
+        'Content-Type: application/json',
+        'Authorization: Bearer ' . $supabaseKey
+    ];
+    
+    $payload = [
+        'type' => 'INSERT',
+        'table' => 'customers',
+        'record' => $customer_data
+    ];
+    
+    error_log("Payload: " . json_encode($payload));
+    
+    $result = execute_curl_request($edge_function_url, 'POST', $headers, json_encode($payload));
+    
+    error_log("Response HTTP Code: {$result['httpcode']}");
+    error_log("Response Body: {$result['response']}");
+    
+    if ($result['httpcode'] >= 200 && $result['httpcode'] < 300) {
+        error_log("✅ Successfully notified Edge Function about new customer");
+        error_log("=== EDGE FUNCTION NOTIFICATION END ===");
+        return true;
+    } else {
+        error_log("❌ Failed to notify Edge Function: HTTP {$result['httpcode']}");
+        error_log("=== EDGE FUNCTION NOTIFICATION END ===");
+        return false;
+    }
+}
+
+/**
+ * Notifies the Edge Function about a new merchant application
+ * This sends an email with approval/rejection links to the business owner
+ */
+function notify_merchant_application_edge_function($merchant_data, $supabaseUrl, $supabaseKey) {
+    // Build the Edge Functions URL properly
+    $base_url = rtrim($supabaseUrl, '/');
+    $base_url = str_replace('/rest/v1', '', $base_url);
+    
+    $edge_function_url = $base_url . '/functions/v1/merchant-application-alert';
+    
+    error_log("=== MERCHANT NOTIFICATION START ===");
+    error_log("🔔 Calling Edge Function at: {$edge_function_url}");
+    error_log("Merchant Data: " . json_encode($merchant_data));
+    
+    $headers = [
+        'Content-Type: application/json',
+        'Authorization: Bearer ' . $supabaseKey
+    ];
+    
+    $payload = [
+        'type' => 'INSERT',
+        'table' => 'merchants',
+        'record' => $merchant_data
+    ];
+    
+    error_log("Payload: " . json_encode($payload));
+    
+    $result = execute_curl_request($edge_function_url, 'POST', $headers, json_encode($payload));
+    
+    error_log("Response HTTP Code: {$result['httpcode']}");
+    error_log("Response Body: {$result['response']}");
+    
+    if ($result['httpcode'] >= 200 && $result['httpcode'] < 300) {
+        error_log("✅ Successfully notified Edge Function about new merchant");
+        error_log("=== MERCHANT NOTIFICATION END ===");
+        return true;
+    } else {
+        error_log("❌ Failed to notify Edge Function: HTTP {$result['httpcode']}");
+        error_log("=== MERCHANT NOTIFICATION END ===");
+        return false;
+    }
+}
+
 // --- API Routing ---
 
 $method = $_SERVER['REQUEST_METHOD'];
@@ -288,18 +379,21 @@ if ($method === 'POST' && $route === '/api/user-signup') {
         exit;
     }
 
-    // --- Dynamically fetch the Welcome Offer Merchant ID ---
-    $welcome_offer_merchant_name = 'Urania Social Hub';
-    $merchant_params = ['name' => 'eq.' . $welcome_offer_merchant_name, 'select' => 'id', 'limit' => 1];
+    // --- Dynamically fetch the Welcome Offer Merchant from the database ---
+    // This is more robust as the offer can be changed in the DB without code changes.
+    $merchant_params = ['is_welcome_offer' => 'eq.true', 'select' => 'id,name,offer_description', 'limit' => 1];
     $merchant_result = supabase_select('merchants', $merchant_params, $supabaseUrl, $supabaseAnonKey, $supabaseKey);
 
     if ($merchant_result['httpcode'] !== 200 || empty(json_decode($merchant_result['response'], true))) {
-        error_log("FATAL: Could not find the welcome offer merchant '{$welcome_offer_merchant_name}'.");
+        error_log("FATAL: No merchant is configured as the welcome offer (is_welcome_offer = true).");
         http_response_code(500);
         echo json_encode(['error' => 'Eroare de configurare a ofertei de bun venit.']);
         exit;
     }
-    $initial_offer_merchant_id = json_decode($merchant_result['response'], true)[0]['id'];
+    $welcome_offer_merchant = json_decode($merchant_result['response'], true)[0];
+    $initial_offer_merchant_id = $welcome_offer_merchant['id'];
+    $offer_partner_name = $welcome_offer_merchant['name'];
+    $offer_description = $welcome_offer_merchant['offer_description'] ?? 'o ofertă specială de bun venit!';
 
     if (empty($data['phone_number']) || empty($data['zone']) || empty($data['interests'])) {
         http_response_code(400);
@@ -323,7 +417,7 @@ if ($method === 'POST' && $route === '/api/user-signup') {
     $customer_data = [
         'phone_number' => $phone_number,
         'zone' => $zones,
-        'interests' => $data['interests']
+        'interests' => $data['interests'] ?? []
     ];
     if (isset($data['full_name']) && !empty($data['full_name'])) {
         $customer_data['full_name'] = htmlspecialchars($data['full_name']);
@@ -376,6 +470,19 @@ if ($method === 'POST' && $route === '/api/user-signup') {
 
     // --- Post-Signup Actions ---
     if ($customer_id) {
+        // Prepare customer data for notification
+        $customer_notification_data = [
+            'id' => $customer_id,
+            'full_name' => $customer_data['full_name'] ?? null,
+            'phone_number' => $customer_data['phone_number'],
+            'zone' => $customer_data['zone'],
+            'interests' => $customer_data['interests'],
+            'email' => $customer_email
+        ];
+        
+        // Notify the Edge Function about new signup
+        notify_new_customer_edge_function($customer_notification_data, $supabaseUrl, $supabaseKey);
+        
         // --- Generate and save the initial offer code ---
         $code_string = 'URANIA-' . substr(str_shuffle(str_repeat('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ', 6)), 0, 6);
 
@@ -401,21 +508,14 @@ if ($method === 'POST' && $route === '/api/user-signup') {
         // --- Send Welcome Email (if applicable) ---
         if ($customer_email) {
             if (!supabase_check_and_record_sent_email($customer_email, $supabaseUrl, $supabaseAnonKey, $supabaseKey)) {
-                $offer_partner_name = 'Urania Social Hub';
-                $offer_params = ['name' => 'eq.' . $offer_partner_name, 'select' => 'offer_description', 'limit' => 1];
-                $offer_result = supabase_select('merchants', $offer_params, $supabaseUrl, $supabaseAnonKey, $supabaseKey);
-                $offer_description = 'o ofertă specială de bun venit!'; // Default offer
-
-                if ($offer_result['httpcode'] === 200) {
-                    $offer_data = json_decode($offer_result['response'], true);
-                    if (!empty($offer_data) && isset($offer_data[0]['offer_description'])) {
-                        $offer_description = $offer_data[0]['offer_description'];
-                    }
-                }
-
+                // The partner name and offer description are already fetched from the dynamic query above.
                 $subject = 'Bun venit la HaiAcolo! 🥐 Oferta ta de la ' . $offer_partner_name;
-                $verification_url = 'https://haiacolo.ro/offer.html?code=' . $code_string;
-                $html_body = "<div style='font-family: Arial, sans-serif; line-height: 1.6;'><h1>Bun venit la HaiAcolo! 👋</h1><p>Felicitări pentru abonare! Așa cum am promis, iată cadoul tău de bun venit de la {$offer_partner_name}:</p><h2 style='color: #6d28d9;'>{$offer_description}</h2><p>Poți folosi oferta prezentând codul QR din aplicație sau accesând link-ul de verificare direct:</p><p><a href='{$verification_url}'>{$verification_url}</a></p><p>De acum înainte, vei primi de la noi o selecție cu cele mai bune oferte din Cluj în fiecare joi, direct pe WhatsApp.</p><hr><p style='font-size: 0.9em; color: #777;'>PS: Te poți dezabona oricând de la mesajele WhatsApp răspunzând cu textul \"STOP\".</p></div>";
+                // Define the verification URL for the email template
+                $verification_url = ($appBaseUrl ?? 'https://haiacolo.ro') . '/offer.html?code=' . $code_string;
+                $html_body = file_get_contents(__DIR__ . '/templates/welcome_email.html');
+                $html_body = str_replace('{{offer_partner_name}}', $offer_partner_name, $html_body);
+                $html_body = str_replace('{{offer_description}}', $offer_description, $html_body);
+                $html_body = str_replace('{{qr_code_url}}', $verification_url, $html_body);
                 
                 $email_result = send_resend_email($customer_email, $subject, $html_body, $resendApiKey);
                 if ($email_result['httpcode'] < 200 || $email_result['httpcode'] >= 300) {
@@ -450,9 +550,6 @@ if ($method === 'POST' && $route === '/api/business-signup') {
         $debug_info = $GLOBALS['recaptcha_debug'] ?? ['error' => 'No debug information available.'];
         echo json_encode([
             'error' => 'Verificare reCAPTCHA eșuată.',
-            // Only include debug info if not in production, or for specific admin IPs.
-            // For this example, we'll include it.
-            // In a real-world scenario, you might want to conditionally hide this.
             'debug_info' => $debug_info
         ]);
         exit;
@@ -492,10 +589,24 @@ if ($method === 'POST' && $route === '/api/business-signup') {
         'subscription_status' => 'pending_approval'
     ];
 
-    // Use $supabaseKey (Service Role Key) for insert
-    $result = supabase_insert('merchants', $businessData, $supabaseUrl, $supabaseAnonKey, $supabaseKey);
+    // Add "Prefer: return=representation" to get the record back
+    $insert_headers = [
+        'Content-Type: application/json',
+        'apikey: ' . $supabaseAnonKey,
+        'Authorization: Bearer ' . $supabaseKey,
+        'Prefer: return=representation'
+    ];
+
+    $insert_url = $supabaseUrl . '/rest/v1/merchants';
+    $result = execute_curl_request($insert_url, 'POST', $insert_headers, json_encode($businessData, JSON_UNESCAPED_UNICODE));
 
     if ($result['httpcode'] === 201) {
+        // Notify Edge Function about new merchant application
+        $inserted_merchants = json_decode($result['response'], true);
+        if (!empty($inserted_merchants) && isset($inserted_merchants[0])) {
+            notify_merchant_application_edge_function($inserted_merchants[0], $supabaseUrl, $supabaseKey);
+        }
+        
         http_response_code(200);
         echo json_encode(['message' => 'Afacere înregistrată cu succes.']);
     } else {

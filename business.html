@@ -238,14 +238,27 @@
                         </div>
 
                         <div class="relative">
-                            <label for="contact_phone" class="block text-sm font-medium text-gray-700">Număr de Telefon
-                                Contact <span class="text-red-500">*</span></label>
-                            <input type="tel" id="contact_phone" name="contact_phone" required
-                                class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500"
-                                placeholder="Ex: 07xx xxx xxx">
+                            <label for="contact_phone_local" class="block text-sm font-medium text-gray-700">Număr de
+                                Telefon Contact <span class="text-red-500" aria-label="obligatoriu">*</span></label>
+                            <div class="flex mt-1">
+                                <select id="phone_country_code" name="phone_country_code"
+                                    class="border border-gray-300 rounded-l-md shadow-sm focus:ring-primary-500 focus:border-primary-500 bg-gray-50 text-gray-700 px-2">
+                                    <option value="+40" data-length="9" selected>+40 (RO)</option>
+                                    <option value="+1" data-length="10">+1 (US)</option>
+                                    <option value="+44" data-length="10">+44 (UK)</option>
+                                    <option value="+49" data-length="10-11">+49 (DE)</option>
+                                    <option value="+33" data-length="9">+33 (FR)</option>
+                                    <option value="+39" data-length="9-10">+39 (IT)</option>
+                                    <option value="+34" data-length="9">+34 (ES)</option>
+                                </select>
+                                <input type="tel" id="contact_phone_local" name="contact_phone_local" required
+                                    class="w-full px-3 py-2 border-t border-b border-r border-gray-300 rounded-r-md shadow-sm focus:ring-primary-500 focus:border-primary-500"
+                                    autocomplete="tel-local" placeholder="712 345 678">
+                            </div>
+                            <input type="hidden" id="contact_phone" name="contact_phone">
                             <span id="contact_phone-validation-icon"
-                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-xl leading-5 pointer-events-none"
-                                style="height: 100%; top: 0;">
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+                                style="top: 2.25rem;" aria-live="polite">
                             </span>
                         </div>
 
@@ -400,10 +413,10 @@
             // Define field IDs
             const fieldIds = {
                 name: 'business_name',
-                contact: 'contact_person',
+                person: 'contact_person',
                 email: 'contact_email',
-                phone: 'contact_phone',
-                type: 'business_type',
+                phone: 'contact_phone_local', // Use local part for validation
+                type: 'business_type', // Corrected from 'type'
                 location: 'business_location',
                 address: 'business_address',
                 offer: 'offer_description'
@@ -417,10 +430,10 @@
             // Define all required fields and their specific validation logic
             const fields = [
                 { id: fieldIds.name, validation: (val) => val.length > 2 },
-                { id: fieldIds.contact, validation: (val) => val.length > 2 },
+                { id: fieldIds.person, validation: (val) => val.length > 2 },
                 { id: fieldIds.email, validation: (val) => emailRegex.test(val) },
-                { id: fieldIds.phone, validation: (val) => phoneRegex.test(val) },
-                { id: fieldIds.type, validation: (val) => val.length > 0 }, // Check if an option is selected
+                // Phone is handled separately in validateForm
+                { id: fieldIds.type, validation: (val) => val.length > 0 },
                 { id: fieldIds.location, validation: (val) => val.length > 0 }, // Check if an option is selected
                 { id: fieldIds.address, validation: (val) => val.length > 5 },
                 { id: fieldIds.offer, validation: (val) => val.length > 4 }
@@ -458,11 +471,54 @@
                 }
             }
 
+            function sanitizePhoneNumber() {
+                const localInput = document.getElementById('contact_phone_local');
+                localInput.value = localInput.value.replace(/[^\d]/g, '');
+
+                const countryCodeSelect = document.getElementById('phone_country_code');
+                const selectedOption = countryCodeSelect.options[countryCodeSelect.selectedIndex];
+                const expectedLength = selectedOption.getAttribute('data-length');
+                if (expectedLength.includes('-')) {
+                    const [, max] = expectedLength.split('-').map(Number);
+                    if (localInput.value.length > max) {
+                        localInput.value = localInput.value.slice(0, max);
+                    }
+                } else {
+                    const maxLength = parseInt(expectedLength, 10);
+                    if (localInput.value.length > maxLength) {
+                        localInput.value = localInput.value.slice(0, maxLength);
+                    }
+                }
+            }
+
             /**
              * Checks all fields, updates icons, and controls the submit button state.
              */
             function validateForm() {
                 let allValid = true;
+
+                // Handle phone number separately to build the full number
+                sanitizePhoneNumber();
+                const countryCodeSelect = document.getElementById('phone_country_code');
+                const localPhoneInput = document.getElementById('contact_phone_local');
+                const fullPhoneInput = document.getElementById('contact_phone');
+                const selectedOption = countryCodeSelect.options[countryCodeSelect.selectedIndex];
+                const expectedLength = selectedOption.getAttribute('data-length');
+                const localNumber = localPhoneInput.value;
+                let isPhoneValid = false;
+                if (expectedLength.includes('-')) {
+                    const [min, max] = expectedLength.split('-').map(Number);
+                    isPhoneValid = localNumber.length >= min && localNumber.length <= max;
+                } else {
+                    isPhoneValid = localNumber.length === parseInt(expectedLength, 10);
+                }
+                fullPhoneInput.value = isPhoneValid ? countryCodeSelect.value + localNumber : '';
+
+                // Explicitly handle phone validation and icon rendering
+                renderIcon(isPhoneValid, 'contact_phone_local');
+                if (!isPhoneValid) {
+                    allValid = false;
+                }
 
                 fields.forEach(field => {
                     const inputElement = document.getElementById(field.id);
@@ -489,10 +545,13 @@
                 const inputElement = document.getElementById(field.id);
                 if (inputElement) {
                     // Use 'input' for text/tel, 'change' for select/textarea
-                    const eventType = (inputElement.tagName === 'SELECT' || inputElement.tagName === 'TEXTAREA') ? 'change' : 'input';
+                    const eventType = (inputElement.tagName === 'SELECT' || inputElement.tagName === 'TEXTAREA') ? 'change' : 'input'; // 'input' for tel
                     inputElement.addEventListener(eventType, validateForm);
                 }
             });
+
+            document.getElementById('phone_country_code').addEventListener('change', validateForm);
+            document.getElementById('contact_phone_local').addEventListener('input', validateForm);
 
             // Run initial validation on page load to set button state and mandatory message visibility
             validateForm();
@@ -545,7 +604,7 @@
                     business_name: toTitleCase(formData.get('business_name').trim()),
                     contact_person: formData.get('contact_person').trim(),
                     contact_email: formData.get('contact_email').trim(),
-                    contact_phone: formData.get('contact_phone').trim(),
+                    contact_phone: document.getElementById('contact_phone').value, // Use the hidden combined field
                     business_type: formData.get('business_type'),
                     business_location: formData.get('business_location'),
                     business_address: formData.get('business_address').trim(),
