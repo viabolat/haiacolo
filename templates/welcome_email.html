@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bun venit la HaiAcolo!</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .header {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .header img {
+            max-width: 150px;
+        }
+
+        .content {
+            padding: 20px 0;
+        }
+
+        .offer {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .button-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .button {
+            background-color: #007bff;
+            color: #ffffff;
+            padding: 12px 25px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="https://haiacolo.ro/public/logo.png" alt="HaiAcolo Logo">
+            <h1>Bun venit la HaiAcolo!</h1>
+        </div>
+        <div class="content">
+            <p>Salut,</p>
+            <p>Îți mulțumim că te-ai alăturat comunității HaiAcolo! Pentru a sărbători, ți-am pregătit o ofertă specială
+                de la partenerul nostru, <strong>{{offer_partner_name}}</strong>.</p>
+            <div class="offer">
+                <p><strong>Oferta ta de bun venit:</strong></p>
+                <p>{{offer_description}}</p>
+            </div>
+            <p>Pentru a revendica oferta, pur și simplu prezintă codul tău la locație. Poți accesa codul oricând prin
+                linkul de mai jos:</p>
+            <div class="button-container"><a href="{{qr_code_url}}" class="button">Vezi Codul Ofertei</a></div>
+        </div>
+        <div class="footer">
+            <p>&copy; 2025 HaiAcolo. Toate drepturile rezervate.</p>
+        </div>
+    </div>
+</body>
+
+</html>

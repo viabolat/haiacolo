@@ -1,0 +1,36 @@
+-- Insert a sample merchant to act as the welcome offer
+INSERT INTO public.merchants (
+    name,
+    location,
+    owner_contact,
+    subscription_status,
+    contact_email,
+    contact_phone,
+    business_type,
+    business_description,
+    offer_description,
+    is_loyalty_program_eligible,
+    is_founding_member,
+    address,
+    is_welcome_offer,
+    category,
+    logo_url,
+    website_url
+) VALUES (
+    'Sample Welcome Merchant',
+    'Cluj-Napoca',
+    'John Doe',
+    'active',
+    'john.doe@example.com',
+    '+40712345678',
+    'Restaurant',
+    'A delightful restaurant offering a special welcome deal.',
+    '20% off your first order!',
+    TRUE,
+    FALSE,
+    'Strada Exemplu, Nr. 10',
+    TRUE,
+    'Food',
+    'https://example.com/logo.png',
+    'https://example.com'
+);
