@@ -288,18 +288,21 @@ if ($method === 'POST' && $route === '/api/user-signup') {
         exit;
     }
 
-    // --- Dynamically fetch the Welcome Offer Merchant ID ---
-    $welcome_offer_merchant_name = 'Urania Social Hub';
-    $merchant_params = ['name' => 'eq.' . $welcome_offer_merchant_name, 'select' => 'id', 'limit' => 1];
+    // --- Dynamically fetch the Welcome Offer Merchant from the database ---
+    // This is more robust as the offer can be changed in the DB without code changes.
+    $merchant_params = ['is_welcome_offer' => 'eq.true', 'select' => 'id,name,offer_description', 'limit' => 1];
     $merchant_result = supabase_select('merchants', $merchant_params, $supabaseUrl, $supabaseAnonKey, $supabaseKey);
 
     if ($merchant_result['httpcode'] !== 200 || empty(json_decode($merchant_result['response'], true))) {
-        error_log("FATAL: Could not find the welcome offer merchant '{$welcome_offer_merchant_name}'.");
+        error_log("FATAL: No merchant is configured as the welcome offer (is_welcome_offer = true).");
         http_response_code(500);
         echo json_encode(['error' => 'Eroare de configurare a ofertei de bun venit.']);
         exit;
     }
-    $initial_offer_merchant_id = json_decode($merchant_result['response'], true)[0]['id'];
+    $welcome_offer_merchant = json_decode($merchant_result['response'], true)[0];
+    $initial_offer_merchant_id = $welcome_offer_merchant['id'];
+    $offer_partner_name = $welcome_offer_merchant['name'];
+    $offer_description = $welcome_offer_merchant['offer_description'] ?? 'o ofertă specială de bun venit!';
 
     if (empty($data['phone_number']) || empty($data['zone']) || empty($data['interests'])) {
         http_response_code(400);
@@ -401,21 +404,13 @@ if ($method === 'POST' && $route === '/api/user-signup') {
         // --- Send Welcome Email (if applicable) ---
         if ($customer_email) {
             if (!supabase_check_and_record_sent_email($customer_email, $supabaseUrl, $supabaseAnonKey, $supabaseKey)) {
-                $offer_partner_name = 'Urania Social Hub';
-                $offer_params = ['name' => 'eq.' . $offer_partner_name, 'select' => 'offer_description', 'limit' => 1];
-                $offer_result = supabase_select('merchants', $offer_params, $supabaseUrl, $supabaseAnonKey, $supabaseKey);
-                $offer_description = 'o ofertă specială de bun venit!'; // Default offer
-
-                if ($offer_result['httpcode'] === 200) {
-                    $offer_data = json_decode($offer_result['response'], true);
-                    if (!empty($offer_data) && isset($offer_data[0]['offer_description'])) {
-                        $offer_description = $offer_data[0]['offer_description'];
-                    }
-                }
-
+                // The partner name and offer description are already fetched from the dynamic query above.
                 $subject = 'Bun venit la HaiAcolo! 🥐 Oferta ta de la ' . $offer_partner_name;
-                $verification_url = 'https://haiacolo.ro/offer.html?code=' . $code_string;
-                $html_body = "<div style='font-family: Arial, sans-serif; line-height: 1.6;'><h1>Bun venit la HaiAcolo! 👋</h1><p>Felicitări pentru abonare! Așa cum am promis, iată cadoul tău de bun venit de la {$offer_partner_name}:</p><h2 style='color: #6d28d9;'>{$offer_description}</h2><p>Poți folosi oferta prezentând codul QR din aplicație sau accesând link-ul de verificare direct:</p><p><a href='{$verification_url}'>{$verification_url}</a></p><p>De acum înainte, vei primi de la noi o selecție cu cele mai bune oferte din Cluj în fiecare joi, direct pe WhatsApp.</p><hr><p style='font-size: 0.9em; color: #777;'>PS: Te poți dezabona oricând de la mesajele WhatsApp răspunzând cu textul \"STOP\".</p></div>";
+                $verification_url = ($appBaseUrl ?? 'https://haiacolo.ro') . '/offer.html?code=' . $code_string;
+                $html_body = file_get_contents(__DIR__ . '/templates/welcome_email.html');
+                $html_body = str_replace('{{offer_partner_name}}', $offer_partner_name, $html_body);
+                $html_body = str_replace('{{offer_description}}', $offer_description, $html_body);
+                $html_body = str_replace('{{verification_url}}', $verification_url, $html_body);
                 
                 $email_result = send_resend_email($customer_email, $subject, $html_body, $resendApiKey);
                 if ($email_result['httpcode'] < 200 || $email_result['httpcode'] >= 300) {
