@@ -1,89 +1,76 @@
-const merchantList = document.getElementById("merchant-list");
-const loadingState = document.getElementById("loading-state");
+document.addEventListener("DOMContentLoaded", () => {
+    const merchantList = document.getElementById("merchant-list");
+    const loadingState = document.getElementById("loading-state");
 
-async function fetchMerchants() {
-  loadingState.style.display = "block"; // Show loading message
-  merchantList.innerHTML = ""; // Clear previous content
+    /**
+     * Creates an HTML card for a single merchant.
+     * @param {object} merchant - The merchant data from the API.
+     * @returns {string} - The HTML string for the merchant card.
+     */
+    function createMerchantCard(merchant) {
+        const isFoundingMember = merchant.is_founding_member;
+        const location = merchant.location || 'N/A';
+        const offer = merchant.offer_description || 'Ofertă specială în curând!';
 
-  try {
-    const response = await fetch("/api.php?route=/api/merchants");
-    const { data: merchants, error } = await response.json();
-
-    loadingState.style.display = "none"; // Hide loading message
-
-    if (error) {
-      console.error("Error fetching merchants:", error);
-      merchantList.innerHTML =
-        '<p class="text-red-500">A apărut o eroare la încărcarea afacerilor. Te rugăm să încerci din nou mai târziu.</p>';
-      return;
+        return `
+            <div class="bg-white rounded-lg shadow-md overflow-hidden transform hover:-translate-y-1 transition-transform duration-300 border ${isFoundingMember ? 'border-primary-500' : 'border-gray-200'}">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold text-gray-800">${merchant.name}</h3>
+                        ${isFoundingMember ? '<span class="bg-yellow-200 text-yellow-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">Membru Fondator</span>' : ''}
+                    </div>
+                    <p class="text-gray-600 mb-2 flex items-center">
+                        <i class="fas fa-tag fa-fw mr-2 text-secondary-500"></i>
+                        <span>${merchant.business_type || 'Afacere Locală'}</span>
+                    </p>
+                    <p class="text-gray-600 mb-4 flex items-center">
+                        <i class="fas fa-map-marker-alt fa-fw mr-2 text-secondary-500"></i>
+                        <span>Zona <strong>${location}</strong></span>
+                    </p>
+                    <div class="bg-gray-100 p-3 rounded-md">
+                        <p class="text-sm font-semibold text-gray-700">Ofertă curentă sau viitoare:</p>
+                        <p class="text-secondary-700 font-medium">${offer}</p>
+                    </div>
+                </div>
+            </div>
+        `;
     }
 
-    if (merchants.length === 0) {
-      merchantList.innerHTML =
-        "<p>Momentan nu sunt afaceri active înscrise.</p>";
-      return;
+    /**
+     * Fetches merchants from the API and renders them on the page.
+     */
+    async function fetchAndRenderMerchants() {
+        try {
+            const response = await fetch('/api.php?route=/api/merchants');
+            if (!response.ok) {
+                throw new Error(`API request failed with status ${response.status}`);
+            }
+            const merchants = await response.json();
+
+            loadingState.style.display = 'none';
+
+            if (merchants && merchants.length > 0) {
+                merchantList.innerHTML = merchants.map(createMerchantCard).join('');
+            } else {
+                merchantList.innerHTML = `
+                    <div class="md:col-span-2 lg:col-span-3 text-center py-10">
+                        <p class="text-lg text-gray-600">Nu există parteneri activi în acest moment. Reveniți în curând!</p>
+                    </div>
+                `;
+            }
+
+        } catch (error) {
+            console.error("Failed to fetch merchants:", error);
+            loadingState.style.display = 'none';
+            merchantList.innerHTML = `
+                <div class="md:col-span-2 lg:col-span-3 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md">
+                    <p class="font-bold">Eroare la încărcarea datelor</p>
+                    <p>Nu am putut prelua lista de parteneri. Vă rugăm să încercați din nou mai târziu.</p>
+                </div>
+            `;
+        }
     }
 
-    merchants.forEach((merchant) => {
-      const card = document.createElement("div");
-      card.className =
-        "relative bg-white rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-transform duration-300 ease-in-out";
-
-      if (merchant.is_founding_member) {
-        const badge = document.createElement('div');
-        badge.className = 'absolute top-2 right-2 bg-yellow-400 text-yellow-900 px-2 py-1 text-xs font-bold rounded-full flex items-center space-x-1';
-        badge.innerHTML = '<i class="fas fa-star text-yellow-700"></i> <span>Membru Fondator</span>';
-        card.appendChild(badge);
-      }
-
-      const contentDiv = document.createElement('div');
-      contentDiv.className = "pt-10 px-6 pb-6";
-
-      const nameH3 = document.createElement('h3');
-      nameH3.className = "font-bold text-2xl mb-2 text-primary-700";
-      nameH3.textContent = merchant.name;
-
-      const businessTypeDiv = document.createElement('div');
-      businessTypeDiv.className = "text-md text-gray-700 mb-2";
-      const businessTypeSpan = document.createElement('span');
-      businessTypeSpan.className = 'font-semibold';
-      businessTypeSpan.textContent = 'Tip: ';
-      businessTypeDiv.appendChild(businessTypeSpan);
-      businessTypeDiv.appendChild(document.createTextNode(merchant.business_type));
-
-      const locationDiv = document.createElement('div');
-      locationDiv.className = "text-md text-gray-700 mb-4";
-      const locationSpan = document.createElement('span');
-      locationSpan.className = 'font-semibold';
-      locationSpan.textContent = 'Locație: ';
-      locationDiv.appendChild(locationSpan);
-      locationDiv.appendChild(document.createTextNode(merchant.location));
-
-      const offerDiv = document.createElement('div');
-      offerDiv.className = "bg-primary-50 p-4 rounded-lg mt-4 border-l-4 border-primary-500";
-      const offerTitleP = document.createElement('p');
-      offerTitleP.className = "font-semibold text-primary-800";
-      offerTitleP.textContent = 'Ofertă Specială:';
-      offerDiv.appendChild(offerTitleP);
-      const offerP = document.createElement('p');
-      offerP.className = "text-primary-900";
-      offerP.textContent = merchant.offer_description;
-      offerDiv.appendChild(offerP);
-
-      contentDiv.appendChild(nameH3);
-      contentDiv.appendChild(businessTypeDiv);
-      contentDiv.appendChild(locationDiv);
-      contentDiv.appendChild(offerDiv);
-
-      card.appendChild(contentDiv);
-      merchantList.appendChild(card);
-    });
-  } catch (err) {
-    console.error("Network or parsing error:", err);
-    loadingState.style.display = "none";
-    merchantList.innerHTML =
-      '<p class="text-red-500">A apărut o eroare de rețea. Te rugăm să verifici conexiunea și să încerci din nou.</p>';
-  }
-}
-
-document.addEventListener("DOMContentLoaded", fetchMerchants);
+    // Initial fetch
+    fetchAndRenderMerchants();
+});

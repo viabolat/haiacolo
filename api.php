@@ -274,10 +274,10 @@ function send_resend_email($to, $subject, $html, $resendApiKey) {
  * This sends an internal notification email to the business owner
  */
 function notify_new_customer_edge_function($customer_data, $supabaseUrl, $supabaseKey) {
-    // Build the Edge Functions URL properly
-    // Remove any trailing slashes and /rest/v1 if present
+    // Build the Edge Functions URL properly.
+    // The base URL for functions is different from the REST API URL.
     $base_url = rtrim($supabaseUrl, '/');
-    $base_url = str_replace('/rest/v1', '', $base_url);
+    $base_url = str_replace('/rest/v1', '', $base_url); // Remove /rest/v1 part
     
     // Construct the full Edge Function URL - using existing user-signup-alert function
     $edge_function_url = $base_url . '/functions/v1/user-signup-alert';
@@ -322,7 +322,7 @@ function notify_new_customer_edge_function($customer_data, $supabaseUrl, $supaba
 function notify_merchant_application_edge_function($merchant_data, $supabaseUrl, $supabaseAnonKey) {
     // Build the Edge Functions URL properly
     $base_url = rtrim($supabaseUrl, '/');
-    $base_url = str_replace('/rest/v1', '', $base_url);
+    $base_url = str_replace('/rest/v1', '', $base_url); // Remove /rest/v1 part
     
     $edge_function_url = $base_url . '/functions/v1/merchant-application-alert';
     
@@ -426,43 +426,31 @@ if ($method === 'POST' && $route === '/api/user-signup') {
         $customer_data['email'] = $customer_email;
     }
 
-    // --- Upsert Logic with returned customer ID ---
+    // --- Upsert customer data and get their ID back ---
     $customer_id = null;
-    
-    // Add "Prefer: return=representation" to get the record back
     $upsert_headers = [
         'Content-Type: application/json',
         'apikey: ' . $supabaseAnonKey,
         'Authorization: Bearer ' . $supabaseKey,
-        'Prefer: return=representation' 
+        'Prefer: return=representation,resolution=merge-duplicates'
     ];
 
-    $select_params = ['phone_number' => 'eq.' . $phone_number, 'select' => 'id'];
-    $existing_customer_result = supabase_select('customers', $select_params, $supabaseUrl, $supabaseAnonKey, $supabaseKey);
+    // The 'on_conflict' parameter tells Supabase to use 'phone_number' as the unique key for upserting.
+    $upsert_url = $supabaseUrl . '/rest/v1/customers?on_conflict=phone_number';
+    $upsert_result = execute_curl_request($upsert_url, 'POST', $upsert_headers, json_encode($customer_data, JSON_UNESCAPED_UNICODE));
 
-    if ($existing_customer_result['httpcode'] === 200) {
-        $existing_customer = json_decode($existing_customer_result['response'], true);
-        
-        if (!empty($existing_customer)) {
-            $update_params = ['phone_number' => 'eq.' . $phone_number];
-            $update_url = $supabaseUrl . '/rest/v1/customers?' . http_build_query($update_params);
-            $update_result = execute_curl_request($update_url, 'PATCH', $upsert_headers, json_encode($customer_data, JSON_UNESCAPED_UNICODE));
-            
-            if ($update_result['httpcode'] >= 200 && $update_result['httpcode'] < 300) {
-                $updated_data = json_decode($update_result['response'], true);
-                $customer_id = $updated_data[0]['id'] ?? null;
-            }
+    if ($upsert_result['httpcode'] === 200 || $upsert_result['httpcode'] === 201) {
+        $upserted_data = json_decode($upsert_result['response'], true);
+        if (!empty($upserted_data) && isset($upserted_data[0]['id'])) {
+            $customer_id = $upserted_data[0]['id'];
         } else {
-            $insert_url = $supabaseUrl . '/rest/v1/customers';
-            $insert_result = execute_curl_request($insert_url, 'POST', $upsert_headers, json_encode($customer_data, JSON_UNESCAPED_UNICODE));
-
-            if ($insert_result['httpcode'] === 201) {
-                $inserted_data = json_decode($insert_result['response'], true);
-                $customer_id = $inserted_data[0]['id'] ?? null;
-            }
+            error_log("User Signup - Upsert succeeded but no customer ID was returned. Response: " . $upsert_result['response']);
+            http_response_code(500);
+            echo json_encode(['error' => 'A apărut o eroare la preluarea ID-ului de utilizator.']);
+            exit;
         }
     } else {
-        error_log("User Signup - Initial Select Error: HTTP {$existing_customer_result['httpcode']}. Response: {$existing_customer_result['response']}");
+        error_log("User Signup - Upsert Error: HTTP {$upsert_result['httpcode']}. Response: {$upsert_result['response']}");
         http_response_code(500);
         echo json_encode(['error' => 'A apărut o eroare la verificarea utilizatorului.']);
         exit;
@@ -630,7 +618,7 @@ if ($method === 'GET' && $route === '/api/merchants') {
 
     if ($result['httpcode'] === 200) {
         http_response_code(200);
-        echo json_encode(['data' => json_decode($result['response'], true)]);
+        echo $result['response']; // Directly echo the JSON response from Supabase
     } else {
         error_log("Merchant Fetch Supabase Error: HTTP {$result['httpcode']}. Response: {$result['response']}");
         http_response_code(500);
