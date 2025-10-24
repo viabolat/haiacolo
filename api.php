@@ -319,7 +319,7 @@ function notify_new_customer_edge_function($customer_data, $supabaseUrl, $supaba
  * Notifies the Edge Function about a new merchant application
  * This sends an email with approval/rejection links to the business owner
  */
-function notify_merchant_application_edge_function($merchant_data, $supabaseUrl, $supabaseKey) {
+function notify_merchant_application_edge_function($merchant_data, $supabaseUrl, $supabaseAnonKey) {
     // Build the Edge Functions URL properly
     $base_url = rtrim($supabaseUrl, '/');
     $base_url = str_replace('/rest/v1', '', $base_url);
@@ -332,7 +332,7 @@ function notify_merchant_application_edge_function($merchant_data, $supabaseUrl,
     
     $headers = [
         'Content-Type: application/json',
-        'Authorization: Bearer ' . $supabaseKey
+        'Authorization: Bearer ' . $supabaseAnonKey // Use Anon Key for Edge Functions
     ];
     
     $payload = [
@@ -586,7 +586,8 @@ if ($method === 'POST' && $route === '/api/business-signup') {
         'address' => htmlspecialchars($data['business_address']),
         'business_description' => isset($data['business_description']) ? htmlspecialchars($data['business_description']) : '',
         'offer_description' => isset($data['offer_description']) ? htmlspecialchars($data['offer_description']) : '',
-        'subscription_status' => 'pending_approval'
+        'subscription_status' => 'pending_approval',
+        'is_welcome_offer' => false // Explicitly set default
     ];
 
     // Add "Prefer: return=representation" to get the record back
@@ -604,7 +605,7 @@ if ($method === 'POST' && $route === '/api/business-signup') {
         // Notify Edge Function about new merchant application
         $inserted_merchants = json_decode($result['response'], true);
         if (!empty($inserted_merchants) && isset($inserted_merchants[0])) {
-            notify_merchant_application_edge_function($inserted_merchants[0], $supabaseUrl, $supabaseKey);
+            notify_merchant_application_edge_function($inserted_merchants[0], $supabaseUrl, $supabaseAnonKey);
         }
         
         http_response_code(200);
