@@ -614,7 +614,7 @@ if ($method === 'GET' && $route === '/api/merchants') {
         'order' => 'is_founding_member.desc,name.asc'
     ];
     // Use the Anon Key for public read
-    $result = supabase_select('merchants', $query_params, $supabaseUrl, $supabaseAnonKey);
+    $result = supabase_select('merchants', $query_params, $supabaseUrl, $supabaseAnonKey, $supabaseKey);
 
     if ($result['httpcode'] === 200) {
         http_response_code(200);
