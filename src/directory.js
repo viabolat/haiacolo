@@ -64,7 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
             loadingState.style.display = 'none';
             merchantList.innerHTML = `
                 <div class="md:col-span-2 lg:col-span-3 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md">
-                    <p class="font-bold">Eroare la încărcarea datelor</p>
+                    <p class="font-bold">Eroare la încărcarea partenerilor</p>
                     <p>Nu am putut prelua lista de parteneri. Vă rugăm să încercați din nou mai târziu.</p>
                 </div>
             `;
