@@ -38,6 +38,68 @@ interface Merchant {
   address?: string;
 }
 
+// Inline email template function
+const getMerchantApplicationEmailTemplate = (
+  merchant: Merchant,
+  approveUrl: string,
+  rejectUrl: string,
+  approveAsFounderUrl: string,
+  tokenExpiry: Date,
+  canBeFounder: boolean
+): string => {
+  return `
+    <html>
+    <body style="font-family: sans-serif; padding: 20px;">
+        <h1 style="color: #333;">🏪 New Merchant Application</h1>
+        <p>A new merchant has applied on HaiAcolo. Please review their details below.</p>
+        <hr>
+        <h3 style="color: #555;">Merchant Details:</h3>
+        <ul>
+            <li><strong>Name:</strong> ${merchant.name}</li>
+            <li><strong>Location:</strong> ${merchant.location}</li>
+            <li><strong>Type:</strong> ${merchant.business_type}</li>
+            <li><strong>Contact Name:</strong> ${merchant.owner_contact}</li>
+            <li><strong>Contact Email:</strong> ${merchant.contact_email}</li>
+            <li><strong>Contact Phone:</strong> ${merchant.contact_phone}</li>
+            ${merchant.address ? `<li><strong>Address:</strong> ${merchant.address}</li>` : ''}
+        </ul>
+        ${merchant.business_description ? `
+        <h3 style="color: #555;">Business Description:</h3>
+        <p style="background-color: #f9f9f9; padding: 10px; border-radius: 5px;">
+            ${merchant.business_description}
+        </p>
+        ` : ''}
+        <h3 style="color: #555;">Proposed Offer:</h3>
+        <p style="background-color: #f4f4f4; padding: 10px; border-radius: 5px;">
+            ${merchant.offer_description || 'No offer description provided'}
+        </p>
+        <hr>
+        <h3 style="color: #555;">Actions:</h3>
+        <p>
+            <a href="${approveUrl}"
+                style="background-color: #28a745; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; margin-right: 10px; display: inline-block; margin-bottom: 10px;">✅
+                Approve</a>
+            ${approveAsFounderUrl ? `<a href="${approveAsFounderUrl}"
+                style="background-color: #ffc107; color: black; padding: 10px 15px; text-decoration: none; border-radius: 5px; margin-right: 10px; display: inline-block; margin-bottom: 10px;">⭐
+                Approve as Founder</a>` : ''}
+            <a href="${rejectUrl}"
+                style="background-color: #dc3545; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; display: inline-block; margin-bottom: 10px;">❌
+                Reject</a>
+        </p>
+        <p style="font-size: 12px; color: #888;">
+            Approving will set the merchant's subscription status to 'active'.
+            ${canBeFounder ? 'Approving as a founder will also grant them special founding member status.' : ''}
+        </p>
+        <hr>
+        <p style="font-size: 11px; color: #aaa;">
+            Merchant ID: ${merchant.id}<br>
+            Token expires: ${tokenExpiry.toLocaleString()}
+        </p>
+    </body>
+    </html>
+  `;
+};
+
 serve(async (req) => {
   console.log("🚀 Merchant Application Alert triggered!");
   console.log("Method:", req.method);
@@ -48,7 +110,7 @@ serve(async (req) => {
 
   try {
     const payload = await req.json();
-    console.log("📦 Received payload:", JSON.stringify(payload, null, 2));
+    console.log("📦 Received payload for merchant ID:", payload.record?.id);
     
     const merchant: Merchant = payload.record;
 
@@ -104,57 +166,21 @@ serve(async (req) => {
     const approveUrl = `${FUNCTION_BASE_URL}?merchant_id=${merchant.id}&action=approve&token=${approvalToken}`;
     const rejectUrl = `${FUNCTION_BASE_URL}?merchant_id=${merchant.id}&action=reject&token=${approvalToken}`;
     let approveAsFounderUrl = '';
+    const canBeFounder = count !== null && count < 10;
 
-    if (count !== null && count < 10) {
+    if (canBeFounder) {
       approveAsFounderUrl = `${FUNCTION_BASE_URL}?merchant_id=${merchant.id}&action=approve_founder&token=${approvalToken}`;
     }
 
-    // 5. Create the email content
-    const emailHtml = `
-      <html>
-        <body style="font-family: sans-serif; padding: 20px;">
-          <h1 style="color: #333;">🏪 New Merchant Application</h1>
-          <p>A new merchant has applied on HaiAcolo. Please review their details below.</p>
-          <hr>
-          <h3 style="color: #555;">Merchant Details:</h3>
-          <ul>
-            <li><strong>Name:</strong> ${merchant.name}</li>
-            <li><strong>Location:</strong> ${merchant.location}</li>
-            <li><strong>Type:</strong> ${merchant.business_type}</li>
-            <li><strong>Contact Name:</strong> ${merchant.owner_contact}</li>
-            <li><strong>Contact Email:</strong> ${merchant.contact_email}</li>
-            <li><strong>Contact Phone:</strong> ${merchant.contact_phone}</li>
-            ${merchant.address ? `<li><strong>Address:</strong> ${merchant.address}</li>` : ''}
-          </ul>
-          ${merchant.business_description ? `
-          <h3 style="color: #555;">Business Description:</h3>
-          <p style="background-color: #f9f9f9; padding: 10px; border-radius: 5px;">
-            ${merchant.business_description}
-          </p>
-          ` : ''}
-          <h3 style="color: #555;">Proposed Offer:</h3>
-          <p style="background-color: #f4f4f4; padding: 10px; border-radius: 5px;">
-            ${merchant.offer_description || 'No offer description provided'}
-          </p>
-          <hr>
-          <h3 style="color: #555;">Actions:</h3>
-          <p>
-            <a href="${approveUrl}" style="background-color: #28a745; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; margin-right: 10px; display: inline-block; margin-bottom: 10px;">✅ Approve</a>
-            ${approveAsFounderUrl ? `<a href="${approveAsFounderUrl}" style="background-color: #ffc107; color: black; padding: 10px 15px; text-decoration: none; border-radius: 5px; margin-right: 10px; display: inline-block; margin-bottom: 10px;">⭐ Approve as Founder</a>` : ''}
-            <a href="${rejectUrl}" style="background-color: #dc3545; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; display: inline-block; margin-bottom: 10px;">❌ Reject</a>
-          </p>
-          <p style="font-size: 12px; color: #888;">
-            Approving will set the merchant's subscription status to 'active'. 
-            ${count !== null && count < 10 ? 'Approving as a founder will also grant them special founding member status.' : ''}
-          </p>
-          <hr>
-          <p style="font-size: 11px; color: #aaa;">
-            Merchant ID: ${merchant.id}<br>
-            Token expires: ${tokenExpiry.toLocaleString()}
-          </p>
-        </body>
-      </html>
-    `;
+    // 5. Generate the email HTML
+    const emailHtml = getMerchantApplicationEmailTemplate(
+      merchant,
+      approveUrl,
+      rejectUrl,
+      approveAsFounderUrl,
+      tokenExpiry,
+      canBeFounder
+    );
 
     console.log("📧 Sending email to:", NOTIFICATION_EMAIL);
 
@@ -173,11 +199,10 @@ serve(async (req) => {
       }),
     });
 
-    const responseBody = await resendResponse.text();
     console.log("📬 Resend API response status:", resendResponse.status);
-    console.log("📬 Resend API response body:", responseBody);
 
     if (!resendResponse.ok) {
+      const responseBody = await resendResponse.text();
       console.error(`❌ Failed to send email: ${resendResponse.status}`, responseBody);
       return new Response(`Failed to send email: ${responseBody}`, { status: 500 });
     }

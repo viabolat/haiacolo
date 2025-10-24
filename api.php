@@ -1,26 +1,31 @@
 <?php
 
+// Include credentials from the secrets file located outside the web root.
+require __DIR__ . '/../secrets.php';
+// require __DIR__ . '/secrets.php';
+
 // Check for cURL extension
 if (!function_exists('curl_init')) {
     http_response_code(500);
     error_log('FATAL ERROR: PHP cURL extension is not installed or enabled.');
-    echo json_encode(['error' => 'Extensia cURL pentru PHP nu este instalată sau activată.']);
+    echo json_encode(['error' => 'The PHP cURL extension is not installed or enabled.']);
     exit;
 }
 
-// api.php
-
-// Include credentials from the secrets file located outside the web root.
-require __DIR__ . '/../secrets.php';
-// require __DIR__ . '/secrets.php';
+error_reporting(E_ALL);
+ini_set('display_errors', 0); // Don't display to users
+ini_set('log_errors', 1);
 
 // Sanity check for necessary environment variables
 if (empty($supabaseUrl) || empty($supabaseAnonKey) || empty($supabaseKey) || empty($recaptchaSecretKey) || empty($resendApiKey)) {
     http_response_code(500);
     error_log("FATAL ERROR: One or more secret keys are missing or empty. Check your secrets.php file.");
-    echo json_encode(['error' => 'Eroare de configurare a cheilor API.']);
+    echo json_encode(['error' => 'API key configuration error.']);
     exit;
 }
+
+// Define app base URL (add this to your secrets.php or keep it here)
+$appBaseUrl = $appBaseUrl ?? 'https://haiacolo.ro';
 
 // --- Validation Functions ---
 
@@ -29,9 +34,7 @@ function validate_email($email) {
 }
 
 function validate_phone($phone) {
-    // A more universal phone number validation.
-    // It requires a '+' at the beginning, followed by 7 to 15 digits.
-    // This is a good practice for storing international numbers.
+    // A universal phone number validation (+ followed by 7 to 15 digits).
     $cleanedPhone = preg_replace('/[^\d+]/', '', $phone);
     return preg_match('/^\+\d{7,15}$/', $cleanedPhone);
 }
@@ -43,7 +46,6 @@ function verify_recaptcha($token, $secretKey) {
     
     $debug['token_received'] = !empty($token);
     $debug['token_length'] = $token ? strlen($token) : 0;
-    $debug['secret_key_prefix'] = substr($secretKey, 0, 10);
     
     if (empty($token)) {
         $debug['error'] = 'No token provided';
@@ -68,7 +70,6 @@ function verify_recaptcha($token, $secretKey) {
     $result = json_decode($response, true);
     
     $debug['http_code'] = $httpcode;
-    $debug['google_response'] = $result;
     
     // Log to error log AND keep for response
     error_log("reCAPTCHA Debug: " . json_encode($debug));
@@ -96,7 +97,6 @@ function execute_curl_request($url, $method, $headers, $payload = null) {
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
     
-    // Log the request attempt
     error_log("CURL DEBUG: Attempting {$method} to {$url}");
     
     if ($payload !== null) {
@@ -110,13 +110,10 @@ function execute_curl_request($url, $method, $headers, $payload = null) {
     curl_close($ch);
 
     if ($response === false) {
-        // Log cURL failure specifically
         error_log("CURL FATAL ERROR ({$curl_errno}) on {$method} to {$url}: {$curl_error}");
-        // Return 500 for a network/connection failure
         return ['httpcode' => 500, 'response' => json_encode(['error' => 'cURL connection failure']), 'curl_error' => $curl_error];
     }
     
-    // Log non-success responses for API debugging (Supabase/Resend error)
     if ($httpcode !== 200 && $httpcode !== 201 && $httpcode !== 204 && $httpcode >= 400) {
         error_log("API RESPONSE ERROR: HTTP {$httpcode} on {$method} to {$url}. Response Body: {$response}");
     }
@@ -125,7 +122,7 @@ function execute_curl_request($url, $method, $headers, $payload = null) {
 }
 
 // Function to send a POST request (INSERT) to Supabase
-function supabase_insert($table, $data, $supabaseUrl, $supabaseAnonKey, $supabaseKey) {
+function supabase_insert($table, $data, $supabaseUrl, $supabaseAnonKey, $supabaseKey, $prefer_header = null) {
     $url = $supabaseUrl . '/rest/v1/' . $table;
     $headers = [
         'Content-Type: application/json', 
@@ -133,6 +130,9 @@ function supabase_insert($table, $data, $supabaseUrl, $supabaseAnonKey, $supabas
         // Use Service Role Key for elevated permissions
         'Authorization: Bearer ' . $supabaseKey
     ];
+    if ($prefer_header) {
+        $headers[] = 'Prefer: ' . $prefer_header;
+    }
     
     return execute_curl_request($url, 'POST', $headers, json_encode($data, JSON_UNESCAPED_UNICODE));
 }
@@ -153,7 +153,7 @@ function supabase_select($table, $query_params, $supabaseUrl, $supabaseAnonKey, 
 }
 
 // Function to send an UPDATE request (PATCH) to Supabase
-function supabase_update($table, $data, $query_params, $supabaseUrl, $supabaseAnonKey, $supabaseKey) {
+function supabase_update($table, $data, $query_params, $supabaseUrl, $supabaseAnonKey, $supabaseKey, $prefer_header = null) {
     $url = $supabaseUrl . '/rest/v1/' . $table . '?' . http_build_query($query_params);
     $headers = [
         'Content-Type: application/json', 
@@ -161,6 +161,9 @@ function supabase_update($table, $data, $query_params, $supabaseUrl, $supabaseAn
         // Use Service Role Key for update permissions
         'Authorization: Bearer ' . $supabaseKey
     ];
+    if ($prefer_header) {
+        $headers[] = 'Prefer: ' . $prefer_header;
+    }
     
     return execute_curl_request($url, 'PATCH', $headers, json_encode($data, JSON_UNESCAPED_UNICODE));
 }
@@ -169,12 +172,12 @@ function supabase_update($table, $data, $query_params, $supabaseUrl, $supabaseAn
 // Function to check the status of a deal code - Used by /api/check-code
 function check_deal_code_status($code, $supabaseUrl, $supabaseAnonKey, $supabaseKey) {
     if (empty($code)) {
-        return ['status' => 'INVALID', 'message' => 'Codul este obligatoriu.'];
+        return ['status' => 'INVALID', 'message' => 'Code is required.'];
     }
 
     $query_params = [
         'select' => 'id,status,used_at,merchants(offer_description)',
-        'code_string' => 'eq.' . $code, // $code is already decoded
+        'code_string' => 'eq.' . $code, 
         'limit' => 1
     ];
     // Use the Service Role Key ($supabaseKey) here for reliable RLS bypass
@@ -182,13 +185,13 @@ function check_deal_code_status($code, $supabaseUrl, $supabaseAnonKey, $supabase
 
     if ($result['httpcode'] !== 200) {
         error_log("Supabase Code Check Failure in check_deal_code_status: HTTP {$result['httpcode']}. Response: {$result['response']}");
-        return ['status' => 'ERROR', 'message' => 'Eroare de sistem la preluarea codului.'];
+        return ['status' => 'ERROR', 'message' => 'System error retrieving code.'];
     }
 
     $codes = json_decode($result['response'], true);
 
     if (empty($codes)) {
-        return ['status' => 'INVALID', 'message' => 'Cod negăsit.'];
+        return ['status' => 'INVALID', 'message' => 'Code not found.'];
     }
 
     $code_data = $codes[0];
@@ -198,62 +201,50 @@ function check_deal_code_status($code, $supabaseUrl, $supabaseAnonKey, $supabase
     }
 
     if ($code_data['status'] === 'issued') {
-        $offer_description = $code_data['merchants']['offer_description'] ?? 'Ofertă generală';
+        $offer_description = $code_data['merchants']['offer_description'] ?? 'General offer';
         // Return the code ID for subsequent redemption
         return ['status' => 'VALID', 'offer' => $offer_description, 'code_id' => $code_data['id']];
     }
 
-    return ['status' => 'INVALID', 'message' => 'Codul are un status invalid.'];
+    return ['status' => 'INVALID', 'message' => 'Code has an invalid status.'];
 }
 
-// Function to check if an email has been sent and record it if not
-// Returns `true` if the email should NOT be sent (already sent or error).
-// Returns `false` if the email should be sent (was just recorded).
+/**
+ * Robust function to check and record sent email using a single INSERT operation.
+ * Requires a UNIQUE constraint on the 'recipient_email' column in 'sent_outreach_emails' table.
+ * @return `true` if email was already sent (INSERT failed with 409) or an error occurred.
+ * @return `false` if the email was just recorded (INSERT succeeded with 201).
+ */
 function supabase_check_and_record_sent_email($recipient_email, $supabaseUrl, $supabaseAnonKey, $supabaseKey) {
-    // Check if email already sent
-    $query_params = [
-        'recipient_email' => 'eq.' . $recipient_email,
-        'select' => 'id',
-        'limit' => 1
-    ];
-    
-    $check_result = supabase_select('sent_outreach_emails', $query_params, $supabaseUrl, $supabaseAnonKey, $supabaseKey);
-
-    if ($check_result['httpcode'] === 200) {
-        $existing_records = json_decode($check_result['response'], true);
-        if (!empty($existing_records)) {
-            return true; // Email already sent, do not send again.
-        }
-    } else {
-        // If the check fails for any reason, log it and assume we shouldn't send to be safe.
-        error_log("Supabase check email query failed: HTTP {$check_result['httpcode']}. Response: {$check_result['response']}");
-        return true; // Error occurred, do not send.
-    }
-
-    // If we reach here, the email was not found. Record it now.
     $insert_data = [
         'recipient_email' => $recipient_email
     ];
+    
+    // We expect the insert to either succeed (201) or conflict (409) due to UNIQUE constraint
+    // We pass null for AnonKey because this is an administrative action using $supabaseKey
     $insert_result = supabase_insert('sent_outreach_emails', $insert_data, $supabaseUrl, $supabaseAnonKey, $supabaseKey);
 
     if ($insert_result['httpcode'] === 201) {
         return false; // Email successfully recorded, OK to send now.
+    } elseif ($insert_result['httpcode'] === 409) {
+        error_log("Email skipped: {$recipient_email} already recorded (409 Conflict).");
+        return true; // Conflict: already recorded, DO NOT send.
     } else {
-        // If the insert fails, log it and prevent sending.
+        // Log other errors and prevent sending to be safe.
         error_log("Error recording sent email to Supabase: HTTP {$insert_result['httpcode']}. Response: {$insert_result['response']}");
-        return true; // Error occurred, do not send.
+        return true; // Error occurred, DO NOT send.
     }
 }
 
 // Function to send an email with Resend
-function send_resend_email($to, $subject, $html, $resendApiKey) {
+function send_resend_email($from_address, $to, $subject, $html, $resendApiKey) {
     $url = 'https://api.resend.com/emails';
     $headers = [
         'Content-Type: application/json',
         'Authorization: Bearer ' . $resendApiKey
     ];
     $data = [
-        'from' => 'HaiAcolo Alerts <alerts@haiacolo.ro>',
+        'from' => $from_address,
         'to' => $to,
         'subject' => $subject,
         'html' => $html
@@ -261,7 +252,6 @@ function send_resend_email($to, $subject, $html, $resendApiKey) {
 
     $result = execute_curl_request($url, 'POST', $headers, json_encode($data));
     
-    // If cURL failed, result['httpcode'] will be 500
     if ($result['curl_error']) {
          error_log("Resend cURL failure for {$to}: {$result['curl_error']}");
     }
@@ -271,20 +261,14 @@ function send_resend_email($to, $subject, $html, $resendApiKey) {
 
 /**
  * Notifies the Edge Function about a new customer signup
- * This sends an internal notification email to the business owner
  */
 function notify_new_customer_edge_function($customer_data, $supabaseUrl, $supabaseKey) {
-    // Build the Edge Functions URL properly.
-    // The base URL for functions is different from the REST API URL.
-    $base_url = rtrim($supabaseUrl, '/');
-    $base_url = str_replace('/rest/v1', '', $base_url); // Remove /rest/v1 part
+    // Robust URL construction for Edge Functions
+    $base_url = rtrim($supabaseUrl, '/rest/v1'); 
     
-    // Construct the full Edge Function URL - using existing user-signup-alert function
     $edge_function_url = $base_url . '/functions/v1/user-signup-alert';
     
-    error_log("=== EDGE FUNCTION NOTIFICATION START ===");
     error_log("🔔 Calling Edge Function at: {$edge_function_url}");
-    error_log("Customer Data: " . json_encode($customer_data));
     
     $headers = [
         'Content-Type: application/json',
@@ -297,42 +281,31 @@ function notify_new_customer_edge_function($customer_data, $supabaseUrl, $supaba
         'record' => $customer_data
     ];
     
-    error_log("Payload: " . json_encode($payload));
-    
     $result = execute_curl_request($edge_function_url, 'POST', $headers, json_encode($payload));
-    
-    error_log("Response HTTP Code: {$result['httpcode']}");
-    error_log("Response Body: {$result['response']}");
     
     if ($result['httpcode'] >= 200 && $result['httpcode'] < 300) {
         error_log("✅ Successfully notified Edge Function about new customer");
-        error_log("=== EDGE FUNCTION NOTIFICATION END ===");
         return true;
     } else {
-        error_log("❌ Failed to notify Edge Function: HTTP {$result['httpcode']}");
-        error_log("=== EDGE FUNCTION NOTIFICATION END ===");
+        error_log("❌ Failed to notify Edge Function: HTTP {$result['httpcode']}. Response: {$result['response']}");
         return false;
     }
 }
 
 /**
  * Notifies the Edge Function about a new merchant application
- * This sends an email with approval/rejection links to the business owner
  */
-function notify_merchant_application_edge_function($merchant_data, $supabaseUrl, $supabaseAnonKey) {
-    // Build the Edge Functions URL properly
-    $base_url = rtrim($supabaseUrl, '/');
-    $base_url = str_replace('/rest/v1', '', $base_url); // Remove /rest/v1 part
+function notify_merchant_application_edge_function($merchant_data, $supabaseUrl, $supabaseKey) {
+    // Robust URL construction for Edge Functions
+    $base_url = rtrim($supabaseUrl, '/rest/v1'); 
     
     $edge_function_url = $base_url . '/functions/v1/merchant-application-alert';
     
-    error_log("=== MERCHANT NOTIFICATION START ===");
     error_log("🔔 Calling Edge Function at: {$edge_function_url}");
-    error_log("Merchant Data: " . json_encode($merchant_data));
     
     $headers = [
         'Content-Type: application/json',
-        'Authorization: Bearer ' . $supabaseAnonKey // Use Anon Key for Edge Functions
+        'Authorization: Bearer ' . $supabaseKey
     ];
     
     $payload = [
@@ -341,23 +314,17 @@ function notify_merchant_application_edge_function($merchant_data, $supabaseUrl,
         'record' => $merchant_data
     ];
     
-    error_log("Payload: " . json_encode($payload));
-    
     $result = execute_curl_request($edge_function_url, 'POST', $headers, json_encode($payload));
-    
-    error_log("Response HTTP Code: {$result['httpcode']}");
-    error_log("Response Body: {$result['response']}");
     
     if ($result['httpcode'] >= 200 && $result['httpcode'] < 300) {
         error_log("✅ Successfully notified Edge Function about new merchant");
-        error_log("=== MERCHANT NOTIFICATION END ===");
         return true;
     } else {
-        error_log("❌ Failed to notify Edge Function: HTTP {$result['httpcode']}");
-        error_log("=== MERCHANT NOTIFICATION END ===");
+        error_log("❌ Failed to notify Edge Function: HTTP {$result['httpcode']}. Response: {$result['response']}");
         return false;
     }
 }
+
 
 // --- API Routing ---
 
@@ -375,36 +342,35 @@ if ($method === 'POST' && $route === '/api/user-signup') {
 
     if (!isset($data['g-recaptcha-response']) || !verify_recaptcha($data['g-recaptcha-response'], $recaptchaSecretKey)) {
         http_response_code(403);
-        echo json_encode(['error' => 'Verificare reCAPTCHA eșuată.']);
+        echo json_encode(['error' => 'reCAPTCHA verification failed.']);
         exit;
     }
 
     // --- Dynamically fetch the Welcome Offer Merchant from the database ---
-    // This is more robust as the offer can be changed in the DB without code changes.
     $merchant_params = ['is_welcome_offer' => 'eq.true', 'select' => 'id,name,offer_description', 'limit' => 1];
     $merchant_result = supabase_select('merchants', $merchant_params, $supabaseUrl, $supabaseAnonKey, $supabaseKey);
 
     if ($merchant_result['httpcode'] !== 200 || empty(json_decode($merchant_result['response'], true))) {
         error_log("FATAL: No merchant is configured as the welcome offer (is_welcome_offer = true).");
         http_response_code(500);
-        echo json_encode(['error' => 'Eroare de configurare a ofertei de bun venit.']);
+        echo json_encode(['error' => 'Welcome offer configuration error.']);
         exit;
     }
     $welcome_offer_merchant = json_decode($merchant_result['response'], true)[0];
     $initial_offer_merchant_id = $welcome_offer_merchant['id'];
     $offer_partner_name = $welcome_offer_merchant['name'];
-    $offer_description = $welcome_offer_merchant['offer_description'] ?? 'o ofertă specială de bun venit!';
+    $offer_description = $welcome_offer_merchant['offer_description'] ?? 'a special welcome offer!';
 
     if (empty($data['phone_number']) || empty($data['zone']) || empty($data['interests'])) {
         http_response_code(400);
-        echo json_encode(['error' => 'Câmpuri obligatorii lipsă.']);
+        echo json_encode(['error' => 'Missing required fields.']);
         exit;
     }
 
     $phone_number = htmlspecialchars($data['phone_number']);
     if (!validate_phone($phone_number)) {
         http_response_code(400);
-        echo json_encode(['error' => 'Formatul numărului de telefon este invalid.']);
+        echo json_encode(['error' => 'Invalid phone number format.']);
         exit;
     }
 
@@ -426,17 +392,20 @@ if ($method === 'POST' && $route === '/api/user-signup') {
         $customer_data['email'] = $customer_email;
     }
 
-    // --- Upsert customer data and get their ID back ---
+    // --- Upsert customer data and get their ID back (Atomic operation) ---
     $customer_id = null;
+    $upsert_prefer_header = 'return=representation,resolution=merge-duplicates';
+
+    // Use the on_conflict query parameter for upsert
+    $upsert_url = $supabaseUrl . '/rest/v1/customers?on_conflict=phone_number';
+    
     $upsert_headers = [
         'Content-Type: application/json',
         'apikey: ' . $supabaseAnonKey,
         'Authorization: Bearer ' . $supabaseKey,
-        'Prefer: return=representation,resolution=merge-duplicates'
+        'Prefer: ' . $upsert_prefer_header
     ];
 
-    // The 'on_conflict' parameter tells Supabase to use 'phone_number' as the unique key for upserting.
-    $upsert_url = $supabaseUrl . '/rest/v1/customers?on_conflict=phone_number';
     $upsert_result = execute_curl_request($upsert_url, 'POST', $upsert_headers, json_encode($customer_data, JSON_UNESCAPED_UNICODE));
 
     if ($upsert_result['httpcode'] === 200 || $upsert_result['httpcode'] === 201) {
@@ -446,13 +415,13 @@ if ($method === 'POST' && $route === '/api/user-signup') {
         } else {
             error_log("User Signup - Upsert succeeded but no customer ID was returned. Response: " . $upsert_result['response']);
             http_response_code(500);
-            echo json_encode(['error' => 'A apărut o eroare la preluarea ID-ului de utilizator.']);
+            echo json_encode(['error' => 'Error retrieving user ID after upsert.']);
             exit;
         }
     } else {
         error_log("User Signup - Upsert Error: HTTP {$upsert_result['httpcode']}. Response: {$upsert_result['response']}");
         http_response_code(500);
-        echo json_encode(['error' => 'A apărut o eroare la verificarea utilizatorului.']);
+        echo json_encode(['error' => 'An error occurred during user verification.']);
         exit;
     }
 
@@ -481,13 +450,14 @@ if ($method === 'POST' && $route === '/api/user-signup') {
             'status' => 'issued'
         ];
 
-        $code_insert_result = supabase_insert('codes', $code_data, $supabaseUrl, $supabaseAnonKey, $supabaseKey);
+        // Use supabase_insert which uses Service Role Key
+        $code_insert_result = supabase_insert('codes', $code_data, $supabaseUrl, $supabaseAnonKey, $supabaseKey, 'return=minimal');
 
         if ($code_insert_result['httpcode'] !== 201) {
             error_log("FATAL: Could not create initial offer code for customer {$customer_id}. DB Response: " . $code_insert_result['response']);
             http_response_code(500);
             echo json_encode([
-                'error' => 'Înregistrarea a reușit, dar a apărut o eroare la generarea codului ofertei.',
+                'error' => 'Registration successful, but an error occurred while generating the offer code.',
                 'db_error' => json_decode($code_insert_result['response'])
             ]);
             exit;
@@ -495,17 +465,16 @@ if ($method === 'POST' && $route === '/api/user-signup') {
 
         // --- Send Welcome Email (if applicable) ---
         if ($customer_email) {
+            // Using the new, robust check-and-record function
             if (!supabase_check_and_record_sent_email($customer_email, $supabaseUrl, $supabaseAnonKey, $supabaseKey)) {
-                // The partner name and offer description are already fetched from the dynamic query above.
                 $subject = 'Bun venit la HaiAcolo! 🥐 Oferta ta de la ' . $offer_partner_name;
-                // Define the verification URL for the email template
-                $verification_url = ($appBaseUrl ?? 'https://haiacolo.ro') . '/offer.html?code=' . $code_string;
+                $verification_url = $appBaseUrl . '/offer.html?code=' . $code_string;
                 $html_body = file_get_contents(__DIR__ . '/templates/welcome_email.html');
                 $html_body = str_replace('{{offer_partner_name}}', $offer_partner_name, $html_body);
                 $html_body = str_replace('{{offer_description}}', $offer_description, $html_body);
                 $html_body = str_replace('{{qr_code_url}}', $verification_url, $html_body);
-                
-                $email_result = send_resend_email($customer_email, $subject, $html_body, $resendApiKey);
+
+                $email_result = send_resend_email('HaiAcolo <noreply@haiacolo.ro>', $customer_email, $subject, $html_body, $resendApiKey);
                 if ($email_result['httpcode'] < 200 || $email_result['httpcode'] >= 300) {
                     error_log("Failed to send welcome email to {$customer_email}. Resend HTTP Code: {$email_result['httpcode']}. Response: {$email_result['response']}");
                 }
@@ -516,7 +485,7 @@ if ($method === 'POST' && $route === '/api/user-signup') {
         http_response_code(200);
         echo json_encode([
             'success' => true,
-            'message' => 'Utilizator înregistrat cu succes.',
+            'message' => 'User successfully registered.',
             'qr_data' => 'haiacolo://verify?code=' . $code_string,
             'code_string' => $code_string
         ]);
@@ -524,7 +493,7 @@ if ($method === 'POST' && $route === '/api/user-signup') {
     } else {
         error_log("User Signup - DB Operation Failed. Could not retrieve customer ID.");
         http_response_code(500);
-        echo json_encode(['error' => 'A apărut o eroare internă la salvarea datelor.']);
+        echo json_encode(['error' => 'An internal error occurred while saving data.']);
     }
     exit;
 }
@@ -535,11 +504,7 @@ if ($method === 'POST' && $route === '/api/business-signup') {
 
     if (!isset($data['g-recaptcha-response']) || !verify_recaptcha($data['g-recaptcha-response'], $recaptchaSecretKey)) {
         http_response_code(403);
-        $debug_info = $GLOBALS['recaptcha_debug'] ?? ['error' => 'No debug information available.'];
-        echo json_encode([
-            'error' => 'Verificare reCAPTCHA eșuată.',
-            'debug_info' => $debug_info
-        ]);
+        echo json_encode(['error' => 'reCAPTCHA verification failed.']);
         exit;
     }
 
@@ -547,20 +512,20 @@ if ($method === 'POST' && $route === '/api/business-signup') {
     foreach ($requiredFields as $field) {
         if (empty($data[$field])) {
             http_response_code(400);
-            echo json_encode(['error' => 'Câmpuri obligatorii lipsă.']);
+            echo json_encode(['error' => 'Missing required fields.']);
             exit;
         }
     }
 
     if (!validate_email($data['contact_email'])) {
         http_response_code(400);
-        echo json_encode(['error' => 'Formatul adresei de email este invalid.']);
+        echo json_encode(['error' => 'Invalid email address format.']);
         exit;
     }
 
     if (!validate_phone($data['contact_phone'])) {
         http_response_code(400);
-        echo json_encode(['error' => 'Formatul numărului de telefon este invalid.']);
+        echo json_encode(['error' => 'Invalid phone number format.']);
         exit;
     }
 
@@ -578,30 +543,38 @@ if ($method === 'POST' && $route === '/api/business-signup') {
         'is_welcome_offer' => false // Explicitly set default
     ];
 
-    // Add "Prefer: return=representation" to get the record back
-    $insert_headers = [
-        'Content-Type: application/json',
-        'apikey: ' . $supabaseAnonKey,
-        'Authorization: Bearer ' . $supabaseKey,
-        'Prefer: return=representation'
-    ];
-
-    $insert_url = $supabaseUrl . '/rest/v1/merchants';
-    $result = execute_curl_request($insert_url, 'POST', $insert_headers, json_encode($businessData, JSON_UNESCAPED_UNICODE));
+    // Use supabase_insert which uses Service Role Key
+    $result = supabase_insert('merchants', $businessData, $supabaseUrl, $supabaseAnonKey, $supabaseKey, 'return=representation');
 
     if ($result['httpcode'] === 201) {
         // Notify Edge Function about new merchant application
         $inserted_merchants = json_decode($result['response'], true);
         if (!empty($inserted_merchants) && isset($inserted_merchants[0])) {
-            notify_merchant_application_edge_function($inserted_merchants[0], $supabaseUrl, $supabaseAnonKey);
+            notify_merchant_application_edge_function($inserted_merchants[0], $supabaseUrl, $supabaseKey);
+        }
+
+        // --- Send Welcome Email to Business ---
+        $business_email = $businessData['contact_email'];
+        $business_name = $businessData['name'];
+
+        // Using the new, robust check-and-record function
+        if (!supabase_check_and_record_sent_email($business_email, $supabaseUrl, $supabaseAnonKey, $supabaseKey)) {
+            $subject = 'Aplicația ta HaiAcolo a fost primită!';
+            $html_body = file_get_contents(__DIR__ . '/templates/business_welcome_email.html');
+            $html_body = str_replace('{{business_name}}', $business_name, $html_body);
+            
+            $email_result = send_resend_email('HaiAcolo <noreply@haiacolo.ro>', $business_email, $subject, $html_body, $resendApiKey);
+            if ($email_result['httpcode'] < 200 || $email_result['httpcode'] >= 300) {
+                error_log("Failed to send business welcome email to {$business_email}. Resend HTTP Code: {$email_result['httpcode']}. Response: {$email_result['response']}");
+            }
         }
         
         http_response_code(200);
-        echo json_encode(['message' => 'Afacere înregistrată cu succes.']);
+        echo json_encode(['message' => 'Business successfully registered.']);
     } else {
         error_log("Business Signup Supabase Error: HTTP {$result['httpcode']}. Response: {$result['response']}");
         http_response_code(500);
-        echo json_encode(['error' => 'A apărut o eroare internă.']);
+        echo json_encode(['error' => 'An internal error occurred.']);
     }
     exit;
 }
@@ -614,7 +587,7 @@ if ($method === 'GET' && $route === '/api/merchants') {
         'order' => 'is_founding_member.desc,name.asc'
     ];
     // Use the Anon Key for public read
-    $result = supabase_select('merchants', $query_params, $supabaseUrl, $supabaseAnonKey, $supabaseKey);
+    $result = supabase_select('merchants', $query_params, $supabaseUrl, $supabaseAnonKey);
 
     if ($result['httpcode'] === 200) {
         http_response_code(200);
@@ -622,7 +595,7 @@ if ($method === 'GET' && $route === '/api/merchants') {
     } else {
         error_log("Merchant Fetch Supabase Error: HTTP {$result['httpcode']}. Response: {$result['response']}");
         http_response_code(500);
-        echo json_encode(['error' => 'A apărut o eroare internă.']);
+        echo json_encode(['error' => 'An internal error occurred.']);
     }
     exit;
 }
@@ -633,7 +606,7 @@ if ($method === 'GET' && $route === '/api/merchant-history') {
 
     if (empty($merchant_id)) {
         http_response_code(400);
-        echo json_encode(['error' => 'ID-ul comerciantului este obligatoriu.']);
+        echo json_encode(['error' => 'Merchant ID is required.']);
         exit;
     }
 
@@ -652,7 +625,7 @@ if ($method === 'GET' && $route === '/api/merchant-history') {
     } else {
         error_log("Merchant History Supabase Error: HTTP {$result['httpcode']}. Response: {$result['response']}");
         http_response_code(500);
-        echo json_encode(['error' => 'A apărut o eroare internă la preluarea istoricului.']);
+        echo json_encode(['error' => 'An internal error occurred while retrieving history.']);
     }
     exit;
 }
@@ -665,7 +638,7 @@ if ($method === 'POST' && $route === '/api/update-redemptions') {
 
     if (empty($deal_id) || !is_numeric($redemptions)) {
         http_response_code(400);
-        echo json_encode(['error' => 'ID-ul ofertei și un număr de răscumpărări sunt obligatorii.']);
+        echo json_encode(['error' => 'Deal ID and a number of redemptions are required.']);
         exit;
     }
 
@@ -673,15 +646,15 @@ if ($method === 'POST' && $route === '/api/update-redemptions') {
     $query_params = ['id' => 'eq.' . $deal_id];
 
     // Use the Service Role Key ($supabaseKey) for updates
-    $result = supabase_update('deal_history', $update_data, $query_params, $supabaseUrl, $supabaseAnonKey, $supabaseKey);
+    $result = supabase_update('deal_history', $update_data, $query_params, $supabaseUrl, $supabaseAnonKey, $supabaseKey, 'return=minimal');
 
     if ($result['httpcode'] >= 200 && $result['httpcode'] < 300) {
         http_response_code(200);
-        echo json_encode(['message' => 'Răscumpărări actualizate cu succes.']);
+        echo json_encode(['message' => 'Redemptions successfully updated.']);
     } else {
         error_log("Redemption Update Supabase Error: HTTP {$result['httpcode']}. Response: {$result['response']}");
         http_response_code(500);
-        echo json_encode(['error' => 'A apărut o eroare internă la actualizare.']);
+        echo json_encode(['error' => 'An internal error occurred during update.']);
     }
     exit;
 }
@@ -694,24 +667,24 @@ if ($method === 'POST' && $route === '/api/send-outreach') {
 
     if (empty($recipients)) {
         http_response_code(400);
-        echo json_encode(['error' => 'Nu au fost furnizate date.']);
+        echo json_encode(['error' => 'No data provided.']);
         exit;
     }
 
     $html_template = '<div style="font-family: Arial, sans-serif; font-size: 16px; color: #333; line-height: 1.6; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
     <div style="text-align: center; padding-bottom: 20px;">
         <img src="https://haiacolo.ro/public/logo.png" alt="HaiAcolo Logo" style="max-width: 150px; height: auto;">
-        <h1 style="color: #007bff; margin-top: 10px;">Oportunitate pentru afacerea ta în Cluj</h1>
+        <h1 style="color: #007bff; margin-top: 10px;">Opportunity for your business in Cluj</h1>
     </div>
     
-    <p>Bun venit! Vă ajutăm să atrageți clienți noi și să creșteți vânzările în Cluj, în special în perioadele mai puțin aglomerate, <strong>fără bătăi de cap</strong>.</p>
+    <p>Welcome! We help you attract new customers and grow sales in Cluj, especially during less busy periods, **without the hassle**.</p>
     
-    <p>Suntem o platformă dedicată conectării afacerilor locale cu mii de clienți dornici să descopere locuri noi. Tot ce trebuie să faceți este să ne spuneți ce ofertă doriți să promovați, iar noi o livrăm direct către clienții interesați prin notificări WhatsApp.</p>
+    <p>We are a platform dedicated to connecting local businesses with thousands of customers eager to discover new places. All you have to do is tell us what offer you want to promote, and we deliver it directly to interested customers via WhatsApp notifications.</p>
 
     <div style="border-bottom: 1px solid #eee; margin: 20px 0;"></div>
 
-    <h3 style="color: #007bff; text-align: center;">Ești gata să atragi clienți noi?</h3>
-    <p style="text-align: center;">Află cum îți poți înscrie afacerea pe HaiAcolo și poți începe să crești traficul de clienți direct la ușa ta.</p>
+    <h3 style="color: #007bff; text-align: center;">Ready to attract new customers?</h3>
+    <p style="text-align: center;">Find out how you can list your business on HaiAcolo and start driving customer traffic right to your door.</p>
     
     <div style="text-align: center; margin-top: 30px; margin-bottom: 30px;">
         <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="margin: 0 auto;">
@@ -721,7 +694,7 @@ if ($method === 'POST' && $route === '/api/send-outreach') {
                         <a href="https://haiacolo.ro/founder" target="_blank" style="padding: 12px 24px; border: 1px solid #007bff; display: inline-block; color: #ffffff; text-decoration: none; border-radius: 5px; font-weight: bold; mso-padding-alt: 0; text-underline-on: none;">
                             <span style="mso-text-raise: 10pt; mso-hide: all;">&nbsp;</span>
                             <span style="display:inline-block; vertical-align:middle; line-height:1.2; padding:0; mso-text-raise: -12pt;">
-                                Află mai multe și Înscrie-te!
+                                Find out more and Register!
                             </span>
                             <span style="mso-text-raise: 10pt; mso-hide: all;">&nbsp;</span>
                         </a>
@@ -731,7 +704,7 @@ if ($method === 'POST' && $route === '/api/send-outreach') {
         </table>
     </div>
 
-    <p style="text-align: center; font-size: 14px; color: #888;">Dacă aveți întrebări, nu ezitați să ne contactați la <a href="mailto:contact@haiacolo.ro" style="color:#007bff; font-weight:bold; text-decoration:underline;">contact@haiacolo.ro</a>.</p>
+    <p style="text-align: center; font-size: 14px; color: #888;">If you have questions, feel free to contact us at <a href="mailto:contact@haiacolo.ro" style="color:#007bff; font-weight:bold; text-decoration:underline;">contact@haiacolo.ro</a>.</p>
 </div>';
 
     $success_count = 0;
@@ -744,18 +717,19 @@ if ($method === 'POST' && $route === '/api/send-outreach') {
         $contact_name = $recipient['contact_name'] ?? '';
 
         if (validate_email($email)) {
+            // Use the robust check-and-record function (relies on DB UNIQUE constraint)
             if (supabase_check_and_record_sent_email($email, $supabaseUrl, $supabaseAnonKey, $supabaseKey)) {
                 $skipped_count++;
-                continue; // Skip if already sent
+                continue; // Skip if already recorded (409) or error occurred
             }
 
-            $subject = "Oportunitate specială pentru {$business_name} - Devino membru fondator HaiAcolo";
+            $subject = "Special opportunity for {$business_name} - Become a HaiAcolo Founding Member";
             $personalized_template = str_replace('[Numele afacerii]', $business_name, $html_template);
             $personalized_template = str_replace('[Numele persoanei de contact]', $contact_name, $personalized_template);
             $personalized_template = str_replace('[Business Name]', $business_name, $personalized_template);
             $personalized_template = str_replace('[Contact Person\'s Name]', $contact_name, $personalized_template);
 
-            $result = send_resend_email($email, $subject, $personalized_template, $resendApiKey);
+            $result = send_resend_email('HaiAcolo <noreply@haiacolo.ro>', $email, $subject, $personalized_template, $resendApiKey);
             if ($result['httpcode'] >= 200 && $result['httpcode'] < 300) {
                 $success_count++;
             } else {
@@ -770,7 +744,62 @@ if ($method === 'POST' && $route === '/api/send-outreach') {
     } else {
         http_response_code(200);
     }
-    echo json_encode(['message' => "Emailuri trimise: {$success_count} cu succes, {$error_count} eșuate, {$skipped_count} omise (deja trimise)."]);
+    echo json_encode(['message' => "Emails sent: {$success_count} successful, {$error_count} failed, {$skipped_count} skipped (already sent/error)."]);
+    exit;
+}
+
+function process_code_redemption_php($code, $supabaseUrl, $supabaseAnonKey, $supabaseKey) {
+    $query_params = [
+        'p_code_string' => $code
+    ];
+
+    $url = $supabaseUrl . '/rest/v1/rpc/process_code_redemption';
+    $headers = [
+        'Content-Type: application/json',
+        'apikey: ' . $supabaseAnonKey,
+        'Authorization: Bearer ' . $supabaseKey
+    ];
+
+    $result = execute_curl_request($url, 'POST', $headers, json_encode($query_params));
+
+    error_log("Supabase process_code_redemption response: " . print_r($result, true));
+
+    if ($result['httpcode'] !== 200) {
+        return [
+            'httpcode' => $result['httpcode'],
+            'response' => ['status' => 'ERROR', 'message' => 'Failed to process redemption.']
+        ];
+    }
+
+    $response_data = json_decode($result['response'], true);
+
+    if (empty($response_data)) {
+        return [
+            'httpcode' => 404,
+            'response' => ['status' => 'INVALID', 'message' => 'Code not found.']
+        ];
+    }
+
+    return [
+        'httpcode' => $result['httpcode'],
+        'response' => $response_data[0]
+    ];
+}
+
+// Handle processing a redemption
+if ($method === 'GET' && $route === '/api/process-redemption') {
+    $code = isset($_GET['code']) ? $_GET['code'] : '';
+
+    if (empty($code)) {
+        http_response_code(400);
+        echo json_encode(['status' => 'INVALID', 'message' => 'Code is required.']);
+        exit;
+    }
+
+    $result = process_code_redemption_php($code, $supabaseUrl, $supabaseAnonKey, $supabaseKey);
+
+    http_response_code($result['httpcode']);
+    echo json_encode($result['response']);
     exit;
 }
 
@@ -778,15 +807,14 @@ if ($method === 'POST' && $route === '/api/send-outreach') {
 
 // Handle checking a deal code status (GET endpoint)
 if ($method === 'GET' && $route === '/api/check-code') {
-    // CRITICAL FIX: URL-decode the code parameter to correctly handle special characters
-    // like '+' or '-' that might be part of the code string.
+    // Note: PHP automatically decodes URL parameters, so we use it directly.
     $code = isset($_GET['code']) ? $_GET['code'] : '';
 
     $status_result = check_deal_code_status($code, $supabaseUrl, $supabaseAnonKey, $supabaseKey);
 
     if ($status_result['status'] === 'ERROR') {
         http_response_code(500);
-        echo json_encode(['status' => 'ERROR', 'message' => 'A apărut o eroare de rețea sau de bază de date. Vă rugăm să încercați din nou.']);
+        echo json_encode(['status' => 'ERROR', 'message' => 'A network or database error occurred. Please try again.']);
     } else {
         http_response_code(200);
         echo json_encode($status_result);
@@ -802,80 +830,79 @@ if ($method === 'POST' && $route === '/api/redeem-code') {
 
     if (empty($code_id)) {
         http_response_code(400);
-        echo json_encode(['status' => 'ERROR', 'message' => 'ID-ul codului este obligatoriu.']);
+        echo json_encode(['status' => 'ERROR', 'message' => 'Code ID is required.']);
         exit;
     }
 
-    // 1. Fetch the current code data to verify it exists and is 'issued'
-    $query_params = [
-        'select' => 'id,status',
-        'id' => 'eq.' . $code_id,
-        'limit' => 1
-    ];
-    // Use the Service Role Key ($supabaseKey)
-    $result = supabase_select('codes', $query_params, $supabaseUrl, $supabaseAnonKey, $supabaseKey);
+    $update_data = [];
+    $update_query_params = ['id' => 'eq.' . $code_id];
+    $is_revenue_only_update = false;
 
-    if ($result['httpcode'] !== 200) {
-        error_log("Redeem Code Fetch Supabase Error: HTTP {$result['httpcode']}. Response: {$result['response']}");
-        http_response_code(500);
-        echo json_encode(['status' => 'ERROR', 'message' => 'Eroare de bază de date la preluarea codului.']);
-        exit;
+    // Determine the update type
+    if ($reported_revenue_ron !== null && is_numeric($reported_revenue_ron)) {
+        $update_data['reported_revenue_ron'] = (float)$reported_revenue_ron;
+        $is_revenue_only_update = true;
     }
 
-    $codes = json_decode($result['response'], true);
+    // Attempt to update status from 'issued' to 'used'
+    // This is an atomic update that also allows setting revenue.
+    $status_update_data = $update_data;
+    $status_update_data['status'] = 'used';
+    $status_update_data['used_at'] = gmdate('c'); // ISO 8601 format (UTC)
+    
+    // Attempt the atomic status and revenue update. 
+    // It will only succeed if the code status is 'issued'
+    $status_update_params = $update_query_params;
+    $status_update_params['status'] = 'eq.issued';
+
+    $update_result = supabase_update('codes', $status_update_data, $status_update_params, $supabaseUrl, $supabaseAnonKey, $supabaseKey, 'return=minimal');
+
+    if ($update_result['httpcode'] === 204) {
+        // Status update succeeded (from issued to used)
+        http_response_code(200);
+        echo json_encode(['status' => 'SUCCESS', 'message' => 'Code successfully redeemed and status updated.']);
+        exit;
+    } 
+    
+    // If the status update failed (not 204), it means either:
+    // 1. The code was already 'used' (filter prevented update).
+    // 2. A database error occurred.
+    // 3. The ID was not found.
+
+    // If the attempt was revenue only, AND the status update failed, we try a revenue-only update
+    if ($is_revenue_only_update) {
+        // Fallback: If status update failed, attempt a PATCH where status='used' just to update revenue
+        // This handles the case where the status was already 'used'.
+        $revenue_only_params = $update_query_params;
+        $revenue_only_params['status'] = 'eq.used';
+
+        $revenue_result = supabase_update('codes', $update_data, $revenue_only_params, $supabaseUrl, $supabaseAnonKey, $supabaseKey, 'return=minimal');
+
+        if ($revenue_result['httpcode'] === 204) {
+            http_response_code(200);
+            echo json_encode(['status' => 'SUCCESS', 'message' => 'Code was already used. Revenue updated.']);
+            exit;
+        }
+    }
+    
+    // If we reach here, neither update succeeded, so we check for generic errors or ID not found.
+    
+    // A quick check to see if the ID exists (similar to initial select in old version, but only on failure)
+    $check_exists_params = ['select' => 'id', 'id' => 'eq.' . $code_id, 'limit' => 1];
+    $check_result = supabase_select('codes', $check_exists_params, $supabaseUrl, $supabaseAnonKey, $supabaseKey);
+    $codes = json_decode($check_result['response'], true);
 
     if (empty($codes)) {
         http_response_code(404);
-        echo json_encode(['status' => 'ERROR', 'message' => 'Codul nu a fost găsit.']);
-        exit;
-    }
-
-    $code_data = $codes[0];
-    $current_status = $code_data['status'];
-
-    $update_data = [];
-
-    // 2. Check current status and prepare update data
-    if ($current_status === 'issued') {
-        $update_data['status'] = 'used';
-        $update_data['used_at'] = gmdate('c'); // ISO 8601 format (UTC)
-    } elseif ($current_status === 'used' && ($reported_revenue_ron === null || !is_numeric($reported_revenue_ron))) {
-        // If it's already used and no new valid revenue is being reported, exit successfully.
-        // If reported_revenue_ron IS a number, we proceed to update it in the next block.
-        http_response_code(200);
-        echo json_encode(['status' => 'SUCCESS', 'message' => 'Codul este deja utilizat. Nicio modificare necesară.']);
-        exit;
-    } elseif ($current_status !== 'used' && $current_status !== 'issued') {
-        http_response_code(400);
-        echo json_encode(['status' => 'ERROR', 'message' => 'Codul are un status invalid pentru răscumpărare.']);
+        echo json_encode(['status' => 'ERROR', 'message' => 'Code not found.']);
         exit;
     }
     
-    // CRUCIAL FIX: Ensure reported_revenue_ron is only set if it's a valid number.
-    if ($reported_revenue_ron !== null && is_numeric($reported_revenue_ron)) {
-        // Cast to float to ensure correct numeric type for DB insertion
-        $update_data['reported_revenue_ron'] = (float)$reported_revenue_ron;
-    }
-
-    // If we're here and $update_data is empty, something is wrong with the flow.
-    if (empty($update_data)) {
-        http_response_code(400);
-        echo json_encode(['status' => 'ERROR', 'message' => 'Nicio dată validă de actualizat furnizată.']);
-        exit;
-    }
-
-    // 3. Apply updates (using Service Role Key)
-    $update_query_params = ['id' => 'eq.' . $code_id];
-    $update_result = supabase_update('codes', $update_data, $update_query_params, $supabaseUrl, $supabaseAnonKey, $supabaseKey);
-
-    if ($update_result['httpcode'] >= 200 && $update_result['httpcode'] < 300) {
-        http_response_code(200);
-        echo json_encode(['status' => 'SUCCESS', 'message' => 'Cod actualizat cu succes.']);
-    } else {
-        error_log("Redeem Code Update Supabase Error: HTTP {$update_result['httpcode']}. Response: {$update_result['response']}");
-        http_response_code(500);
-        echo json_encode(['status' => 'ERROR', 'message' => 'Eroare la actualizarea statusului codului.']);
-    }
+    // If it exists but we couldn't update, it's a server or unknown status error.
+    error_log("Redeem Code Final Update Failure for ID {$code_id}. Status update HTTP: {$update_result['httpcode']}. Revenue update HTTP: " . ($revenue_result['httpcode'] ?? 'N/A'));
+    http_response_code(500);
+    echo json_encode(['status' => 'ERROR', 'message' => 'Failed to update code status or revenue due to an internal error.']);
+    
     exit;
 }
 
@@ -904,7 +931,7 @@ if ($method === 'POST' && $route === '/api/save-push-subscription') {
 
     if (empty($endpoint) || empty($p256dh) || empty($auth)) {
         http_response_code(400);
-        echo json_encode(['error' => 'Datele de abonare sunt incomplete.']);
+        echo json_encode(['error' => 'Incomplete subscription data.']);
         exit;
     }
 
@@ -913,11 +940,12 @@ if ($method === 'POST' && $route === '/api/save-push-subscription') {
         'endpoint' => $endpoint,
         'p256dh' => $p256dh,
         'auth' => $auth,
-        'expiration_time' => $expiration_time ? date('c', $expiration_time / 1000) : null // Convert ms to ISO 8601
+        // Convert ms to ISO 8601, Supabase JWT is not used here (pass null)
+        'expiration_time' => $expiration_time ? gmdate('c', $expiration_time / 1000) : null 
     ];
 
-    // Use the Anon Key for public insert, RLS policy handles permissions
-    $result = supabase_insert('push_subscriptions', $insert_data, $supabaseUrl, $supabaseAnonKey, null); // Pass null for user JWT
+    // Use the Anon Key for public insert. Note: $supabaseKey is passed as null.
+    $result = supabase_insert('push_subscriptions', $insert_data, $supabaseUrl, $supabaseAnonKey, null, 'return=minimal'); 
 
     if ($result['httpcode'] === 201) {
         http_response_code(200);
@@ -928,13 +956,13 @@ if ($method === 'POST' && $route === '/api/save-push-subscription') {
     } else {
         error_log("Supabase Subscription Save Error: HTTP {$result['httpcode']}. Response: {$result['response']}");
         http_response_code(500);
-        echo json_encode(['error' => 'A apărut o eroare la salvarea abonamentului.']);
+        echo json_encode(['error' => 'An error occurred while saving the subscription.']);
     }
     exit;
 }
 
 // If no route is matched, return a 404 error
 http_response_code(404);
-echo json_encode(['error' => 'Pagină negăsită.']);
+echo json_encode(['error' => 'Page not found.']);
 
 ?>

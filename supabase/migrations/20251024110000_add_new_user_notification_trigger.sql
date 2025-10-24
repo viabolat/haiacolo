@@ -10,7 +10,7 @@ BEGIN
     -- The body is structured to mimic a standard Supabase webhook payload.
     PERFORM net.http_post(
         url := 'https://gucrinbliukkhubtxhqn.supabase.co/functions/v1/user-signup-alert',
-        headers := '{"Content-Type": "application/json", "Authorization": "Bearer ' || secrets.get('SUPABASE_SERVICE_ROLE_KEY') || '"}'::jsonb,
+        headers := '{"Content-Type": "application/json"}'::jsonb,
         body := jsonb_build_object(
             'type', 'INSERT',
             'table', 'customers',

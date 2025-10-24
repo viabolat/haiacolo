@@ -14,6 +14,7 @@ async function sha256(text: string) {
 // These secrets are stored securely in Supabase secrets
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
 const ERROR_HTML = `
   <html><body style="font-family: sans-serif; text-align: center; padding: 40px;">
@@ -21,6 +22,120 @@ const ERROR_HTML = `
     <p>This approval link is either invalid or has expired. Please generate a new one if needed.</p>
   </body></html>
 `;
+
+// Inline email template function
+const getMerchantApprovalEmailTemplate = (businessName: string, offerDescription: string): string => {
+  return `
+    <!DOCTYPE html>
+    <html lang="ro">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Parteneriatul tău a fost aprobat! | HaiAcolo</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                color: #333;
+                line-height: 1.6;
+            }
+            .container {
+                max-width: 600px;
+                margin: 20px auto;
+                padding: 20px;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+            }
+            .header {
+                text-align: center;
+                padding-bottom: 20px;
+                border-bottom: 1px solid #eee;
+            }
+            .header img {
+                max-width: 150px;
+            }
+            .content {
+                padding: 20px 0;
+            }
+            .offer-box {
+                background-color: #f0f9ff;
+                border-left: 4px solid #0ea5e9;
+                padding: 15px;
+                margin: 20px 0;
+                border-radius: 4px;
+            }
+            .footer {
+                text-align: center;
+                font-size: 12px;
+                color: #888;
+                margin-top: 20px;
+                padding-top: 20px;
+                border-top: 1px solid #eee;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <img src="https://haiacolo.ro/public/logo.png" alt="HaiAcolo Logo">
+                <h1>Felicitări, ${businessName}!</h1>
+            </div>
+            <div class="content">
+                <p>Salut,</p>
+                <p>Avem vești excelente! Aplicația ta a fost aprobată și ești oficial partener HaiAcolo. Bun venit în
+                    comunitate!</p>
+                <p>Vom începe să promovăm oferta ta către abonații noștri interesați:</p>
+                <div class="offer-box">
+                    <p><strong>Oferta ta activă:</strong> "${offerDescription}"</p>
+                </div>
+                <p>Îți reamintim că parteneriatul nostru este bazat pe performanță. Asta înseamnă că vei plăti un comision
+                    doar atunci când un client HaiAcolo scanează un cod de ofertă la locația ta, generând o vânzare directă.
+                </p>
+                <p>Îți mulțumim pentru încredere și abia așteptăm să contribuim la succesul afacerii tale!</p>
+            </div>
+            <div class="footer">
+                <p>&copy; 2025 HaiAcolo. Toate drepturile rezervate.</p>
+                <p style="margin-top: 10px;">Te rugăm să nu răspunzi la acest email. Adresa nu este monitorizată. Pentru
+                    orice întrebări, te rugăm să ne contactezi la <a href="mailto:contact@haiacolo.ro"
+                        style="color: #007bff;">contact@haiacolo.ro</a>.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+  `;
+};
+
+/**
+ * Sends an approval notification email to the merchant.
+ * @param merchant The merchant object containing contact details.
+ */
+async function sendApprovalEmail(merchant: any) {
+  if (!RESEND_API_KEY) {
+    console.error("❌ RESEND_API_KEY is not set. Cannot send approval email.");
+    return;
+  }
+
+  try {
+    const emailHtml = getMerchantApprovalEmailTemplate(merchant.name, merchant.offer_description);
+
+    const resendResponse = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${RESEND_API_KEY}`,
+      },
+      body: JSON.stringify({
+        from: `HaiAcolo <noreply@haiacolo.ro>`,
+        to: merchant.contact_email,
+        subject: `Felicitări! Parteneriatul tău HaiAcolo a fost aprobat!`,
+        html: emailHtml,
+      }),
+    });
+
+    console.log(`📬 Approval email to ${merchant.contact_email} - Resend status: ${resendResponse.status}`);
+  } catch (error) {
+    console.error("❌ Error sending approval email:", error);
+  }
+}
 
 serve(async (req) => {
   console.log("🔐 Handle Merchant Approval triggered!");
@@ -46,13 +161,14 @@ serve(async (req) => {
     console.log("🔑 Environment check:");
     console.log("- SUPABASE_URL:", !!SUPABASE_URL);
     console.log("- SUPABASE_SERVICE_ROLE_KEY:", !!SUPABASE_SERVICE_ROLE_KEY);
+    console.log("- RESEND_API_KEY:", !!RESEND_API_KEY);
 
     if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
       console.error("❌ Missing environment variables");
       return new Response("Server configuration error", { status: 500 });
     }
 
-    // Create Supabase client with service role key - THIS IS THE KEY FIX
+    // Create Supabase client with service role key
     const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
       auth: {
         autoRefreshToken: false,
@@ -143,7 +259,12 @@ serve(async (req) => {
 
     console.log("✅ Merchant updated successfully:", updatedMerchant.name);
 
-    // 6. Return a user-friendly confirmation page
+    // 6. Send approval email to the merchant if the action was an approval
+    if (action.includes('approve')) {
+      await sendApprovalEmail(updatedMerchant);
+    }
+
+    // 7. Return a user-friendly confirmation page
     const confirmationHtml = `
       <html>
         <head>
