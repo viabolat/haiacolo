@@ -5,6 +5,7 @@
 .env
 ignore
 qrcodes
+secrets.php
 
 # Python Virtual Environment
 /.venv/

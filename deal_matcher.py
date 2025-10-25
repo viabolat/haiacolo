@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 import shutil
+import json
 
 load_dotenv()
 import random
@@ -38,7 +39,11 @@ SUPABASE_API_KEY: Optional[str] = os.environ.get("SUPABASE_API_KEY")
 if not SUPABASE_URL or not SUPABASE_API_KEY:
     raise ValueError("Supabase URL and API Key must be set in your .env file.")
 
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_API_KEY)
+try:
+    supabase: Client = create_client(SUPABASE_URL, SUPABASE_API_KEY)
+except Exception as e:
+    print(f"FATAL: Could not initialize Supabase client: {e}")
+    raise
 
 
 def generate_short_code(length: int = 6) -> str:
@@ -256,6 +261,7 @@ def run_deal_matching():
         pending_sends_to_insert: List[Dict[str, Any]] = []
         codes_to_log: List[Dict[str, Any]] = []
         total_eligible_count = 0
+        BATCH_SIZE = 500  # Process inserts in chunks to avoid timeouts
 
         for merchant in merchants:
             merchant_id = merchant["id"]
@@ -281,15 +287,28 @@ def run_deal_matching():
                 if (customer_id, str(merchant_id)) in sent_deal_logs:
                     continue
 
-                # SCHEMA: zone is TEXT (single string), interests is TEXT[] (array)
-                customer_zone = (c.get("zone") or "").lower().strip()
+                # SCHEMA: zone is TEXT[], interests is TEXT[] (array)
+                customer_zones_raw = c.get("zone") or []
                 customer_interests_raw = c.get("interests") or []
-                customer_interests = [
-                    i.lower().strip() for i in customer_interests_raw if i
-                ]
 
-                # Check zone match (exact match since zone is a single string)
-                zone_match = customer_zone == merchant_location
+                # The supabase-py library should automatically convert TEXT[] to a Python list,
+                # but it appears to sometimes return a string representation of a list.
+                if isinstance(customer_zones_raw, str):
+                    try:
+                        # The string can be a JSON-like array with unescaped newlines.
+                        customer_zones_raw = json.loads(customer_zones_raw.replace('\n', ''))
+                    except json.JSONDecodeError:
+                        print(f"   ⚠️  Customer {customer_id} has malformed 'zone' data (could not parse string): {customer_zones_raw}")
+                        customer_zones_raw = []
+                if not isinstance(customer_zones_raw, list):
+                    print(f"   ⚠️  Customer {customer_id} has malformed 'zone' data (expected list): {customer_zones_raw}")
+                    customer_zones_raw = []
+
+                customer_zones = [str(z).lower().strip() for z in customer_zones_raw if z]
+                customer_interests = [str(i).lower().strip() for i in customer_interests_raw if i]
+
+                # Check zone match (merchant location must be in customer's zones array)
+                zone_match = merchant_location in customer_zones
 
                 # Check interest match (merchant type must be in customer's interests array)
                 interest_match = merchant_type in customer_interests
@@ -297,7 +316,7 @@ def run_deal_matching():
                 if zone_match and interest_match:
                     eligible_customers.append(c)
                     print(
-                        f"      ✓ Match: {c.get('phone_number')} (zone: {customer_zone}, interests: {customer_interests})"
+                        f"      ✓ Match: {c.get('phone_number')} (zones: {customer_zones}, interests: {customer_interests})"
                     )
 
             if not eligible_customers:
@@ -375,17 +394,23 @@ def run_deal_matching():
         print(f"  - Deals to send: {len(pending_sends_to_insert)}")
 
         if pending_sends_to_insert:
+            # --- Batch insert into database ---
             try:
                 if codes_to_log:
-                    print(f"\n💾 Inserting {len(codes_to_log)} codes into database...")
-                    supabase.table("codes").insert(codes_to_log).execute()
-                    print("   ✅ Codes inserted successfully")
+                    print(f"\n💾 Inserting {len(codes_to_log)} codes into 'codes' table...")
+                    for i in range(0, len(codes_to_log), BATCH_SIZE):
+                        batch = codes_to_log[i:i + BATCH_SIZE]
+                        supabase.table("codes").insert(batch).execute()
+                        print(f"   ... inserted batch {i // BATCH_SIZE + 1}")
+                    print("   ✅ All codes inserted successfully.")
 
-                print(f"💾 Inserting {len(pending_sends_to_insert)} pending sends...")
-                supabase.table("pending_sends").insert(
-                    pending_sends_to_insert
-                ).execute()
-                print("   ✅ Pending sends inserted successfully")
+                if pending_sends_to_insert:
+                    print(f"\n💾 Inserting {len(pending_sends_to_insert)} deals into 'pending_sends' table...")
+                    for i in range(0, len(pending_sends_to_insert), BATCH_SIZE):
+                        batch = pending_sends_to_insert[i:i + BATCH_SIZE]
+                        supabase.table("pending_sends").insert(batch).execute()
+                        print(f"   ... inserted batch {i // BATCH_SIZE + 1}")
+                    print("   ✅ All pending sends inserted successfully.")
 
                 email_subject = f"{len(pending_sends_to_insert)} New HaiAcolo Deals are Ready to Send"
                 email_body = (

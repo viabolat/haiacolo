@@ -749,41 +749,51 @@ if ($method === 'POST' && $route === '/api/send-outreach') {
 }
 
 function process_code_redemption_php($code, $supabaseUrl, $supabaseAnonKey, $supabaseKey) {
-    $query_params = [
-        'p_code_string' => $code
-    ];
+    // 1. Check code status and get details
+    $code_details = check_deal_code_status($code, $supabaseUrl, $supabaseAnonKey, $supabaseKey);
 
-    $url = $supabaseUrl . '/rest/v1/rpc/process_code_redemption';
-    $headers = [
-        'Content-Type: application/json',
-        'apikey: ' . $supabaseAnonKey,
-        'Authorization: Bearer ' . $supabaseKey
-    ];
-
-    $result = execute_curl_request($url, 'POST', $headers, json_encode($query_params));
-
-    error_log("Supabase process_code_redemption response: " . print_r($result, true));
-
-    if ($result['httpcode'] !== 200) {
-        return [
-            'httpcode' => $result['httpcode'],
-            'response' => ['status' => 'ERROR', 'message' => 'Failed to process redemption.']
-        ];
+    if ($code_details['status'] === 'INVALID') {
+        return ['httpcode' => 200, 'response' => ['status' => 'INVALID', 'message' => $code_details['message']]];
     }
 
-    $response_data = json_decode($result['response'], true);
-
-    if (empty($response_data)) {
-        return [
-            'httpcode' => 404,
-            'response' => ['status' => 'INVALID', 'message' => 'Code not found.']
-        ];
+    if ($code_details['status'] === 'ALREADY_USED') {
+        return ['httpcode' => 200, 'response' => ['status' => 'ALREADY_USED', 'used_at' => $code_details['used_at']]];
     }
 
-    return [
-        'httpcode' => $result['httpcode'],
-        'response' => $response_data[0]
+    if ($code_details['status'] === 'ERROR') {
+        return ['httpcode' => 500, 'response' => ['status' => 'ERROR', 'message' => $code_details['message']]];
+    }
+
+    // At this point, status is 'VALID'. The code exists and is 'issued'.
+    // $code_details contains 'code_id' and 'offer'.
+
+    // 2. Redeem the code (mark as 'used')
+    $update_data = [
+        'status' => 'used',
+        'used_at' => gmdate('c') // ISO 8601 format (UTC)
     ];
+    $update_query_params = [
+        'id' => 'eq.' . $code_details['code_id'],
+        'status' => 'eq.issued' // Atomic update
+    ];
+
+    $update_result = supabase_update('codes', $update_data, $update_query_params, $supabaseUrl, $supabaseAnonKey, $supabaseKey, 'return=minimal');
+
+    if ($update_result['httpcode'] === 204 || $update_result['httpcode'] === 200) { // 204 is success with no content, 200 can also be success
+        // Success!
+        return ['httpcode' => 200, 'response' => [
+            'status' => 'SUCCESS',
+            'code_id' => $code_details['code_id'],
+            'offer' => $code_details['offer']
+        ]];
+    } else {
+        // The update failed for some reason.
+        error_log("Atomic redemption failed for code ID {$code_details['code_id']} even after check. HTTP: {$update_result['httpcode']}. Response: {$update_result['response']}");
+        return [
+            'httpcode' => 500,
+            'response' => ['status' => 'ERROR', 'message' => 'Failed to save redemption status after validation.']
+        ];
+    }
 }
 
 // Handle processing a redemption

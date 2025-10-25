@@ -411,14 +411,14 @@
                                 <h4 class="font-semibold text-gray-800">Mâncare și Băutură</h4>
                                 <div class="pl-4 mt-2 space-y-2">
                                     <label class="flex items-center">
-                                        <input type="checkbox" name="interests" value="Restaurante"
+                                        <input type="checkbox" name="interests" value="Restaurant"
                                             class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
-                                        <span class="ml-2 text-sm text-gray-700">Restaurante</span>
+                                        <span class="ml-2 text-sm text-gray-700">Restaurant</span>
                                     </label>
                                     <label class="flex items-center">
-                                        <input type="checkbox" name="interests" value="Cafenele"
+                                        <input type="checkbox" name="interests" value="Cafenea"
                                             class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
-                                        <span class="ml-2 text-sm text-gray-700">Cafenele</span>
+                                        <span class="ml-2 text-sm text-gray-700">Cafenea</span>
                                     </label>
                                     <label class="flex items-center">
                                         <input type="checkbox" name="interests" value="Brutării și Cofetării"
@@ -686,7 +686,7 @@
             const counterValueElement = document.getElementById('counter-value');
 
             function handleSuccessfulSubmission(qrData, codeString, emailProvided) {
-                window.location.href = `/offer.html?code=${codeString}&qr=${encodeURIComponent(qrData)}&email=${emailProvided}`;
+                window.location.replace(`/offer.html?code=${codeString}&qr=${encodeURIComponent(qrData)}&email=${emailProvided}`);
             }
 
             signupForm.addEventListener('submit', async (e) => {
