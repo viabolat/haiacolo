@@ -1,42 +1,39 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
-        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<?xml version='1.0' encoding='UTF-8'?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9         http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
 
   <url>
     <loc>https://haiacolo.ro/</loc>
-    <lastmod>2025-10-17T00:00:00+00:00</lastmod>
+    <lastmod>2025-10-22T17:56:36.692231+00:00</lastmod>
     <priority>1.00</priority>
   </url>
 
   <url>
     <loc>https://haiacolo.ro/founder</loc>
-    <lastmod>2025-10-17T00:00:00+00:00</lastmod>
+    <lastmod>2025-10-22T17:56:36.692231+00:00</lastmod>
     <priority>0.80</priority>
   </url>
 
   <url>
     <loc>https://haiacolo.ro/business</loc>
-    <lastmod>2025-10-17T00:00:00+00:00</lastmod>
+    <lastmod>2025-10-26T15:43:36.003859+00:00</lastmod>
     <priority>0.80</priority>
   </url>
 
   <url>
     <loc>https://haiacolo.ro/user</loc>
-    <lastmod>2025-10-17T00:00:00+00:00</lastmod>
+    <lastmod>2025-10-26T16:22:37.291861+00:00</lastmod>
     <priority>0.80</priority>
   </url>
 
   <url>
     <loc>https://haiacolo.ro/privacy</loc>
-    <lastmod>2025-10-17T00:00:00+00:00</lastmod>
+    <lastmod>2025-10-22T17:56:36.728237+00:00</lastmod>
     <priority>0.80</priority>
   </url>
 
   <url>
     <loc>https://haiacolo.ro/directory</loc>
-    <lastmod>2025-10-17T00:00:00+00:00</lastmod>
+    <lastmod>2025-10-22T17:56:36.676229+00:00</lastmod>
     <priority>0.70</priority>
   </url>
 

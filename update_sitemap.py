@@ -17,24 +17,46 @@ SITEMAP_FILE = os.environ.get("SITEMAP_FILE", "sitemap.xml")
 # The base URL of your website
 BASE_URL = os.environ.get("BASE_URL", "https://haiacolo.ro/")
 
-def get_html_files(base_path: str = ".") -> Dict[str, str]:
+# List of specific filenames to exclude from the sitemap
+FILES_TO_EXCLUDE = {
+    "404.html",
+    "admin.html",
+    "sender.html",
+    "verify.html",
+    "merchant_dashboard.html",
+    "merchant_demo.html",
+    "outreach_email.html",
+    "offer.html",
+}
+
+# List of directories to exclude from the sitemap scan
+DIRS_TO_EXCLUDE = {".git", ".github", ".venv", "node_modules", "extras", "ignore", "templates"}
+
+def get_html_files(base_path: str = ".") -> dict[str, str]:
     """
     Dynamically discovers HTML files and creates a URL-to-file mapping.
     Assumes URLs are derived directly from file paths relative to BASE_URL.
+    Respects the DIRS_TO_EXCLUDE and FILES_TO_EXCLUDE configurations.
     """
     html_map = {}
-    for root, _, files in os.walk(base_path):
+    for root, dirs, files in os.walk(base_path):
+        # Modify the dir list in-place to prevent os.walk from descending into excluded dirs
+        dirs[:] = [d for d in dirs if d not in DIRS_TO_EXCLUDE]
+
         for file in files:
-            if file.endswith(".html"):
+            if file.endswith(".html") and file not in FILES_TO_EXCLUDE:
                 relative_path = Path(root) / file
                 # Construct URL: replace .html with empty string for root, otherwise use filename
                 if file == "index.html":
                     url_path = ""
                 else:
-                    url_path = file.replace(".html", "")
+                    # Create a clean URL path from the relative file path
+                    url_path = str(relative_path.with_suffix(''))
+                    # On Windows, paths might use backslashes; ensure they are forward slashes for URLs
+                    url_path = url_path.replace("\\", "/")
+
                 html_map[f"{BASE_URL}{url_path}"] = str(relative_path)
     return html_map
-
 
 def update_sitemap_lastmod(dry_run: bool = False):
     """
@@ -54,24 +76,31 @@ def update_sitemap_lastmod(dry_run: bool = False):
         root = tree.getroot()
         ns = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
 
-        # Dynamically get the mapping of URLs to local files
+        # Dynamically get the mapping of valid URLs to local files
         url_to_file_map = get_html_files()
+        valid_urls = set(url_to_file_map.keys())
         
-        urls_processed = 0
         urls_in_sitemap = set()
+        elements_to_remove = []
         changes_made = False
 
-        # First pass: Update existing URLs and track them
+        # First pass: Identify URLs to update, and mark invalid ones for removal
         for url_element in root.findall("sm:url", ns):
             loc_element = url_element.find("sm:loc", ns)
             if loc_element is None or not loc_element.text:
-                logger.warning("Skipping malformed <url> entry (missing or empty <loc>).")
+                logger.warning("Found malformed <url> entry, marking for removal.")
+                elements_to_remove.append(url_element)
+                changes_made = True
                 continue
 
             url = loc_element.text.strip()
             urls_in_sitemap.add(url)
 
-            if url in url_to_file_map:
+            if url not in valid_urls:
+                logger.info(f"  -> Marking for removal: {url}")
+                elements_to_remove.append(url_element)
+                changes_made = True
+            elif url in url_to_file_map:
                 filepath = url_to_file_map[url]
                 if os.path.exists(filepath):
                     mod_time_unix = os.path.getmtime(filepath)
@@ -88,11 +117,11 @@ def update_sitemap_lastmod(dry_run: bool = False):
                         lastmod_element.text = w3c_format_date
                         logger.info(f"  -> Updated {url} to {w3c_format_date}")
                         changes_made = True
-                    urls_processed += 1
-                else:
-                    logger.warning(f"  -> Warning: File not found for URL {url} at {filepath}. Skipping update.")
-            else:
-                logger.warning(f"  -> Warning: URL {url} found in sitemap but not in dynamic file map. Skipping update.")
+
+        # Perform the removal of marked elements
+        if elements_to_remove:
+            for elem in elements_to_remove:
+                root.remove(elem)
 
         # Second pass: Add new URLs that are not yet in the sitemap
         for url, filepath in url_to_file_map.items():
@@ -109,20 +138,15 @@ def update_sitemap_lastmod(dry_run: bool = False):
                     lastmod_element.text = w3c_format_date
                     logger.info(f"  -> Added new URL {url} with lastmod {w3c_format_date}")
                     changes_made = True
-                    urls_processed += 1
-                else:
-                    logger.warning(f"  -> Warning: Dynamically discovered file {filepath} for URL {url} not found. Skipping addition.")
-
 
         if changes_made and not dry_run:
             # Write the changes back to the sitemap file
             tree.write(SITEMAP_FILE, encoding="UTF-8", xml_declaration=True)
-            logger.info(f"\nSitemap update complete. {urls_processed} URLs processed/added.")
+            logger.info(f"\nSitemap update complete. {len(valid_urls)} URLs are now in the sitemap.")
         elif changes_made and dry_run:
-            logger.info(f"\nDry run complete. {urls_processed} URLs would have been processed/added.")
+            logger.info(f"\nDry run complete. Sitemap would be updated to contain {len(valid_urls)} URLs.")
         else:
             logger.info("\nNo changes needed for sitemap.xml.")
-
 
     except (FileNotFoundError, ET.ParseError) as e:
         logger.error(f"Error: Could not read or parse {SITEMAP_FILE}. Details: {e}")
@@ -139,3 +163,4 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     update_sitemap_lastmod(dry_run=args.dry_run)
+
