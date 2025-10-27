@@ -6,12 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Invitație Parteneri Fondatori | HaiAcolo</title>
 
-    <!-- SEO Meta Tags -->
     <meta name="description"
         content="Invitație exclusivă pentru afacerile locale din Cluj-Napoca să devină membri fondatori HaiAcolo. Obține vizibilitate, tarif blocat și poziție premium.">
     <link rel="canonical" href="https://www.haiacolo.ro/founder" />
 
-    <!-- Open Graph (Facebook, LinkedIn) -->
     <meta property="og:title" content="Devino Partener Fondator în Cluj | HaiAcolo" />
     <meta property="og:description"
         content="Ofertă exclusivă: Tarif blocat (7.50 RON) și poziție premium pentru primele 10 afaceri din Cluj. Asigură-ți locul acum!" />
@@ -20,12 +18,11 @@
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="HaiAcolo" />
 
-    <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Devino Partener Fondator în Cluj | HaiAcolo" />
-    <meta name="twitter:description"
+    <meta property="twitter:description"
         content="Ofertă exclusivă: Tarif blocat și poziție premium pentru primele 10 afaceri din Cluj. Asigură-ți locul acum!" />
-    <meta name="twitter:image" content="https://www.haiacolo.ro/public/logo.png" />
+    <meta property="twitter:image" content="https://www.haiacolo.ro/public/logo.png" />
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -34,28 +31,12 @@
                 extend: {
                     colors: {
                         primary: {
-                            50: '#f5f3ff',
-                            100: '#ede9fe',
-                            200: '#ddd6fe',
-                            300: '#c4b5fd',
-                            400: '#a78bfa',
-                            500: '#8b5cf6',
-                            600: '#7c3aed',
-                            700: '#6d28d9',
-                            800: '#5b21b6',
-                            900: '#4c1d95',
+                            50: '#f5f3ff', 100: '#ede9fe', 200: '#ddd6fe', 300: '#c4b5fd', 400: '#a78bfa',
+                            500: '#8b5cf6', 600: '#7c3aed', 700: '#6d28d9', 800: '#5b21b6', 900: '#4c1d95',
                         },
                         secondary: {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            200: '#bae6fd',
-                            300: '#7dd3fc',
-                            400: '#38bdf8',
-                            500: '#0ea5e9',
-                            600: '#0284c7',
-                            700: '#0369a1',
-                            800: '#075985',
-                            900: '#0c4a6e',
+                            50: '#f0f9ff', 100: '#e0f2fe', 200: '#bae6fd', 300: '#7dd3fc', 400: '#38bdf8',
+                            500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1', 800: '#075985', 900: '#0c4a6e',
                         }
                     }
                 }
@@ -71,7 +52,6 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/public/logo.png">
     <link rel="icon" href="/public/logo.svg" type="image/svg+xml" sizes="any">
 
-    <!-- JSON-LD Structured Data -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -102,19 +82,8 @@
         html {
             scroll-behavior: smooth;
         }
-
-        .logo-circle {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #8b5cf6 0%, #0ea5e9 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            box-shadow: 0 4px 6px rgba(139, 92, 246, 0.2);
-            border: 2px solid #8b5cf6;
-        }
+        
+        /* Removed .logo-circle and complex header gradient styles */
 
         .gradient-text {
             background: linear-gradient(135deg, #8b5cf6 0%, #0ea5e9 100%);
@@ -124,58 +93,40 @@
             font-weight: 700;
         }
 
-        #mobile-menu {
-            transition: all 0.3s ease;
-        }
+        /* Removed redundant mobile menu transition style */
     </style>
 </head>
 
 <body class="bg-gray-50 text-gray-900 flex flex-col min-h-screen">
 
-    <header class="bg-gradient-to-r from-secondary-600 to-primary-600 shadow-lg sticky top-0 z-50">
-        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" aria-label="Main navigation">
-            <div class="flex justify-between items-center py-4">
-                <a href="/index" title="HaiAcolo Home" class="hover:opacity-90 transition-opacity flex items-center">
-                    <div class="logo-circle mr-3 floating" aria-hidden="true">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-5 h-5 fill-white">
-                            <path
-                                d="M505 174.8l-39.6-39.6c-9.4-9.4-24.6-9.4-33.9 0L192 374.7 80.6 263.2c-9.4-9.4-24.6-9.4-33.9 0L7 302.9c-9.4 9.4-9.4 24.6 0 34L175 505c9.4 9.4 24.6 9.4 33.9 0l296-296.2c9.4-9.5 9.4-24.7 .1-34zm-324.3 106c6.2 6.3 16.4 6.3 22.6 0l208-208.2c6.2-6.3 6.2-16.4 0-22.6L366.1 4.7c-6.2-6.3-16.4-6.3-22.6 0L192 156.2l-55.4-55.5c-6.2-6.3-16.4-6.3-22.6 0L68.7 146c-6.2 6.3-6.2 16.4 0 22.6l112 112.2z" />
-                        </svg>
-                    </div>
-                    <span class="text-xl font-bold text-white italic">HaiAcolo</span>
-                </a>
-                <div class="hidden md:flex space-x-8">
-                    <a href="/user" class="text-white hover:text-secondary-200 transition-colors nav-link">Vreau
-                        Oferte</a>
-                    <a href="/founder" class="font-bold text-secondary-200 transition-colors nav-link">Pentru
-                        Afaceri</a>
-                    <a href="/directory"
-                        class="text-white hover:text-secondary-200 transition-colors nav-link">Parteneri</a>
-                    <a href="mailto:contact@haiacolo.ro"
-                        class="text-white hover:text-secondary-200 nav-link">Contact</a>
-                </div>
-                <button id="mobile-menu-button" class="md:hidden text-white">
-                    <i class="fas fa-bars text-xl"></i>
-                </button>
-            </div>
-        </nav>
+    <header class="p-4 bg-white shadow-md sticky top-0 z-10">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <a href="/index" title="HaiAcolo Home" class="flex items-center text-xl font-bold text-gray-900">
+                <img src="/public/logo.svg" alt="HaiAcolo Logo" class="w-10 h-10 mr-2">
+                HaiAcolo
+            </a>
+            <nav class="hidden md:flex space-x-6">
+                <a href="/user" class="text-gray-600 hover:text-secondary-600 font-medium transition duration-200">Vreau Oferte</a>
+                <a href="/founder" class="font-bold text-primary-600 transition-colors">Pentru Afaceri</a>
+                <a href="/directory" class="text-gray-600 hover:text-primary-600 font-medium transition duration-200">Parteneri</a>
+            </nav>
+            <button id="mobile-menu-button-founder" class="md:hidden text-gray-600">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+        </div>
     </header>
 
-    <div id="mobile-menu" class="hidden fixed inset-0 bg-white z-50 pt-20">
-        <button id="close-mobile-menu" class="absolute top-4 right-4 text-gray-600">
+    <div id="mobile-menu-founder" class="hidden fixed inset-0 bg-white z-50 pt-20">
+        <button id="close-mobile-menu-founder" class="absolute top-4 right-4 text-gray-600">
             <i class="fas fa-times text-2xl"></i>
         </button>
-        <div class="space-y-8 text-center">
-            <a href="mailto:contact@haiacolo.ro"
-                class="block text-2xl font-medium text-gray-900 hover:text-indigo-600">Contact</a>
-            <a href="/directory" class="block text-2xl font-medium text-gray-900 hover:text-indigo-600">Parteneri</a>
-            <a href="/user" class="block text-2xl font-medium text-gray-900 hover:text-indigo-600">Vreau Oferte</a>
-            <a href="/founder" class="block text-2xl font-medium text-gray-900 hover:text-indigo-600">Pentru
-                Afacere</a>
-            <a href="/privacy"
-                class="block text-2xl font-medium text-gray-900 hover:text-indigo-600">Confidențialitate</a>
+        <div class="space-y-8 text-center p-6">
+            <a href="/user" class="block text-2xl font-medium text-gray-900 hover:text-secondary-600">Vreau Oferte</a>
+            <a href="/founder" class="block text-2xl font-medium text-primary-600 hover:text-primary-700">Pentru Afaceri</a>
+            <a href="/directory" class="block text-2xl font-medium text-gray-900 hover:text-primary-600">Parteneri</a>
         </div>
     </div>
+
 
     <main class="flex-grow">
         <div class="max-w-4xl mx-auto px-6 py-4 bg-secondary-100 border-l-4 border-secondary-500 rounded-md mt-6">
@@ -184,6 +135,7 @@
                     class="text-primary-600 hover:underline">Revino la pagina de oferte!</a>
             </p>
         </div>
+        
         <section class="py-16 px-6 bg-white">
             <div class="max-w-4xl mx-auto text-center">
                 <h1 class="text-4xl md:text-5xl font-bold mb-4 gradient-text">Devino un Partener Fondator în Cluj!</h1>
@@ -203,7 +155,7 @@
             <div class="max-w-4xl mx-auto grid md:grid-cols-2 gap-10 items-center">
                 <div>
                     <div class="flex justify-center -mt-8 mb-16">
-                        <div id="urgency-message" class="mt-4"></div>
+                        <div id="urgency-message"></div>
                     </div>
                     <h2 class="text-3xl font-semibold mb-4 text-primary-700">Beneficii Exclusive de Fondator</h2>
                     <ul class="list-disc list-inside text-lg text-gray-700 space-y-3">
@@ -227,7 +179,6 @@
                 </div>
             </div>
         </section>
-
 
 
         <section class="py-16 px-6 bg-gray-100">
@@ -312,55 +263,14 @@
         </section>
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-gradient-to-r from-primary-800 to-secondary-800 text-white py-10 mt-16">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid md:grid-cols-3 gap-8">
-                <div>
-                    <div class="flex items-center mb-4">
-                        <div class="logo-circle mr-3" aria-hidden="true">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-5 h-5 fill-white">
-                                <path
-                                    d="M505 174.8l-39.6-39.6c-9.4-9.4-24.6-9.4-33.9 0L192 374.7 80.6 263.2c-9.4-9.4-24.6-9.4-33.9 0L7 302.9c-9.4 9.4-9.4 24.6 0 34L175 505c9.4 9.4 24.6 9.4 33.9 0l296-296.2c9.4-9.5 9.4-24.7 .1-34zm-324.3 106c6.2 6.3 16.4 6.3 22.6 0l208-208.2c6.2-6.3 6.2-16.4 0-22.6L366.1 4.7c-6.2-6.3-16.4-6.3-22.6 0L192 156.2l-55.4-55.5c-6.2-6.3-16.4-6.3-22.6 0L68.7 146c-6.2 6.3-6.2 16.4 0 22.6l112 112.2z" />
-                            </svg>
-                        </div>
-                        <span class="text-xl font-bold text-white italic">HaiAcolo</span>
-                    </div>
-                    <p class="text-primary-200 mb-4">Promovare locală simplificată</p>
-                </div>
-                <div>
-                    <h4 class="text-white font-semibold mb-4">Navigare</h4>
-                    <ul class="space-y-2">
-                        <li><a href="/user" class="text-primary-200 hover:text-white transition-colors">Vreau
-                                Oferte</a>
-                        </li>
-                        <li><a href="/founder" class="text-primary-200 hover:text-white transition-colors">Pentru
-                                Afaceri</a>
-                        </li>
-                        <li><a href="/directory"
-                                class="text-primary-200 hover:text-white transition-colors">Parteneri</a>
-                        </li>
-                        <li><a href="mailto:contact@haiacolo.ro"
-                                class="text-primary-200 hover:text-white transition-colors">Contact</a>
-                        </li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="text-white font-semibold mb-4">Legal</h4>
-                    <ul class="space-y-2">
-                        <li><a href="/privacy"
-                                class="text-primary-200 hover:text-white transition-colors">Confidențialitate</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <div class="mt-10 pt-8 border-t border-primary-700 text-center text-sm text-primary-200">
-                <p>&copy; 2025 HaiAcolo. Toate drepturile rezervate.</p>
-            </div>
-        </div>
+    <footer class="p-8 bg-gray-800 text-center text-gray-300">
+        <p class="text-sm">&copy; 2025 HaiAcolo. Toate drepturile rezervate. | 
+            <a href="/privacy" class="hover:text-primary-500">Confidențialitate</a>
+        </p>
     </footer>
 
     <script>
+        // LOGIC/JAVASCRIPT (PRESERVED)
         document.addEventListener("DOMContentLoaded", function () {
             // =========================================================
             // === CONTROL PANEL: UPDATE ONLY THIS VARIABLE MANUALLY ===
@@ -374,7 +284,7 @@
             const ctaButtonHeader = document.querySelector("#cta-button");
             const ctaButtonFooter = document.querySelector("#cta-button-footer");
 
-
+            // --- Urgency Logic (PRESERVED) ---
             if (remainingSpots > 0) {
                 // --- SCENARIO 1: SPOTS REMAINING (Urgency) ---
                 const message = `
@@ -422,21 +332,22 @@
             }
 
 
-            // Mobile Menu Functionality (kept from original code)
-            const mobileMenuButton = document.getElementById("mobile-menu-button");
-            const closeMobileMenu = document.getElementById("close-mobile-menu");
-            const mobileMenu = document.getElementById("mobile-menu");
+            // Mobile Menu Functionality (SIMPLIFIED and Unified)
+            const mobileMenuButton = document.getElementById("mobile-menu-button-founder");
+            const closeMobileMenu = document.getElementById("close-mobile-menu-founder");
+            const mobileMenu = document.getElementById("mobile-menu-founder");
+            const body = document.body;
 
             // Open mobile menu
             mobileMenuButton.addEventListener("click", function () {
                 mobileMenu.classList.remove("hidden");
-                document.body.style.overflow = "hidden";
+                body.style.overflow = "hidden";
             });
 
             // Close mobile menu
             closeMobileMenu.addEventListener("click", function () {
                 mobileMenu.classList.add("hidden");
-                document.body.style.overflow = "";
+                body.style.overflow = "";
             });
 
             // Close menu when clicking on links
@@ -449,7 +360,7 @@
                     }
 
                     mobileMenu.classList.add("hidden");
-                    document.body.style.overflow = "";
+                    body.style.overflow = "";
 
                     if (!this.href.startsWith("mailto:")) {
                         setTimeout(() => {
@@ -460,6 +371,7 @@
             });
         });
     </script>
+
 </body>
 
 </html>
