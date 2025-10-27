@@ -94,6 +94,23 @@
             70% { box-shadow: 0 0 0 10px rgba(76, 175, 80, 0); }
             100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
         }
+
+        /* Added for 16:9 Aspect Ratio */
+        .video-responsive-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio (9/16 * 100) */
+            height: 0;
+            overflow: hidden;
+            max-width: 100%;
+        }
+        .video-responsive-container iframe,
+        .video-responsive-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
     </style>
 </head>
 
@@ -101,14 +118,33 @@
 
     <header class="p-4 bg-white shadow-md sticky top-0 z-10">
         <div class="max-w-6xl mx-auto flex justify-between items-center">
-            <img src="/public/logo.svg" alt="HaiAcolo Logo" class="w-10 h-10">
-            <nav>
+            <h1 class="flex items-center text-xl font-bold text-gray-900">
+                <a href="/index" class="flex items-center">
+                    <img src="/public/logo.svg" alt="HaiAcolo Logo" class="w-10 h-10 mr-2">
+                    HaiAcolo
+                </a>
+            </h1>
+            <nav class="hidden md:flex">
                 <a href="#offers" class="text-gray-600 hover:text-primary-600 font-medium transition duration-200 mx-3">Oferte</a>
                 <a href="#business" class="text-gray-600 hover:text-primary-600 font-medium transition duration-200 mx-3">Pentru Afaceri</a>
                 <a href="/directory" class="text-gray-600 hover:text-primary-600 font-medium transition duration-200 mx-3">Parteneri</a>
             </nav>
+            <button id="mobile-menu-button-index" class="md:hidden text-gray-600">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
         </div>
     </header>
+    
+    <div id="mobile-menu-index" class="hidden fixed inset-0 bg-white z-50 pt-20">
+        <button id="close-mobile-menu-index" class="absolute top-4 right-4 text-gray-600">
+            <i class="fas fa-times text-2xl"></i>
+        </button>
+        <div class="space-y-8 text-center p-6">
+            <a href="#offers" class="block text-2xl font-medium text-gray-900 hover:text-primary-600">Oferte</a>
+            <a href="#business" class="block text-2xl font-medium text-gray-900 hover:text-primary-600">Pentru Afaceri</a>
+            <a href="/directory" class="block text-2xl font-medium text-gray-900 hover:text-primary-600">Parteneri</a>
+        </div>
+    </div>
 
     <main>
         <section id="hero" class="py-16 md:py-24 bg-white overflow-hidden">
@@ -131,14 +167,16 @@
                     </p>
                 </div>
 
-                <div class="relative w-full h-80 rounded-2xl shadow-2xl overflow-hidden bg-gray-200 border-4 border-primary-100 group">
-                    <img src="https://via.placeholder.com/800x600/a78bfa/ffffff?text=Video+sau+Imagine+Cluj" 
-                        alt="Scena de cafenea sau restaurant din Cluj" 
-                        class="w-full h-full object-cover transition duration-500 group-hover:scale-105"
-                    />
-                    <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 opacity-0 group-hover:opacity-100 transition duration-300">
-                        <span class="text-white text-xl font-semibold">Vezi cum funcționează</span>
-                    </div>
+                <div class="relative w-full rounded-2xl shadow-2xl overflow-hidden border-4 border-primary-100 video-responsive-container">
+                    <video
+                        class="absolute top-0 left-0 w-full h-full object-cover" 
+                        src="https://haiacolo.ro/public/haiacolo.ro.vid.mp4" 
+                        title="Video explicativ HaiAcolo"
+                        autoplay
+                        muted
+                        loop
+                        playsinline
+                    ></video>
                 </div>
             </div>
         </section>
@@ -265,10 +303,46 @@
 
     <footer class="p-8 bg-gray-800 text-center text-gray-300">
         <p class="text-sm">&copy; 2025 HaiAcolo. Toate drepturile rezervate. | 
-            <a href="/privacy" class="hover:text-primary-500">Confidențialitate</a>
+            <a href="/privacy" class="hover:text-primary-500">Confidențialitate</a> |
+            <a href="/terms" class="hover:text-primary-500">Termeni și Condiții</a>
         </p>
     </footer>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const mobileMenuButton = document.getElementById("mobile-menu-button-index");
+            const closeMobileMenu = document.getElementById("close-mobile-menu-index");
+            const mobileMenu = document.getElementById("mobile-menu-index");
+            const body = document.body;
 
+            mobileMenuButton.addEventListener("click", function () {
+                mobileMenu.classList.remove("hidden");
+                body.style.overflow = "hidden"; // Prevent scrolling behind overlay
+            });
+
+            closeMobileMenu.addEventListener("click", function () {
+                mobileMenu.classList.add("hidden");
+                body.style.overflow = ""; // Restore scrolling
+            });
+
+            // Smooth scroll for internal links and close menu
+            mobileMenu.querySelectorAll("a").forEach(link => {
+                link.addEventListener("click", function (e) {
+                    if (this.hash) {
+                        e.preventDefault();
+                        const targetId = this.getAttribute('href');
+                        const targetElement = document.querySelector(targetId);
+
+                        if (targetElement) {
+                            targetElement.scrollIntoView({ behavior: 'smooth' });
+                        }
+                    }
+                    mobileMenu.classList.add("hidden");
+                    body.style.overflow = "";
+                });
+            });
+        });
+    </script>
 </body>
 
 </html>
