@@ -116,15 +116,24 @@
             -webkit-text-fill-color: transparent;
             font-weight: 700;
         }
-        
+
         /* Interactive CTA Animation */
         .whatsapp-button-animate {
             animation: pulse-ring 2s infinite;
         }
+
         @keyframes pulse-ring {
-            0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(76, 175, 80, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
+            0% {
+                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(76, 175, 80, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+            }
         }
 
 
@@ -151,7 +160,7 @@
 </head>
 
 <body class="bg-gray-50 text-gray-900 flex flex-col min-h-screen">
-    
+
     <header class="p-4 bg-white shadow-md sticky top-0 z-10">
         <div class="max-w-6xl mx-auto flex justify-between items-center">
             <a href="/index" title="HaiAcolo Home" class="flex items-center text-xl font-bold text-gray-900">
@@ -160,8 +169,10 @@
             </a>
             <nav class="hidden md:flex space-x-6">
                 <a href="#signup-form-container" class="font-bold text-secondary-600 transition-colors">Abonează-te</a>
-                <a href="/founder" class="text-gray-600 hover:text-primary-600 font-medium transition duration-200">Pentru Afaceri</a>
-                <a href="/directory" class="text-gray-600 hover:text-primary-600 font-medium transition duration-200">Parteneri</a>
+                <a href="/founder"
+                    class="text-gray-600 hover:text-primary-600 font-medium transition duration-200">Pentru Afaceri</a>
+                <a href="/directory"
+                    class="text-gray-600 hover:text-primary-600 font-medium transition duration-200">Parteneri</a>
             </nav>
             <button id="mobile-menu-button-user" class="md:hidden text-gray-600">
                 <i class="fas fa-bars text-xl"></i>
@@ -174,8 +185,10 @@
             <i class="fas fa-times text-2xl"></i>
         </button>
         <div class="space-y-8 text-center p-6">
-            <a href="#signup-form-container" class="block text-2xl font-medium text-secondary-600 hover:text-secondary-700">Abonează-te</a>
-            <a href="/founder" class="block text-2xl font-medium text-gray-900 hover:text-primary-600">Pentru Afaceri</a>
+            <a href="#signup-form-container"
+                class="block text-2xl font-medium text-secondary-600 hover:text-secondary-700">Abonează-te</a>
+            <a href="/founder" class="block text-2xl font-medium text-gray-900 hover:text-primary-600">Pentru
+                Afaceri</a>
             <a href="/directory" class="block text-2xl font-medium text-gray-900 hover:text-primary-600">Parteneri</a>
             <a href="#faq" class="block text-2xl font-medium text-gray-900 hover:text-primary-600">FAQ</a>
         </div>
@@ -187,33 +200,41 @@
                 Acces Exclusiv la Oferte Premium din Cluj.
             </h1>
             <p class="text-xl mb-8 max-w-3xl mx-auto text-gray-700">
-                Fii primul care primește cele mai căutate experiențe și **oferte unice** de la partenerii de top din oraș. Direct pe **WhatsApp**.
+                Fii primul care primește cele mai căutate experiențe și <strong>unice</strong> de la partenerii de top
+                din oraș. Direct pe <strong
+                    class="font-bold text-white bg-green-500 rounded-full shadow-xl">WhatsApp</strong>.
             </p>
-            
+
             <div class="my-16">
                 <h2 class="text-3xl font-bold text-center mb-4 text-gray-800">Prima Noastră Ofertă Exclusivă</h2>
                 <p class="text-xl text-center text-gray-600 mb-12 max-w-2xl mx-auto">
                     Ne lansăm cu o ofertă specială de la partenerul nostru fondator, Urania Social Hub!
                 </p>
-                <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden border-4 border-primary-500 hover:shadow-primary-300/50 transition duration-300">
+                <div
+                    class="max-w-2xl mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden border-4 border-primary-500 hover:shadow-primary-300/50 transition duration-300">
                     <div class="p-8">
-                        <div class="flex flex-col md:flex-row md:items-center text-center md:text-left mb-6 border-b pb-6 border-gray-100">
+                        <div
+                            class="flex flex-col md:flex-row md:items-center text-center md:text-left mb-6 border-b pb-6 border-gray-100">
                             <img src="/public/urania.png" alt="Urania Social Hub Logo"
                                 class="w-48 md:w-36 h-auto mx-auto md:mx-0 mb-4 md:mb-0 md:mr-6 rounded-lg shadow-md"
                                 loading="lazy">
                             <div>
                                 <p class="text-sm font-semibold uppercase text-primary-600">OFERTĂ DE LANSARE</p>
                                 <h3 class="text-4xl font-extrabold text-gray-800">Urania Social Hub</h3>
-                                <p class="text-lg font-medium text-gray-600 mt-1 flex items-center justify-center md:justify-start">
+                                <p
+                                    class="text-lg font-medium text-gray-600 mt-1 flex items-center justify-center md:justify-start">
                                     <i class="fas fa-map-marker-alt text-primary-500 mr-2" aria-hidden="true"></i>
                                     <span>Zona <strong class="font-bold">Centru</strong></span>
                                 </p>
                             </div>
                         </div>
                         <div class="text-center my-6">
-                            <p class="text-2xl text-gray-700 leading-snug">Cumpără 2 băuturi calde (Latte, Flat White, Ceai) și primești</p>
-                            <p class="text-5xl font-extrabold gradient-text my-4">2 produse de patiserie la 50% reducere!</p>
-                            <p class="text-sm text-gray-500 leading-tight">(Croissant sau echivalent. Ofertă valabilă exclusiv pentru abonații HaiAcolo. Doar la pachet/To-go.)</p>
+                            <p class="text-2xl text-gray-700 leading-snug">Cumpără 2 băuturi calde (Latte, Flat White,
+                                Ceai) și primești</p>
+                            <p class="text-5xl font-extrabold gradient-text my-4">2 produse de patiserie la 50%
+                                reducere!</p>
+                            <p class="text-sm text-gray-500 leading-tight">(Croissant sau echivalent. Ofertă valabilă
+                                exclusiv pentru abonații HaiAcolo. Doar la pachet/To-go.)</p>
                         </div>
                         <div class="mt-8 text-center">
                             <a href="#signup-form-container"
@@ -224,22 +245,27 @@
                     </div>
                 </div>
             </div>
-            
+
             <div id="scarcity-counter-display"
                 class="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 my-10 rounded-lg shadow-md flex justify-center items-center scarcity-counter max-w-lg mx-auto"
                 role="alert">
                 <i class="fas fa-fire text-xl mr-3" aria-hidden="true"></i>
                 <p class="font-bold text-md leading-none">
-                    Au mai rămas doar <span id="counter-value" class="text-2xl font-extrabold text-red-800 mx-1">65</span>
+                    Au mai rămas doar <span id="counter-value"
+                        class="text-2xl font-extrabold text-red-800 mx-1">60</span>
                     vouchere Urania Social Hub!
                 </p>
             </div>
-            
+
             <div class="max-w-lg mx-auto text-center mt-16 mb-8">
                 <h3 class="text-3xl font-bold text-gray-800">Completează pentru a primi acces:</h3>
-                <p class="text-gray-600 mt-2">Durează mai puțin de 30 de secunde. **Fără spam, doar valoare.**</p>
+                <p class="text-gray-600 mt-2">Durează mai puțin de 30 de secunde. Primești notificări doar pentru
+                    ofertele care te interesează. Fără grupuri zgomotoase, doar oferte relevante pentru tine.
+                    <strong>Fără
+                        spam, doar valoare.</strong>
+                </p>
             </div>
-            
+
             <div id="signup-form-container" class="max-w-lg mx-auto text-left">
                 <form id="user-signup-form" class="bg-gray-50 p-8 rounded-xl shadow-2xl border border-gray-200">
                     <div class="space-y-4">
@@ -412,7 +438,8 @@
                         WhatsApp de la HaiAcolo.
                         Te poți dezabona oricând.
                     </p>
-                    <div class="g-recaptcha my-4 mx-auto max-w-xs" data-sitekey="6Le9i8krAAAAAFtGhvT1vauj1j2MXxDnJTFU_D7s">
+                    <div class="g-recaptcha my-4 mx-auto max-w-xs"
+                        data-sitekey="6Le9i8krAAAAAFtGhvT1vauj1j2MXxDnJTFU_D7s">
                     </div>
                     <div id="form-feedback" aria-live="polite"></div>
                     <div class="mt-6">
@@ -428,34 +455,43 @@
         <section class="py-20 px-6 bg-secondary-50" id="faq">
             <div class="max-w-4xl mx-auto text-center">
                 <h2 class="text-3xl font-bold mb-10 text-gray-800">Întrebări Frecvente</h2>
-                <p class="text-gray-700 mb-12">Răspunsuri rapide la cele mai importante întrebări despre abonamentul tău exclusiv.</p>
+                <p class="text-gray-700 mb-12">Răspunsuri rapide la cele mai importante întrebări despre abonamentul tău
+                    exclusiv.</p>
 
                 <div class="text-left mt-16">
                     <div class="space-y-6 text-gray-800 max-w-2xl mx-auto">
                         <div>
                             <p class="font-bold text-lg">🔒 Datele mele sunt în siguranță?</p>
-                            <p>Da, folosim numărul tău de telefon pentru a-ți trimite ofertele noastre săptămânale și adresa de email pentru a-ți trimite o confirmare. Nu le vom împărtăși niciodată cu terțe părți. Te rugăm să consulți <a href="/privacy" class="text-secondary-600 hover:underline">politica de confidențialitate</a>.</p>
+                            <p>Da, folosim numărul tău de telefon pentru a-ți trimite ofertele noastre săptămânale și
+                                adresa de email pentru a-ți trimite o confirmare. Nu le vom împărtăși niciodată cu terțe
+                                părți. Te rugăm să consulți <a href="/privacy"
+                                    class="text-secondary-600 hover:underline">politica de confidențialitate</a>.</p>
                         </div>
                         <div>
                             <p class="font-bold text-lg">📅 Cât de des primesc mesaje?</p>
-                            <p>O singură dată pe săptămână, de obicei joia. Fără mesaje suplimentare, **fără spam**.</p>
+                            <p>O singură dată pe săptămână, de obicei joia. Fără mesaje suplimentare, <strong>fără
+                                    spam</strong>.</p>
                         </div>
                         <div>
                             <p class="font-bold text-lg">📍 Este doar pentru Cluj?</p>
-                            <p>Da, momentan serviciul este disponibil doar în **Cluj-Napoca și Florești**.</p>
+                            <p>Da, momentan serviciul este disponibil doar în <strong>Cluj-Napoca și Florești</strong>.
+                            </p>
                         </div>
                         <div>
                             <p class="font-bold text-lg">🚪 Cum mă dezabonez?</p>
-                            <p>Poți să te dezabonezi oricând, răspunzând cu textul "**STOP**" la orice mesaj primit de la noi.</p>
+                            <p>Poți să te dezabonezi oricând, răspunzând cu textul <strong
+                                    class="font-bold text-lg">"STOP"</strong> la orice
+                                mesaj primit de
+                                la noi.</p>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
     </main>
-    
+
     <footer class="p-8 bg-gray-800 text-center text-gray-300">
-        <p class="text-sm">&copy; 2025 HaiAcolo. Toate drepturile rezervate. | 
+        <p class="text-sm">&copy; 2025 HaiAcolo. Toate drepturile rezervate. |
             <a href="/privacy" class="hover:text-primary-500">Confidențialitate</a>
     </footer>
 
@@ -483,7 +519,7 @@
             const mobileMenuButton = document.getElementById("mobile-menu-button-user");
             const closeMobileMenu = document.getElementById("close-mobile-menu-user");
             const mobileMenu = document.getElementById("mobile-menu-user");
-            
+
             mobileMenuButton.addEventListener("click", function () {
                 mobileMenu.classList.remove("hidden");
                 body.style.overflow = "hidden";
@@ -540,7 +576,7 @@
                 const interests = Array.from(formData.getAll('interests'));
                 const zones = Array.from(formData.getAll('zone'));
                 const recaptchaResponse = formData.get('g-recaptcha-response');
-                if (!recaptchaResponse) {
+                if (!recaptcha.getResponse()) {
                     feedbackDiv.innerHTML = `<p class="mb-4 p-4 rounded-md bg-red-100 text-red-700">Te rugăm să completezi verificarea reCAPTCHA.</p>`;
                     submitButton.disabled = false;
                     submitButton.textContent = 'Finalizează Abonarea';

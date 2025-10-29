@@ -84,25 +84,36 @@
             -webkit-text-fill-color: transparent;
             font-weight: 700;
         }
-        
+
         /* Interactive CTA Animation */
         .whatsapp-button-animate {
             animation: pulse-ring 2s infinite;
         }
+
         @keyframes pulse-ring {
-            0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(76, 175, 80, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
+            0% {
+                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(76, 175, 80, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+            }
         }
 
         /* Added for 16:9 Aspect Ratio */
         .video-responsive-container {
             position: relative;
-            padding-bottom: 56.25%; /* 16:9 aspect ratio (9/16 * 100) */
+            padding-bottom: 56.25%;
+            /* 16:9 aspect ratio (9/16 * 100) */
             height: 0;
             overflow: hidden;
             max-width: 100%;
         }
+
         .video-responsive-container iframe,
         .video-responsive-container video {
             position: absolute;
@@ -125,23 +136,28 @@
                 </a>
             </h1>
             <nav class="hidden md:flex">
-                <a href="#offers" class="text-gray-600 hover:text-primary-600 font-medium transition duration-200 mx-3">Oferte</a>
-                <a href="#business" class="text-gray-600 hover:text-primary-600 font-medium transition duration-200 mx-3">Pentru Afaceri</a>
-                <a href="/directory" class="text-gray-600 hover:text-primary-600 font-medium transition duration-200 mx-3">Parteneri</a>
+                <a href="#offers"
+                    class="text-gray-600 hover:text-primary-600 font-medium transition duration-200 mx-3">Oferte</a>
+                <a href="#business"
+                    class="text-gray-600 hover:text-primary-600 font-medium transition duration-200 mx-3">Pentru
+                    Afaceri</a>
+                <a href="/directory"
+                    class="text-gray-600 hover:text-primary-600 font-medium transition duration-200 mx-3">Parteneri</a>
             </nav>
             <button id="mobile-menu-button-index" class="md:hidden text-gray-600">
                 <i class="fas fa-bars text-xl"></i>
             </button>
         </div>
     </header>
-    
+
     <div id="mobile-menu-index" class="hidden fixed inset-0 bg-white z-50 pt-20">
         <button id="close-mobile-menu-index" class="absolute top-4 right-4 text-gray-600">
             <i class="fas fa-times text-2xl"></i>
         </button>
         <div class="space-y-8 text-center p-6">
             <a href="#offers" class="block text-2xl font-medium text-gray-900 hover:text-primary-600">Oferte</a>
-            <a href="#business" class="block text-2xl font-medium text-gray-900 hover:text-primary-600">Pentru Afaceri</a>
+            <a href="#business" class="block text-2xl font-medium text-gray-900 hover:text-primary-600">Pentru
+                Afaceri</a>
             <a href="/directory" class="block text-2xl font-medium text-gray-900 hover:text-primary-600">Parteneri</a>
         </div>
     </div>
@@ -154,7 +170,8 @@
                         Descoperă Clujul: <span class="gradient-text">Oferte Locale</span> Direct pe WhatsApp
                     </h1>
                     <p class="text-xl text-gray-600 mb-8">
-                        Conectăm clienții cu **accesul la cele mai căutate** experiențe și oferte de la afacerile de top din **Cluj-Napoca**.
+                        Conectăm clienții cu <strong>accesul la cele mai căutate</strong> experiențe și oferte de la
+                        afacerile de top din <strong>Cluj-Napoca</strong>.
                     </p>
 
                     <a href="/user"
@@ -163,20 +180,16 @@
                     </a>
 
                     <p class="mt-4 text-sm text-gray-500">
-                        Înscrie-te și primești prima ofertă instant. **Fără spam, doar valoare.**
+                        Primești notificări doar pentru ofertele care te interesează, fără grupuri zgomotoase, doar
+                        valoare relevantă pentru tine. <strong>Fără spam, doar valoare.</strong>
                     </p>
                 </div>
 
-                <div class="relative w-full rounded-2xl shadow-2xl overflow-hidden border-4 border-primary-100 video-responsive-container">
-                    <video
-                        class="absolute top-0 left-0 w-full h-full object-cover" 
-                        src="https://haiacolo.ro/public/site_vid.mp4" 
-                        title="Video explicativ HaiAcolo"
-                        autoplay
-                        muted
-                        loop
-                        playsinline
-                    ></video>
+                <div
+                    class="relative w-full rounded-2xl shadow-2xl overflow-hidden border-4 border-primary-100 video-responsive-container">
+                    <video class="absolute top-0 left-0 w-full h-full object-cover"
+                        src="https://haiacolo.ro/public/site_vid.mp4" title="Video explicativ HaiAcolo" autoplay muted
+                        loop playsinline></video>
                 </div>
             </div>
         </section>
@@ -186,20 +199,31 @@
                 <h2 class="text-3xl font-bold text-center mb-12 text-gray-800">De ce să alegi HaiAcolo?</h2>
 
                 <div class="grid md:grid-cols-3 gap-8">
-                    <div class="p-6 bg-white rounded-xl shadow-lg border-b-4 border-secondary-500 hover:shadow-xl transition duration-300">
+                    <div
+                        class="p-6 bg-white rounded-xl shadow-lg border-b-4 border-secondary-500 hover:shadow-xl transition duration-300">
                         <div class="text-4xl mb-4 text-secondary-600"><i class="fas fa-percent"></i></div>
                         <h3 class="text-xl font-semibold mb-2 text-gray-800">Oferte Exclusive</h3>
-                        <p class="text-gray-600">Nu le găsești nicăieri altundeva. **Ofertă premium** la restaurante, cafenele și servicii.</p>
+                        <p class="text-gray-600">Nu le găsești nicăieri altundeva. <strong>Ofertă premium</strong> la
+                            restaurante,
+                            cafenele și servicii.</p>
                     </div>
-                    <div class="p-6 bg-white rounded-xl shadow-lg border-b-4 border-primary-500 hover:shadow-xl transition duration-300">
+                    <div
+                        class="p-6 bg-white rounded-xl shadow-lg border-b-4 border-primary-500 hover:shadow-xl transition duration-300">
                         <div class="text-4xl mb-4 text-primary-600"><i class="fab fa-whatsapp"></i></div>
                         <h3 class="text-xl font-semibold mb-2 text-gray-800">Livrare Simplă</h3>
-                        <p class="text-gray-600">Primești ofertele direct pe **WhatsApp**. Rapid, simplu, fără aplicații suplimentare.</p>
+                        <p class="text-gray-600">Primești ofertele direct pe <strong
+                                class="font-bold text-white bg-green-500 rounded-full shadow-xl">WhatsApp</strong>.
+                            Rapid, simplu, fără aplicații
+                            suplimentare.</p>
                     </div>
-                    <div class="p-6 bg-white rounded-xl shadow-lg border-b-4 border-secondary-500 hover:shadow-xl transition duration-300">
+                    <div
+                        class="p-6 bg-white rounded-xl shadow-lg border-b-4 border-secondary-500 hover:shadow-xl transition duration-300">
                         <div class="text-4xl mb-4 text-secondary-600"><i class="fas fa-map-marker-alt"></i></div>
                         <h3 class="text-xl font-semibold mb-2 text-gray-800">Descoperire Locală</h3>
-                        <p class="text-gray-600">Susții afacerile locale din Cluj. Fii parte din cercul care **descoperă Clujul altfel**.</p>
+                        <p class="text-gray-600">Susții afacerile locale din Cluj. Fii parte din cercul care
+                            <strong>descoperă
+                                Clujul altfel</strong>.
+                        </p>
                     </div>
                 </div>
             </div>
@@ -207,16 +231,18 @@
 
         <section class="py-16 bg-white">
             <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                
+
                 <h2 class="text-3xl font-bold text-center mb-4 text-gray-800">Prima Noastră Ofertă Exclusivă</h2>
                 <p class="text-xl text-center text-gray-600 mb-12 max-w-2xl mx-auto">
                     Ne lansăm cu o ofertă specială de la partenerul nostru fondator, Urania Social Hub!
                 </p>
 
-                <div class="bg-white rounded-2xl shadow-2xl overflow-hidden border-4 border-primary-500 hover:shadow-primary-300/50 transition duration-300">
+                <div
+                    class="bg-white rounded-2xl shadow-2xl overflow-hidden border-4 border-primary-500 hover:shadow-primary-300/50 transition duration-300">
                     <div class="p-8">
-                        
-                        <div class="flex flex-col md:flex-row md:items-center text-center md:text-left mb-6 border-b pb-6 border-gray-100">
+
+                        <div
+                            class="flex flex-col md:flex-row md:items-center text-center md:text-left mb-6 border-b pb-6 border-gray-100">
                             <img src="/public/urania.png" alt="Urania Social Hub Logo"
                                 class="w-48 md:w-36 h-auto mx-auto md:mx-0 mb-4 md:mb-0 md:mr-6 rounded-lg shadow-md"
                                 loading="lazy">
@@ -232,9 +258,12 @@
                         </div>
 
                         <div class="text-center my-6">
-                            <p class="text-2xl text-gray-700 leading-snug">Cumpără 2 băuturi calde (Latte, Flat White, Ceai) și primești</p>
-                            <p class="text-5xl font-extrabold gradient-text my-4">2 produse de patiserie la 50% reducere!</p>
-                            <p class="text-sm text-gray-500 leading-tight">(Croissant sau echivalent. Ofertă valabilă exclusiv pentru abonații HaiAcolo. Doar la pachet/To-go.)</p>
+                            <p class="text-2xl text-gray-700 leading-snug">Cumpără 2 băuturi calde (Latte, Flat White,
+                                Ceai) și primești</p>
+                            <p class="text-5xl font-extrabold gradient-text my-4">2 produse de patiserie la 50%
+                                reducere!</p>
+                            <p class="text-sm text-gray-500 leading-tight">(Croissant sau echivalent. Ofertă valabilă
+                                exclusiv pentru abonații HaiAcolo. Doar la pachet/To-go.)</p>
                         </div>
 
                         <div class="text-center mt-8">
@@ -247,14 +276,16 @@
                 </div>
             </div>
         </section>
-        
-        <section id="business" class="py-16 bg-gray-100"> 
-             <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid md:grid-cols-2 gap-12 items-center">
+
+        <section id="business" class="py-16 bg-gray-100">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid md:grid-cols-2 gap-12 items-center">
                 <div class="p-8 rounded-2xl shadow-2xl bg-primary-50 border-t-8 border-primary-600">
                     <div class="text-5xl mb-4 text-primary-700">🚀</div>
                     <h2 class="text-3xl font-bold mb-3 text-gray-800">Ești o Afacere în Cluj?</h2>
                     <p class="text-lg mb-6 text-gray-600">
-                        Folosește cel mai direct canal de marketing: **WhatsApp**. Promovează-ți ofertele direct către mii de clujeni.
+                        Folosește cel mai direct canal de marketing: <strong>WhatsApp</strong>. Promovează-ți ofertele
+                        direct către
+                        mii de clujeni.
                     </p>
                     <a href="/founder"
                         class="inline-block px-6 py-3 font-semibold text-white bg-primary-600 rounded-full shadow-lg hover:bg-primary-700 transition duration-300 transform hover:scale-105">
@@ -266,7 +297,9 @@
                     <div class="text-5xl mb-4 text-secondary-700"><i class="fas fa-mug-hot"></i></div>
                     <h2 class="text-3xl font-bold mb-3 text-gray-800">Vrei Acces Exclusiv?</h2>
                     <p class="text-lg mb-6 text-gray-600">
-                        Nu rata următoarea **oportunitate exclusivă**. Fii primul care află despre cele mai noi experiențe din Cluj.
+                        Nu rata următoarea <strong>oportunitate exclusivă</strong>. Fii primul care află despre cele mai
+                        noi
+                        experiențe din Cluj.
                     </p>
                     <a href="/user"
                         class="inline-block px-6 py-3 font-semibold text-white bg-secondary-600 rounded-full shadow-lg hover:bg-secondary-700 transition duration-300 transform hover:scale-105">
@@ -284,10 +317,14 @@
                 </p>
 
                 <div class="flex flex-wrap justify-center items-center space-x-8 space-y-4">
-                    <img src="/public/steampunk.png" alt="Steampunk Coffee Logo" class="h-10 opacity-70 hover:opacity-100 transition duration-300 cursor-pointer">
-                    <img src="/public/berrak_kebap.png" alt="Berrak Kebap Logo" class="h-10 opacity-70 hover:opacity-100 transition duration-300 cursor-pointer">
-                    <img src="/public/community_bakery.png" alt="Community Bakery Logo" class="h-10 opacity-70 hover:opacity-100 transition duration-300 cursor-pointer">
-                    <img src="/public/nish.png" alt="Nish Hair Salon Logo" class="h-10 opacity-70 hover:opacity-100 transition duration-300 cursor-pointer">
+                    <img src="/public/steampunk.png" alt="Steampunk Coffee Logo"
+                        class="h-10 opacity-70 hover:opacity-100 transition duration-300 cursor-pointer">
+                    <img src="/public/berrak_kebap.png" alt="Berrak Kebap Logo"
+                        class="h-10 opacity-70 hover:opacity-100 transition duration-300 cursor-pointer">
+                    <img src="/public/bodega_del_taco.png" alt="Bodega Del Taco Logo"
+                        class="h-10 opacity-70 hover:opacity-100 transition duration-300 cursor-pointer">
+                    <img src="/public/nish.png" alt="Nish Hair Salon Logo"
+                        class="h-10 opacity-70 hover:opacity-100 transition duration-300 cursor-pointer">
                 </div>
 
                 <div class="mt-10">
@@ -302,10 +339,10 @@
     </main>
 
     <footer class="p-8 bg-gray-800 text-center text-gray-300">
-        <p class="text-sm">&copy; 2025 HaiAcolo. Toate drepturile rezervate. | 
+        <p class="text-sm">&copy; 2025 HaiAcolo. Toate drepturile rezervate. |
             <a href="/privacy" class="hover:text-primary-500">Confidențialitate</a>
     </footer>
-    
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const mobileMenuButton = document.getElementById("mobile-menu-button-index");
