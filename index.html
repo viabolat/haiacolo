@@ -10,6 +10,9 @@
         content="Platforma ta de oferte locale exclusive în Cluj-Napoca. Descoperă cele mai bune oferte premium la restaurante, cafenele și servicii locale, direct pe WhatsApp.">
     <link rel="canonical" href="https://www.haiacolo.ro/index" />
 
+    <link rel="preload" href="/includes/header.html" as="fetch" crossorigin="anonymous">
+    <link rel="preload" href="/includes/footer.html" as="fetch" crossorigin="anonymous">
+
     <meta property="og:title" content="HaiAcolo | Oferte Locale Exclusive în Cluj-Napoca" />
     <meta property="og:description"
         content="Conectăm clienții cu oferte locale exclusive și ajutăm afacerile din Cluj-Napoca să crească prin promovare directă pe WhatsApp." />
@@ -127,40 +130,7 @@
 
 <body class="bg-gray-50 text-gray-900">
 
-    <header class="p-4 bg-white shadow-md sticky top-0 z-10">
-        <div class="max-w-6xl mx-auto flex justify-between items-center">
-            <h1 class="flex items-center text-xl font-bold text-gray-900">
-                <a href="/index" class="flex items-center">
-                    <img src="/public/logo.svg" alt="HaiAcolo Logo" class="w-10 h-10 mr-2">
-                    HaiAcolo
-                </a>
-            </h1>
-            <nav class="hidden md:flex">
-                <a href="#offers"
-                    class="text-gray-600 hover:text-primary-600 font-medium transition duration-200 mx-3">Oferte</a>
-                <a href="#business"
-                    class="text-gray-600 hover:text-primary-600 font-medium transition duration-200 mx-3">Pentru
-                    Afaceri</a>
-                <a href="/directory"
-                    class="text-gray-600 hover:text-primary-600 font-medium transition duration-200 mx-3">Parteneri</a>
-            </nav>
-            <button id="mobile-menu-button-index" class="md:hidden text-gray-600">
-                <i class="fas fa-bars text-xl"></i>
-            </button>
-        </div>
-    </header>
-
-    <div id="mobile-menu-index" class="hidden fixed inset-0 bg-white z-50 pt-20">
-        <button id="close-mobile-menu-index" class="absolute top-4 right-4 text-gray-600">
-            <i class="fas fa-times text-2xl"></i>
-        </button>
-        <div class="space-y-8 text-center p-6">
-            <a href="#offers" class="block text-2xl font-medium text-gray-900 hover:text-primary-600">Oferte</a>
-            <a href="#business" class="block text-2xl font-medium text-gray-900 hover:text-primary-600">Pentru
-                Afaceri</a>
-            <a href="/directory" class="block text-2xl font-medium text-gray-900 hover:text-primary-600">Parteneri</a>
-        </div>
-    </div>
+    <div id="header-placeholder"></div>
 
     <main>
         <section id="hero" class="py-16 md:py-24 bg-white overflow-hidden">
@@ -174,7 +144,7 @@
                         afacerile de top din <strong>Cluj-Napoca</strong>.
                     </p>
 
-                    <a href="/user"
+                    <a href="/user#signup-form-container"
                         class="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white bg-green-500 rounded-full shadow-xl hover:bg-green-600 transition duration-300 transform hover:scale-105 whatsapp-button-animate">
                         <i class="fab fa-whatsapp mr-3 text-2xl"></i> Vreau Oferte Acum!
                     </a>
@@ -267,7 +237,7 @@
                         </div>
 
                         <div class="text-center mt-8">
-                            <a href="/user"
+                            <a href="/user#signup-form-container"
                                 class="inline-block px-10 py-4 text-xl font-bold text-white bg-green-500 rounded-full shadow-xl hover:bg-green-600 transition duration-300 transform hover:scale-105 whatsapp-button-animate">
                                 <i class="fab fa-whatsapp mr-3 text-2xl"></i> Vreau Oferta Urania!
                             </a>
@@ -338,46 +308,9 @@
 
     </main>
 
-    <footer class="p-8 bg-gray-800 text-center text-gray-300">
-        <p class="text-sm">&copy; 2025 HaiAcolo. Toate drepturile rezervate. |
-            <a href="/privacy" class="hover:text-primary-500">Confidențialitate</a>
-    </footer>
+    <div id="footer-placeholder"></div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const mobileMenuButton = document.getElementById("mobile-menu-button-index");
-            const closeMobileMenu = document.getElementById("close-mobile-menu-index");
-            const mobileMenu = document.getElementById("mobile-menu-index");
-            const body = document.body;
-
-            mobileMenuButton.addEventListener("click", function () {
-                mobileMenu.classList.remove("hidden");
-                body.style.overflow = "hidden"; // Prevent scrolling behind overlay
-            });
-
-            closeMobileMenu.addEventListener("click", function () {
-                mobileMenu.classList.add("hidden");
-                body.style.overflow = ""; // Restore scrolling
-            });
-
-            // Smooth scroll for internal links and close menu
-            mobileMenu.querySelectorAll("a").forEach(link => {
-                link.addEventListener("click", function (e) {
-                    if (this.hash) {
-                        e.preventDefault();
-                        const targetId = this.getAttribute('href');
-                        const targetElement = document.querySelector(targetId);
-
-                        if (targetElement) {
-                            targetElement.scrollIntoView({ behavior: 'smooth' });
-                        }
-                    }
-                    mobileMenu.classList.add("hidden");
-                    body.style.overflow = "";
-                });
-            });
-        });
-    </script>
+    <script src="/includes/loader.js"></script>
 </body>
 
 </html>

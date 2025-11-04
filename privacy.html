@@ -10,6 +10,9 @@
         content="Politica de confidențialitate pentru HaiAcolo. Înțelege ce date colectăm, cum le folosim și care sunt drepturile tale. Nu folosim cookie-uri sau metode de tracking.">
     <link rel="canonical" href="https://www.haiacolo.ro/privacy" />
 
+    <link rel="preload" href="/includes/header.html" as="fetch" crossorigin="anonymous">
+    <link rel="preload" href="/includes/footer.html" as="fetch" crossorigin="anonymous">
+
     <meta property="og:title" content="Politica de Confidențialitate | HaiAcolo" />
     <meta property="og:description"
         content="Politica de confidențialitate pentru HaiAcolo. Înțelege ce date colectăm, cum le folosim și care sunt drepturile tale." />
@@ -97,33 +100,7 @@
 
 <body class="bg-gray-50 text-gray-900 flex flex-col min-h-screen">
 
-    <header class="p-4 bg-white shadow-md sticky top-0 z-10">
-        <div class="max-w-6xl mx-auto flex justify-between items-center">
-            <a href="/index" title="HaiAcolo Home" class="flex items-center text-xl font-bold text-gray-900">
-                <img src="/public/logo.svg" alt="HaiAcolo Logo" class="w-10 h-10 mr-2">
-                HaiAcolo
-            </a>
-            <nav class="hidden md:flex space-x-6">
-                <a href="/user" class="text-gray-600 hover:text-secondary-600 font-medium transition duration-200">Vreau Oferte</a>
-                <a href="/founder" class="text-gray-600 hover:text-primary-600 font-medium transition duration-200">Pentru Afaceri</a>
-                <a href="/directory" class="text-gray-600 hover:text-primary-600 font-medium transition duration-200">Parteneri</a>
-            </nav>
-            <button id="mobile-menu-button-privacy" class="md:hidden text-gray-600">
-                <i class="fas fa-bars text-xl"></i>
-            </button>
-        </div>
-    </header>
-
-    <div id="mobile-menu-privacy" class="hidden fixed inset-0 bg-white z-50 pt-20">
-        <button id="close-mobile-menu-privacy" class="absolute top-4 right-4 text-gray-600">
-            <i class="fas fa-times text-2xl"></i>
-        </button>
-        <div class="space-y-8 text-center p-6">
-            <a href="/user" class="block text-2xl font-medium text-gray-900 hover:text-secondary-600">Vreau Oferte</a>
-            <a href="/founder" class="block text-2xl font-medium text-gray-900 hover:text-primary-600">Pentru Afaceri</a>
-            <a href="/directory" class="block text-2xl font-medium text-gray-900 hover:text-primary-600">Parteneri</a>
-        </div>
-    </div>
+    <div id="header-placeholder"></div>
 
     <section class="py-16 md:py-24 flex-grow">
         <div class="container mx-auto px-4">
@@ -201,53 +178,9 @@
         </div>
     </section>
 
-    <footer class="p-8 bg-gray-800 text-center text-gray-300 mt-0">
-        <p class="text-sm">&copy; 2025 HaiAcolo. Toate drepturile rezervate. | 
-            <a href="/privacy" class="hover:text-primary-500">Confidențialitate</a>
-        </p>
-    </footer>
+    <div id="footer-placeholder"></div>
 
-    <script>
-        // Mobile Menu Functionality (Unified)
-        document.addEventListener("DOMContentLoaded", function () {
-            const mobileMenuButton = document.getElementById("mobile-menu-button-privacy");
-            const closeMobileMenu = document.getElementById("close-mobile-menu-privacy");
-            const mobileMenu = document.getElementById("mobile-menu-privacy");
-            const body = document.body;
-
-            // Open mobile menu
-            mobileMenuButton.addEventListener("click", function () {
-                mobileMenu.classList.remove("hidden");
-                body.style.overflow = "hidden";
-            });
-
-            // Close mobile menu
-            closeMobileMenu.addEventListener("click", function () {
-                mobileMenu.classList.add("hidden");
-                body.style.overflow = "";
-            });
-
-            // Close menu when clicking on links
-            const mobileLinks = mobileMenu.querySelectorAll("a");
-            mobileLinks.forEach(link => {
-                link.addEventListener("click", function (e) {
-                    // Don't prevent default for mailto links
-                    if (!this.href.startsWith("mailto:")) {
-                        e.preventDefault();
-                    }
-
-                    mobileMenu.classList.add("hidden");
-                    body.style.overflow = "";
-
-                    if (!this.href.startsWith("mailto:")) {
-                        setTimeout(() => {
-                            window.location.href = this.href;
-                        }, 300);
-                    }
-                });
-            });
-        });
-    </script>
+    <script src="/includes/loader.js"></script>
 </body>
 
 </html>

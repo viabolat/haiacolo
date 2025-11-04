@@ -10,6 +10,9 @@
         content="Aplică la programul de Parteneri Fondatori HaiAcolo în Cluj. Promovează-ți afacerea locală și plătește doar pentru rezultate. Fără costuri fixe, comision bazat pe performanță.">
     <link rel="canonical" href="https://www.haiacolo.ro/business" />
 
+    <link rel="preload" href="/includes/header.html" as="fetch" crossorigin="anonymous">
+    <link rel="preload" href="/includes/footer.html" as="fetch" crossorigin="anonymous">
+
     <meta property="og:title" content="HaiAcolo - Crește-ți Vânzările Locale (Plată pe Performanță)" />
     <meta property="og:description"
         content="Atrage clienți noi în Cluj prin newsletter-ul nostru. Sistem de comisionare pe bază de rezultat. Aplică acum pentru a deveni partener fondator!" />
@@ -107,33 +110,7 @@
 
 <body class="bg-gray-50 text-gray-900 flex flex-col min-h-screen">
 
-    <header class="p-4 bg-white shadow-md sticky top-0 z-10">
-        <div class="max-w-6xl mx-auto flex justify-between items-center">
-            <a href="/index" title="HaiAcolo Home" class="flex items-center text-xl font-bold text-gray-900">
-                <img src="/public/logo.svg" alt="HaiAcolo Logo" class="w-10 h-10 mr-2">
-                HaiAcolo
-            </a>
-            <nav class="hidden md:flex space-x-6">
-                <a href="/user" class="text-gray-600 hover:text-secondary-600 font-medium transition duration-200">Vreau Oferte</a>
-                <a href="/founder" class="font-bold text-primary-600 transition-colors">Pentru Afaceri</a>
-                <a href="/directory" class="text-gray-600 hover:text-primary-600 font-medium transition duration-200">Parteneri</a>
-            </nav>
-            <button id="mobile-menu-button-business" class="md:hidden text-gray-600">
-                <i class="fas fa-bars text-xl"></i>
-            </button>
-        </div>
-    </header>
-
-    <div id="mobile-menu-business" class="hidden fixed inset-0 bg-white z-50 pt-20">
-        <button id="close-mobile-menu-business" class="absolute top-4 right-4 text-gray-600">
-            <i class="fas fa-times text-2xl"></i>
-        </button>
-        <div class="space-y-8 text-center p-6">
-            <a href="/user" class="block text-2xl font-medium text-gray-900 hover:text-secondary-600">Vreau Oferte</a>
-            <a href="/founder" class="block text-2xl font-medium text-primary-600 hover:text-primary-700">Pentru Afaceri</a>
-            <a href="/directory" class="block text-2xl font-medium text-gray-900 hover:text-primary-600">Parteneri</a>
-        </div>
-    </div>
+    <div id="header-placeholder"></div>
 
     <main class="py-16 px-6 flex-grow">
         <div class="max-w-lg mx-auto">
@@ -303,11 +280,9 @@
         </div>
     </main>
 
-    <footer class="p-8 bg-gray-800 text-center text-gray-300 mt-0">
-        <p class="text-sm">&copy; 2025 HaiAcolo. Toate drepturile rezervate. | 
-            <a href="/privacy" class="hover:text-primary-500">Confidențialitate</a>
-    </footer>
+    <div id="footer-placeholder"></div>
 
+    <script src="/includes/loader.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const signupForm = document.getElementById('business-signup-form');
