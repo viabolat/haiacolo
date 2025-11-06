@@ -16,7 +16,7 @@
     <meta property="og:description"
         content="Primește cele mai bune oferte de la afaceri locale din Cluj direct pe WhatsApp. Simplu, fără spam și gratuit." />
     <meta property="og:image" content="https://www.haiacolo.ro/public/logo.png" />
-    <meta property="og:url" content="https://www.haiacolo.ro/user.html" />
+    <meta property="og:url" content="https://www.haiacolo.ro/user" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="HaiAcolo" />
     <meta property="twitter:card" content="summary_large_image" />
@@ -55,8 +55,8 @@
         {
           "@type": "WebPage",
           "name": "Abonați-vă la Oferte Locale | HaiAcolo",
-          "description": "Primește cele mai bune oferte de la afaceri locale din Cluj direct pe WhatsApp. Simplu, fără spam și gratuit. Abonează-te acum!",
-          "url": "https://www.haiacolo.ro/user.html",
+          "description": "Primește cele mai bune oferte de la afaceri locale din Cluj direct pe WhatsApp. Simplu, fără spam și gratuit. Abonează-te acum! Găsește reduceri la restaurante, cafenele și multe altele.",
+          "url": "https://www.haiacolo.ro/user",
           "publisher": {
             "@type": "Organization",
             "name": "HaiAcolo",
@@ -235,7 +235,7 @@
                 </p>
             </div>
 
-            <div id="signup-form-container" class="max-w-lg mx-auto text-left">
+            <div id="signup-form-container" class="max-w-lg mx-auto text-left mt-8">
                 <form id="user-signup-form" class="bg-gray-50 p-8 rounded-xl shadow-2xl border border-gray-200">
                     <div class="space-y-4">
                         <div class="relative">
@@ -245,8 +245,8 @@
                             <input type="text" id="full_name" name="full_name"
                                 class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500"
                                 autocomplete="name">
-                            <span id="full_name-validation-icon"
-                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+                            <span id="full_name-validation-icon" class="absolute inset-y-0 right-0 pr-3 flex items-center text-xl leading-5 pointer-events-none"
+                                style="height: 100%; top: 0;"
                                 aria-live="polite"></span>
                         </div>
                         <div class="relative">
@@ -256,8 +256,8 @@
                             <input type="email" id="email" name="email"
                                 class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500"
                                 placeholder="Email (Opțional)" autocomplete="email">
-                            <span id="email-validation-icon"
-                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+                            <span id="email-validation-icon" class="absolute inset-y-0 right-0 pr-3 flex items-center text-xl leading-5 pointer-events-none"
+                                style="height: 100%; top: 0;"
                                 aria-live="polite"></span>
                         </div>
                         <div class="relative">
@@ -279,8 +279,7 @@
                                     class="w-full px-3 py-2 border-t border-b border-r border-gray-300 rounded-r-md shadow-sm focus:ring-primary-500 focus:border-primary-500"
                                     autocomplete="tel-local" placeholder="712 345 678">
                             </div>
-                            <input type="hidden" id="phone_number" name="phone_number">
-                            <span id="phone_number-validation-icon"
+`                            <input type="hidden" id="phone_number" name="phone_number">
                                 class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
                                 style="top: 2.25rem;" aria-live="polite"></span>
                         </div>
@@ -358,7 +357,7 @@
                                 </label>
                             </div>
                             <p id="zone-validation-status" class="text-xs text-gray-500 mt-1" aria-live="polite">
-                                Selectează cel puțin o zonă.
+                                <!-- Validation message for zones will be rendered here -->
                             </p>
                         </div>
                         <div class="relative">
@@ -398,7 +397,7 @@
                                 </div>
                             </div>
                             <p id="interests-validation-status" class="text-xs text-gray-500 mt-1" aria-live="polite">
-                                Selectează cel puțin un interes.
+                                <!-- Validation message for interests will be rendered here -->
                             </p>
                         </div>
                     </div>
@@ -462,14 +461,15 @@
     <script src="/includes/loader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1/build/qrcode.min.js"></script>
     <script>
+        // Global reCAPTCHA callback, required by Google's script
         function onRecaptchaLoad() {
             grecaptcha.render('recaptcha-container', {
                 'sitekey': '6Le9i8krAAAAAFtGhvT1vauj1j2MXxDnJTFU_D7s',
-                'callback': 'onRecaptchaSuccess'
+                'callback': 'handleRecaptchaSuccess' // Call our local handler
             });
         }
-
-        function onRecaptchaSuccess() {
+        // Define a global stub for reCAPTCHA success callback to call our local handler
+        window.handleRecaptchaSuccess = function() {
             validateForm();
         }
 
@@ -481,10 +481,10 @@
             const emailInput = signupForm.querySelector('#email');
             const emailValidationIcon = document.getElementById('email-validation-icon');
             const phoneCountryCodeInput = document.getElementById('phone_country_code');
-            const phoneLocalInput = document.getElementById('phone_number_local');
+            const phoneLocalInput = document.getElementById('phone_number_local'); // Input for local part
             const fullPhoneInput = document.getElementById('phone_number');
-            const phoneValidationIcon = document.getElementById('phone_number-validation-icon');
             const zoneCheckboxes = signupForm.querySelectorAll('input[name="zone"]');
+            const zoneCheckboxesContainer = document.getElementById('zone-checkboxes');
             const zoneValidationStatus = document.getElementById('zone-validation-status');
             const interestCheckboxes = signupForm.querySelectorAll('input[name="interests"]');
             const interestsValidationStatus = document.getElementById('interests-validation-status');
@@ -503,10 +503,28 @@
                 });
             });
 
+            /**
+             * Renders a check or cross icon next to an input field based on its validity.
+             * @param {HTMLElement} iconElement The span element where the icon should be rendered.
+             * @param {boolean} isValid Whether the input value is valid.
+             * @param {boolean} isOptional Whether the field is optional.
+             */
+            function renderValidationIcon(iconElement, isValid, isOptional = false) {
+                if (!iconElement) return;
+
+                // If optional and empty, don't show any icon
+                if (isOptional && !document.getElementById(iconElement.id.replace('-validation-icon', '')).value.trim()) {
+                    iconElement.innerHTML = '';
+                    return;
+                }
+
+                iconElement.innerHTML = isValid
+                    ? `<i class="fas fa-check-circle text-green-500"></i>`
+                    : `<i class="fas fa-times-circle text-red-500"></i>`;
+            }
 
             function handleSuccessfulSubmission(qrData, codeString, emailProvided) {
-                // Redirect logic
-                window.location.replace(`/offer.html?code=${codeString}&qr=${encodeURIComponent(qrData)}&email=${emailProvided}`);
+                window.location.replace(`/offer?code=${codeString}&qr=${encodeURIComponent(qrData)}&email=${emailProvided}`);
             }
 
             signupForm.addEventListener('submit', async (e) => {
@@ -564,6 +582,7 @@
             });
 
             // --- Live Form Validation ---
+            // Sanitizes the local phone number input by removing non-digit characters.
             function sanitizePhoneNumber() {
                 phoneLocalInput.value = phoneLocalInput.value.replace(/[^\d]/g, '');
             }
@@ -573,6 +592,7 @@
 
                 // Phone Number Validation
                 sanitizePhoneNumber();
+                const fullNameInput = document.getElementById('full_name'); // Moved from below
                 const selectedOption = phoneCountryCodeInput.options[phoneCountryCodeInput.selectedIndex];
                 const expectedLength = selectedOption.getAttribute('data-length');
                 const localNumber = phoneLocalInput.value;
@@ -591,55 +611,65 @@
                     fullPhoneInput.value = '';
                 }
 
-                if (isPhoneValid) {
-                    phoneValidationIcon.innerHTML = `<i class="fas fa-check-circle text-green-500"></i>`;
-                } else if (phoneLocalInput.value.length > 0 || isFinalCheck) {
-                    phoneValidationIcon.innerHTML = `<i class="fas fa-times-circle text-red-500"></i>`;
+                // Full Name Validation (Optional)
+                const isFullNamePresent = fullNameInput.value.trim().length > 0;
+                if (isFullNamePresent) {
+                    renderValidationIcon(fullNameValidationIcon, true, true);
                 } else {
-                    phoneValidationIcon.innerHTML = '';
+                    fullNameValidationIcon.innerHTML = '';
                 }
+
                 if (!isPhoneValid) allValid = false;
 
+                // Email Validation (Optional)
                 const emailValue = emailInput.value.trim();
                 const emailRegex = /^[^'@]+@[^'@]+\.[^'@]+$/;
                 const isEmailValid = emailValue === '' || emailRegex.test(emailValue);
-                if (emailValue === '') {
-                    emailValidationIcon.innerHTML = '';
-                } else if (isEmailValid) {
-                    emailValidationIcon.innerHTML = `<i class="fas fa-check-circle text-green-500"></i>`;
-                } else {
-                    emailValidationIcon.innerHTML = `<i class="fas fa-times-circle text-red-500"></i>`;
-                }
+                renderValidationIcon(emailValidationIcon, isEmailValid, true);
                 if (!isEmailValid) allValid = false;
 
-                const isZoneSelected = Array.from(zoneCheckboxes).some(cb => cb.checked);
-                if (isZoneSelected) {
-                    zoneValidationStatus.innerHTML = `<span class="text-green-600 font-medium"><i class="fas fa-check"></i> Selectat.</span>`;
+                // Zone Checkboxes Validation
+                // Check if any checkbox in the container is checked
+                const anyZoneChecked = Array.from(zoneCheckboxes).some(cb => cb.checked);
+                if (anyZoneChecked) {
+                    zoneValidationStatus.innerHTML = `<span class="text-green-600 font-medium"><i class="fas fa-check"></i> Cel puțin o zonă selectată.</span>`;
+                    zoneCheckboxesContainer.classList.remove('border-red-500');
+                    zoneCheckboxesContainer.classList.add('border-gray-300');
                 } else {
                     zoneValidationStatus.innerHTML = `<span class="text-red-500 font-medium">Selectează cel puțin o zonă.</span>`;
+                    zoneCheckboxesContainer.classList.add('border-red-500'); // Highlight container if invalid
+                    zoneCheckboxesContainer.classList.remove('border-gray-300');
                     allValid = false;
                 }
 
+                const interestsCheckboxesContainer = document.getElementById('interests-checkboxes');
                 const isInterestSelected = Array.from(interestCheckboxes).some(cb => cb.checked);
                 if (isInterestSelected) {
-                    interestsValidationStatus.innerHTML = `<span class="text-green-600 font-medium"><i class="fas fa-check"></i> Selectat.</span>`;
+                    interestsValidationStatus.innerHTML = `<span class="text-green-600 font-medium"><i class="fas fa-check"></i> Cel puțin un interes selectat.</span>`;
+                    interestsCheckboxesContainer.classList.remove('border-red-500');
+                    interestsCheckboxesContainer.classList.add('border-gray-300');
                 } else {
                     interestsValidationStatus.innerHTML = `<span class="text-red-500 font-medium">Selectează cel puțin un interes.</span>`;
+                    interestsCheckboxesContainer.classList.add('border-red-500'); // Highlight container if invalid
                     allValid = false;
                 }
 
+                // reCAPTCHA Validation
                 const isRecaptchaValid = grecaptcha && grecaptcha.getResponse().length > 0;
                 if (!isRecaptchaValid) {
                     allValid = false;
                 }
 
-                submitButton.disabled = !allValid;
+                // Scarcity Counter Check
                 if (counterValueElement && counterValueElement.textContent === '0') {
-                    submitButton.disabled = true;
+                    allValid = false; // If counter is 0, form is not valid for submission
                 }
-                return allValid;
+
+                submitButton.disabled = !allValid;
+                return allValid; // Return the final validity state
             }
 
+            // Attach event listeners for live validation
             emailInput.addEventListener('input', validateForm);
             phoneCountryCodeInput.addEventListener('change', validateForm);
             phoneLocalInput.addEventListener('input', validateForm);
@@ -647,6 +677,7 @@
             zoneCheckboxes.forEach(checkbox => checkbox.addEventListener('change', validateForm));
             interestCheckboxes.forEach(checkbox => checkbox.addEventListener('change', validateForm));
             validateForm();
+            // Initial validation call to set the button state and messages
         });
     </script>
 </body>
