@@ -2,7 +2,12 @@ document.addEventListener('DOMContentLoaded', function() {
     fetch('/includes/header.html')
         .then(response => response.text())
         .then(data => {
-            document.getElementById('header-placeholder').innerHTML = data;
+            const headerPlaceholder = document.getElementById('header-placeholder');
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = data;
+            const headerContent = Array.from(tempDiv.children);
+            headerPlaceholder.replaceWith(...headerContent);
+
             // Mobile menu logic
             const mobileMenuButton = document.getElementById("mobile-menu-button");
             const closeMobileMenu = document.getElementById("close-mobile-menu");
@@ -32,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 mobileMenu.querySelectorAll("a").forEach(link => {
                     link.addEventListener("click", function (e) {
                         if (this.hash) {
-                            const targetId = this.getAttribute('href');
+                            const targetId = this.hash;
                             if (window.location.pathname === '/index.html' || window.location.pathname === '/') {
                                 e.preventDefault();
                                 const targetElement = document.querySelector(targetId);

@@ -50,6 +50,7 @@
     </script>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/includes/styles.css">
 
     <link rel="icon" href="/public/logo.png" type="image/png" sizes="32x32">
     <link rel="icon" href="/public/logo.png" type="image/png" sizes="16x16">
@@ -75,29 +76,13 @@
     </script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-
         body {
-            font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, #f5f7fa 0%, #e4e7f1 100%);
-            min-height: 100vh;
         }
 
         html {
             scroll-behavior: smooth;
         }
-
-        /* Removed redundant .logo-circle for cleaner CSS */
-
-        .gradient-text {
-            background: linear-gradient(135deg, #8b5cf6 0%, #0ea5e9 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 700;
-        }
-
-        /* Removed #mobile-menu transition style as it's handled by Tailwind utilities */
 
         .error-message {
             color: #ef4444;
@@ -534,49 +519,6 @@
                         grecaptcha.reset();
                     }
                 }
-            });
-        });
-    </script>
-
-    <script>
-        // Mobile Menu Functionality (SIMPLIFIED)
-        document.addEventListener("DOMContentLoaded", function () {
-            // Renamed IDs for specificity
-            const mobileMenuButton = document.getElementById("mobile-menu-button-business");
-            const closeMobileMenu = document.getElementById("close-mobile-menu-business");
-            const mobileMenu = document.getElementById("mobile-menu-business");
-            const body = document.body;
-
-            // Open mobile menu
-            mobileMenuButton.addEventListener("click", function () {
-                mobileMenu.classList.remove("hidden");
-                body.style.overflow = "hidden";
-            });
-
-            // Close mobile menu
-            closeMobileMenu.addEventListener("click", function () {
-                mobileMenu.classList.add("hidden");
-                body.style.overflow = "";
-            });
-
-            // Close menu when clicking on links
-            const mobileLinks = mobileMenu.querySelectorAll("a");
-            mobileLinks.forEach(link => {
-                link.addEventListener("click", function (e) {
-                    // Don't prevent default for mailto links
-                    if (!this.href.startsWith("mailto:")) {
-                        e.preventDefault();
-                    }
-
-                    mobileMenu.classList.add("hidden");
-                    body.style.overflow = "";
-
-                    if (!this.href.startsWith("mailto:")) {
-                        setTimeout(() => {
-                            window.location.href = this.href;
-                        }, 300);
-                    }
-                });
             });
         });
     </script>
