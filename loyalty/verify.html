@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifying Code | Loyalty Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .verification-card {
+            text-align: center;
+        }
+        .result-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+        .result-icon.success {
+            color: var(--success-color);
+        }
+        .result-icon.error {
+            color: var(--error-color);
+        }
+        .result-message {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .back-link:hover {
+            background-color: #5b21b6;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Verifying Customer Code</h1>
+    </header>
+
+    <main>
+        <div id="verification-result" class="card verification-card">
+            <!-- Result will be rendered here -->
+            <p>Processing...</p>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const resultDiv = document.getElementById('verification-result');
+            const params = new URLSearchParams(window.location.search);
+            const code = params.get('code');
+            const merchantId = params.get('merchant_id'); // Keep track of merchant for the back link
+
+            const getCodeFromUrl = () => {
+                const params = new URLSearchParams(window.location.search);
+                return params.get('code');
+            };
+
+            const renderResult = (status, message, icon) => {
+                let backUrl = 'index.html';
+                // Try to get merchant_id from referrer to build back link
+                if (document.referrer) {
+                    try {
+                        const referrerUrl = new URL(document.referrer);
+                        const merchantId = referrerUrl.searchParams.get('merchant_id');
+                        if (merchantId) {
+                            backUrl += `?merchant_id=${merchantId}`;
+                        }
+                    } catch (e) {
+                        console.warn("Could not parse referrer URL, using default back link.");
+                    }
+                }
+
+                resultDiv.innerHTML = `
+                    <div class="result-icon ${status}">${icon}</div>
+                    <div class="result-message">${message}</div>
+                    <a href="${backUrl}" class="back-link">Back to Dashboard</a>
+                `;
+            };
+
+            const processRedemption = async (code) => {
+                if (!code) {
+                    renderResult('error', 'No code provided in URL.', '&#10060;'); // Cross mark
+                    return;
+                }
+
+                try {
+                    const response = await fetch('api.php?route=/api/redeem-loyalty-code', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ code: code })
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(data.message || 'An unknown error occurred.');
+                    }
+
+                    // Handle the different success messages from the database function
+                    if (data.status === 'success') {
+                        // The message contains the details we need to display
+                        renderResult('success', data.message, '&#9989;'); // Check mark
+                    } else {
+                        // Handle errors returned by the function (e.g., code not found, already used)
+                        renderResult('error', data.message, '&#10060;');
+                    }
+
+                } catch (error) {
+                    console.error('Redemption error:', error);
+                    renderResult('error', error.message, '&#10060;');
+                }
+            };
+
+            const codeToVerify = getCodeFromUrl();
+            processRedemption(codeToVerify);
+        });
+    </script>
+
+</body>
+</html>

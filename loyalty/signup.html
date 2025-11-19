@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join Loyalty Program</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1 id="page-title">Join Loyalty Program</h1>
+    </header>
+
+    <main>
+        <div id="loading-state">
+            <p>Loading...</p>
+        </div>
+
+        <div id="error-state" class="hidden">
+            <p id="error-message"></p>
+        </div>
+
+        <div id="signup-form-container" class="card hidden">
+            <form id="signup-form">
+                <div class="form-field">
+                    <label for="full_name">Your Name (Optional)</label>
+                    <input type="text" id="full_name" name="full_name">
+                </div>
+                <div class="form-field">
+                    <label for="phone_number">Your Phone Number</label>
+                    <input type="tel" id="phone_number" name="phone_number" required placeholder="+40712345678">
+                </div>
+                <div id="form-feedback"></div>
+                <button type="submit" id="submit-button">Join Now</button>
+            </form>
+        </div>
+    </main>
+
+    <style>
+        .form-field {
+            margin-bottom: 15px;
+        }
+        .form-field label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-field input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+        #form-feedback {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+            color: white;
+        }
+        #form-feedback.error {
+            background-color: var(--error-color);
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const loadingState = document.getElementById('loading-state');
+            const errorState = document.getElementById('error-state');
+            const errorMessage = document.getElementById('error-message');
+            const signupFormContainer = document.getElementById('signup-form-container');
+            const signupForm = document.getElementById('signup-form');
+            const pageTitle = document.getElementById('page-title');
+            const feedbackDiv = document.getElementById('form-feedback');
+            const submitButton = document.getElementById('submit-button');
+
+            const getMerchantId = () => {
+                const params = new URLSearchParams(window.location.search);
+                return params.get('merchant_id');
+            };
+
+            const showError = (message) => {
+                errorMessage.textContent = message;
+                loadingState.classList.add('hidden');
+                signupFormContainer.classList.add('hidden');
+                errorState.classList.remove('hidden');
+            };
+
+            const showFeedback = (status, message) => {
+                feedbackDiv.textContent = message;
+                feedbackDiv.className = status;
+                feedbackDiv.style.display = 'block';
+            };
+
+            const fetchMerchantName = async (merchantId) => {
+                try {
+                    // We can use the loyalty-program endpoint to get merchant details
+                    const response = await fetch(`api.php?route=/api/loyalty-program&merchant_id=${merchantId}`);
+                    if (!response.ok) {
+                        throw new Error('Could not find this business.');
+                    }
+                    const program = await response.json();
+                    pageTitle.textContent = `Join ${program.merchants.name}'s Loyalty Program`;
+                    loadingState.classList.add('hidden');
+                    signupFormContainer.classList.remove('hidden');
+                } catch (error) {
+                    showError(error.message);
+                }
+            };
+
+            signupForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                submitButton.disabled = true;
+                submitButton.textContent = 'Joining...';
+                feedbackDiv.style.display = 'none';
+
+                const merchantId = getMerchantId();
+                const formData = new FormData(signupForm);
+                const data = {
+                    merchant_id: merchantId,
+                    full_name: formData.get('full_name'),
+                    phone_number: formData.get('phone_number')
+                };
+
+                try {
+                    const response = await fetch('api.php?route=/api/join-loyalty', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                    const result = await response.json();
+
+                    if (result.status === 'success' && result.loyalty_card_id) {
+                        // Redirect to the new card page
+                        window.location.href = `card.html?card_id=${result.loyalty_card_id}`;
+                    } else {
+                        throw new Error(result.message || 'An unknown error occurred.');
+                    }
+                } catch (error) {
+                    showFeedback('error', error.message);
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Join Now';
+                }
+            });
+
+            const merchantId = getMerchantId();
+            if (!merchantId) {
+                showError('No merchant ID was provided in the URL.');
+            } else {
+                fetchMerchantName(merchantId);
+            }
+        });
+    </script>
+
+</body>
+</html>

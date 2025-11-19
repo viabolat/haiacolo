@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Loyalty Card</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .loyalty-card-container {
+            max-width: 400px;
+            margin: 40px auto;
+        }
+
+        .loyalty-card {
+            background-color: var(--card-bg-color);
+            border-radius: 16px;
+            box-shadow: 0 10px 20px var(--shadow-color);
+            padding: 25px;
+            text-align: center;
+        }
+
+        .card-header h3 {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin: 0;
+        }
+
+        .card-header p {
+            font-size: 1rem;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        #qr-code-container {
+            margin: 25px auto;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            display: inline-block;
+        }
+
+        .reward {
+            margin: 25px 0;
+            padding: 15px;
+            background-color: var(--secondary-color);
+            border-radius: 8px;
+        }
+
+        .reward p {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .stamps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stamp {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 3px dashed #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--primary-color);
+            background-color: #f9fafb;
+        }
+
+        .stamp.punched {
+            border-style: solid;
+            border-color: var(--primary-color);
+            background-color: var(--secondary-color);
+            animation: punch-animation 0.5s ease-in-out;
+        }
+
+        @keyframes punch-animation {
+            0% { transform: scale(0.8); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="loyalty-card-container">
+        <div id="loading-state">
+            <p>Loading card...</p>
+        </div>
+
+        <div id="error-state" class="hidden">
+            <p id="error-message"></p>
+        </div>
+
+        <div id="card-content" class="loyalty-card hidden">
+            <div class="card-header">
+                <h3 id="merchant-name"></h3>
+                <p id="customer-name"></p>
+            </div>
+
+            <div id="qr-code-container">
+                 <canvas id="qr-code-canvas"></canvas>
+            </div>
+
+            <div class="reward">
+                <p id="reward-description"></p>
+            </div>
+
+            <div id="stamps-grid" class="stamps-grid">
+                <!-- Stamps will be generated here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1/build/qrcode.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const loadingState = document.getElementById('loading-state');
+            const errorState = document.getElementById('error-state');
+            const errorMessage = document.getElementById('error-message');
+            const cardContent = document.getElementById('card-content');
+            const merchantNameEl = document.getElementById('merchant-name');
+            const customerNameEl = document.getElementById('customer-name');
+            const rewardDescriptionEl = document.getElementById('reward-description');
+            const stampsGrid = document.getElementById('stamps-grid');
+            const qrCanvas = document.getElementById('qr-code-canvas');
+
+            let pollingInterval; // To hold the interval ID
+
+            const getCardId = () => {
+                const params = new URLSearchParams(window.location.search);
+                return params.get('card_id');
+            };
+
+            const showError = (message) => {
+                errorMessage.textContent = message;
+                loadingState.classList.add('hidden');
+                errorState.classList.remove('hidden');
+            };
+
+            const startPolling = (cardId) => {
+                // Ensure we only have one polling interval running
+                if (pollingInterval) {
+                    clearInterval(pollingInterval);
+                }
+                pollingInterval = setInterval(() => {
+                    fetchCardDetails(cardId, true); // 'true' indicates this is an update
+                }, 4000); // Poll every 4 seconds
+            };
+
+            const renderCard = (card, isUpdate = false) => {
+                const program = card.loyalty_programs;
+                const customer = card.customers;
+
+                merchantNameEl.textContent = program.merchants.name;
+                customerNameEl.textContent = `For: ${customer?.full_name || customer?.phone_number || 'Valued Customer'}`;
+                rewardDescriptionEl.textContent = `Reward: ${program.reward_description}`;
+
+                if (!isUpdate) { // Only generate QR code on initial load
+                    QRCode.toCanvas(qrCanvas, card.id, { width: 200, margin: 2 }, function (error) {
+                        if (error) console.error(error);
+                    });
+                }
+
+                // Render stamps
+                stampsGrid.innerHTML = '';
+                for (let i = 1; i <= program.punches_required; i++) {
+                    const stamp = document.createElement('div');
+                    stamp.classList.add('stamp');
+                    if (i <= card.current_punches) {
+                        stamp.classList.add('punched');
+                        stamp.innerHTML = '&#10003;'; // Checkmark
+                    }
+                    stampsGrid.appendChild(stamp);
+                }
+            };
+
+            const fetchCardDetails = async (cardId, isUpdate = false) => {
+                try {
+                    const response = await fetch(`api.php?route=/api/loyalty-card&card_id=${cardId}`);
+                    if (!response.ok) {
+                        // If polling fails, just log it quietly and don't show a big error
+                        if (isUpdate) {
+                            console.error('Polling update failed.');
+                            return;
+                        }
+                        throw new Error('Failed to fetch card details.');
+                    }
+                    
+                    const card = await response.json();
+                    renderCard(card, isUpdate);
+
+                    if (!isUpdate) { // On initial load
+                        loadingState.classList.add('hidden');
+                        cardContent.classList.remove('hidden');
+                        // Start polling for updates after the first successful load
+                        startPolling(cardId);
+                    }
+                } catch (error) {
+                    showError(error.message);
+                }
+            };
+
+            const cardId = getCardId();
+            if (!cardId) {
+                showError('Card ID is missing from the URL.');
+            } else {
+                fetchCardDetails(cardId);
+            }
+        });
+    </script>
+
+</body>
+</html>

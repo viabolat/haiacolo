@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loyalty Program Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        #scanner-container {
+            max-width: 500px;
+            margin: 20px auto;
+        }
+        #scan-result {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+        }
+        #scan-result.success {
+            background-color: var(--success-color);
+            color: white;
+        }
+        #scan-result.error {
+            background-color: var(--error-color);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Loyalty Program Dashboard</h1>
+        <h2 id="merchant-name"></h2>
+    </header>
+
+    <main>
+        <div id="loading-state">
+            <p>Loading merchant data...</p>
+        </div>
+
+        <div id="error-state" class="hidden">
+            <p id="error-message"></p>
+        </div>
+
+        <div id="dashboard-content" class="hidden">
+            <section id="program-details" class="card">
+                <h3>Your Loyalty Program</h3>
+                <p id="program-description"></p>
+            </section>
+
+            <section id="code-redemption" class="card">
+                <h3>Punch a Customer's Card</h3>
+                <button id="start-scan-btn">Scan Customer QR Code</button>
+                <div id="scanner-container" class="hidden">
+                    <div id="qr-reader"></div>
+                    <button id="stop-scan-btn" class="hidden">Stop Scanning</button>
+                </div>
+                <div id="scan-result"></div>
+            </section>
+
+            <section id="customer-cards" class="card">
+                <h3>Customer Loyalty Cards</h3>
+                <table id="cards-table">
+                    <thead>
+                        <tr>
+                            <th>Customer</th>
+                            <th>Punches</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cards-table-body">
+                        <!-- Rows will be inserted here -->
+                    </tbody>
+                </table>
+            </section>
+        </div>
+    </main>
+
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const loadingState = document.getElementById('loading-state');
+            const errorState = document.getElementById('error-state');
+            const errorMessage = document.getElementById('error-message');
+            const dashboardContent = document.getElementById('dashboard-content');
+            const merchantNameHeader = document.getElementById('merchant-name');
+            const programDescription = document.getElementById('program-description');
+            const cardsTableBody = document.getElementById('cards-table-body');
+            
+            const startScanBtn = document.getElementById('start-scan-btn');
+            const stopScanBtn = document.getElementById('stop-scan-btn');
+            const scannerContainer = document.getElementById('scanner-container');
+            const qrReaderDiv = document.getElementById('qr-reader');
+            const scanResultDiv = document.getElementById('scan-result');
+
+            let html5QrCode;
+
+            const getMerchantId = () => {
+                const params = new URLSearchParams(window.location.search);
+                return params.get('merchant_id');
+            };
+
+            const showError = (message) => {
+                errorMessage.textContent = message;
+                loadingState.classList.add('hidden');
+                dashboardContent.classList.add('hidden');
+                errorState.classList.remove('hidden');
+            };
+
+            const fetchProgramDetails = async (merchantId) => {
+                try {
+                    const response = await fetch(`api.php?route=/api/loyalty-program&merchant_id=${merchantId}`);
+                    if (!response.ok) {
+                        if (response.status === 404) throw new Error('No loyalty program found for this merchant ID.');
+                        throw new Error('Failed to fetch loyalty program details.');
+                    }
+                    const program = await response.json();
+                    merchantNameHeader.textContent = program.merchants.name;
+                    programDescription.textContent = `Offer: ${program.punches_required} punches for a ${program.reward_description}.`;
+                } catch (error) {
+                    showError(error.message);
+                    throw error;
+                }
+            };
+
+            const fetchLoyaltyCards = async (merchantId) => {
+                try {
+                    const response = await fetch(`api.php?route=/api/loyalty-cards&merchant_id=${merchantId}`);
+                    if (!response.ok) throw new Error('Failed to fetch loyalty cards.');
+                    const cards = await response.json();
+                    renderCardsTable(cards);
+                } catch (error) {
+                    showError(error.message);
+                    throw error;
+                }
+            };
+
+            const renderCardsTable = (cards) => {
+                cardsTableBody.innerHTML = '';
+                if (cards.length === 0) {
+                    cardsTableBody.innerHTML = '<tr><td colspan="3">No customer cards found.</td></tr>';
+                    return;
+                }
+                cards.forEach(card => {
+                    const row = document.createElement('tr');
+                    const customerName = card.customers?.full_name || card.customers?.phone_number || 'N/A';
+                    row.innerHTML = `
+                        <td>${customerName}</td>
+                        <td>${card.current_punches}</td>
+                        <td><span class="status status-${card.status}">${card.status}</span></td>
+                    `;
+                    cardsTableBody.appendChild(row);
+                });
+            };
+
+            const showScanResult = (status, message) => {
+                scanResultDiv.textContent = message;
+                scanResultDiv.className = status; // 'success' or 'error'
+                scanResultDiv.style.display = 'block';
+                setTimeout(() => { scanResultDiv.style.display = 'none'; }, 5000);
+            };
+
+            const onScanSuccess = async (decodedText, decodedResult) => {
+                // decodedText is the loyalty_card_id from the QR code
+                stopScanning();
+                showScanResult('success', 'QR Code scanned! Processing punch...');
+
+                try {
+                    const response = await fetch('api.php?route=/api/punch-card', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ loyalty_card_id: decodedText })
+                    });
+                    const result = await response.json();
+
+                    if (result.status === 'success') {
+                        showScanResult('success', result.message);
+                        // Refresh the card list to show the new punch count
+                        fetchLoyaltyCards(getMerchantId());
+                    } else {
+                        showScanResult('error', `Error: ${result.message}`);
+                    }
+                } catch (err) {
+                    showScanResult('error', 'Failed to connect to the API.');
+                }
+            };
+
+            const startScanning = () => {
+                html5QrCode = new Html5Qrcode("qr-reader");
+                scannerContainer.classList.remove('hidden');
+                startScanBtn.classList.add('hidden');
+                stopScanBtn.classList.remove('hidden');
+                
+                html5QrCode.start(
+                    { facingMode: "environment" },
+                    { fps: 10, qrbox: { width: 250, height: 250 } },
+                    onScanSuccess,
+                    (errorMessage) => { /* handle scan failure, usually ignore */ }
+                ).catch((err) => {
+                    showScanResult('error', 'Could not start QR scanner. Please grant camera permissions.');
+                    stopScanning();
+                });
+            };
+
+            const stopScanning = () => {
+                if (html5QrCode && html5QrCode.isScanning) {
+                    html5QrCode.stop().then(() => {
+                        scannerContainer.classList.add('hidden');
+                        startScanBtn.classList.remove('hidden');
+                        stopScanBtn.classList.add('hidden');
+                    }).catch(err => console.error("Failed to stop scanner", err));
+                } else {
+                     scannerContainer.classList.add('hidden');
+                     startScanBtn.classList.remove('hidden');
+                     stopScanBtn.classList.add('hidden');
+                }
+            };
+
+            startScanBtn.addEventListener('click', startScanning);
+            stopScanBtn.addEventListener('click', stopScanning);
+
+            const init = async () => {
+                const merchantId = getMerchantId();
+                if (!merchantId) {
+                    showError('Merchant ID is missing from the URL. Please add ?merchant_id=YOUR_ID to the address bar.');
+                    return;
+                }
+
+                try {
+                    await fetchProgramDetails(merchantId);
+                    await fetchLoyaltyCards(merchantId);
+                    loadingState.classList.add('hidden');
+                    dashboardContent.classList.remove('hidden');
+                } catch (error) {
+                    console.error('Initialization failed:', error);
+                }
+            };
+
+            init();
+        });
+    </script>
+
+</body>
+</html>
