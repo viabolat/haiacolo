@@ -86,6 +86,18 @@ Routes are passed as `?route=/api/...` query strings to the PHP files. `.htacces
 
 ---
 
+## Frontend Verification Protocol
+
+After any HTML/CSS/JS change, before reporting done:
+1. **Fetch the live site** (`https://haiacolo.ro`) using `WebFetch` to get a rendered snapshot.
+2. **Check key pages** affected by the change (e.g. index, user, business, loyalty/).
+3. **Verify**: target section is present, no orphaned text visible, no obvious layout breaks.
+4. Self-anneal any issue found before committing. Do not commit broken HTML.
+
+> Rationale: WSL2 cannot reach Windows localhost, so live `haiacolo.ro` is the only reliable rendering target for verification.
+
+---
+
 ## Database Migration Rules
 
 See `supabase.md` for the full workflow. The critical rule: **`supabase/migrations/` is the sole source of truth for schema**. Never use the Supabase SQL Editor for schema changes.
