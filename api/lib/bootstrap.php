@@ -1,17 +1,5 @@
 <?php
 
-$projectRoot = dirname(__DIR__, 2);
-$secretsPath = $projectRoot . '/../secrets.php';
-
-if (!file_exists($secretsPath)) {
-    http_response_code(500);
-    error_log('FATAL ERROR: secrets.php not found.');
-    echo json_encode(['error' => 'API key configuration error.']);
-    exit;
-}
-
-require $secretsPath;
-
 if (!function_exists('curl_init')) {
     http_response_code(500);
     error_log('FATAL ERROR: PHP cURL extension is not installed or enabled.');

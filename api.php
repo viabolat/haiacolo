@@ -1,5 +1,7 @@
 <?php
 
+require '/home1/rcfzzwte/secrets.php';
+
 require __DIR__ . '/api/lib/bootstrap.php';
 require __DIR__ . '/api/lib/http.php';
 require __DIR__ . '/api/lib/router.php';
@@ -43,4 +45,3 @@ $routes = [
 ];
 
 ha_dispatch_routes($routes, $method, $route);
-
