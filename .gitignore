@@ -9,3 +9,8 @@ secrets.php
 
 # Python Virtual Environment
 /.venv/
+
+# VSCode settings
+.vscode/
+
+

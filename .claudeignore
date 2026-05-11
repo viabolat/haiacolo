@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+venv/
+.venv/
+vendor/
+.vscode
+.gemini
+
+# Build outputs
+dist/
+build/
+.next/
+.turbo/
+out/
+
+# Secrets (Double Layer of Protection)
+.env*
+*.pem
+*.key
+*.p12
+*credentials*.json
+
+# Cache and Logs
+.cache/
+*.log
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Large Binary Files
+*.pdf
+*.mp4
+*.zip
+*.tar.gz
+
+# Folders/Files
+ignore
+extras
+Secrets.php
