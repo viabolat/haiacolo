@@ -8,7 +8,7 @@ Inherits global behavioral rules from `~/.claude/CLAUDE.md` (token discipline, s
 
 ## Project Overview
 
-HaiAcolo is a Romanian local-business loyalty and deals platform targeting Cluj. Users sign up to receive deal codes from local merchants; merchants get a QR-punch loyalty card system. The live site is at `haiacolo.ro`.
+HaiAcolo is a Romanian **offers platform** targeting Cluj-Napoca. Users subscribe (free, via WhatsApp) to receive exclusive deal codes from local merchants. Merchants pay to list offers and promote to the subscriber base. The loyalty card (QR-punch system) is a backend feature available to merchants but is **not** the primary product proposition. The live site is at `haiacolo.ro`.
 
 **Stack:** Vanilla HTML + Tailwind CDN frontend · PHP 8.3 backend (no framework) · Supabase (PostgreSQL + Edge Functions) · Resend (email) · Google reCAPTCHA v2 · Apache/cPanel hosting
 
