@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     fetch('/includes/header.html')
         .then(response => response.text())
+        .catch(() => '')
         .then(data => {
             const headerPlaceholder = document.getElementById('header-placeholder');
             const tempDiv = document.createElement('div');
@@ -58,6 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     fetch('/includes/footer.html')
         .then(response => response.text())
+        .catch(() => '')
         .then(data => {
             document.getElementById('footer-placeholder').innerHTML = data;
         });
