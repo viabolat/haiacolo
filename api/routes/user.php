@@ -123,7 +123,7 @@ function ha_route_user_signup() {
         if ($customer_email) {
             if (!ha_supabase_check_and_record_sent_email($customer_email, $supabaseUrl, $supabaseAnonKey, $supabaseKey)) {
                 $subject = 'Bun venit la HaiAcolo! Oferta ta de la ' . $offer_partner_name;
-                $verification_url = $appBaseUrl . '/offer.html?code=' . $code_string;
+                $verification_url = $appBaseUrl . '/offer?code=' . $code_string;
                 $html_body = file_get_contents($projectRoot . '/templates/welcome_email.html');
                 $html_body = str_replace('{{offer_partner_name}}', $offer_partner_name, $html_body);
                 $html_body = str_replace('{{offer_description}}', $offer_description, $html_body);

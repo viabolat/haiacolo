@@ -15,6 +15,10 @@ if (empty($appBaseUrl)) {
     $appBaseUrl = 'https://haiacolo.ro';
 }
 
+// E3: Resolved absolute path to the web root, used by route handlers to locate
+// email templates (e.g. templates/welcome_email.html).
+$projectRoot = realpath(__DIR__ . '/../..');
+
 function ha_require_secrets(array $required_keys) {
     foreach ($required_keys as $key) {
         if (empty($GLOBALS[$key])) {

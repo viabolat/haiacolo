@@ -93,8 +93,11 @@ function ha_send_resend_email($from_address, $to, $subject, $html, $resendApiKey
 }
 
 function ha_notify_new_customer_edge_function($customer_data, $supabaseUrl, $supabaseKey) {
-    $base_url = rtrim($supabaseUrl, '/rest/v1');
-    $edge_function_url = $base_url . '/functions/v1/user-signup-alert';
+    // E5: $supabaseUrl is the bare project URL with no path suffix; build the
+    // Edge function URL directly instead of using rtrim() as a suffix stripper
+    // (rtrim strips individual characters, not substrings, and would silently
+    // corrupt URLs whose trailing chars overlap the character set '/rest/v1').
+    $edge_function_url = $supabaseUrl . '/functions/v1/user-signup-alert';
 
     error_log("Calling Edge Function at: {$edge_function_url}");
 
@@ -121,8 +124,7 @@ function ha_notify_new_customer_edge_function($customer_data, $supabaseUrl, $sup
 }
 
 function ha_notify_merchant_application_edge_function($merchant_data, $supabaseUrl, $supabaseKey) {
-    $base_url = rtrim($supabaseUrl, '/rest/v1');
-    $edge_function_url = $base_url . '/functions/v1/merchant-application-alert';
+    $edge_function_url = $supabaseUrl . '/functions/v1/merchant-application-alert';
 
     error_log("Calling Edge Function at: {$edge_function_url}");
 

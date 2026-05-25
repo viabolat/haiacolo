@@ -39,7 +39,6 @@ $routes = [
         '/api/business-signup' => 'ha_route_business_signup',
         '/api/update-redemptions' => 'ha_route_update_redemptions',
         '/api/send-outreach' => 'ha_route_send_outreach',
-        '/api/redeem-code' => 'ha_route_redeem_code',
         '/api/save-push-subscription' => 'ha_route_save_push_subscription'
     ]
 ];
