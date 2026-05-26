@@ -444,7 +444,6 @@
     <script src="/includes/loader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1/build/qrcode.min.js"></script>
     <script>
-        // Track verification status safely without calling the API prematurely
         window.recaptchaVerified = false;
 
         window.onRecaptchaVerify = function (token) {
@@ -488,8 +487,8 @@
                 }
 
                 iconElement.innerHTML = isValid
-                    ? `<i class="fas fa-check-circle text-green-500"></i>`
-                    : `<i class="fas fa-times-circle text-red-500"></i>`;
+                    ? '<i class="fas fa-check-circle text-green-500"></i>'
+                    : '<i class="fas fa-times-circle text-red-500"></i>';
             }
 
             function handleSuccessfulSubmission(qrData, codeString, emailProvided) {
@@ -500,7 +499,7 @@
                 e.preventDefault();
 
                 if (!validateForm()) {
-                    feedbackDiv.innerHTML = `<p class="mb-4 p-4 rounded-md bg-red-100 text-red-700">Te rugăm să completezi toate câmpurile obligatorii corect și să validezi reCAPTCHA. 🤖</p>`;
+                    feedbackDiv.innerHTML = '<p class="mb-4 p-4 rounded-md bg-red-100 text-red-700">Te rugăm să completezi toate câmpurile obligatorii corect și să validezi reCAPTCHA.</p>';
                     return;
                 }
 
@@ -608,11 +607,11 @@
 
                 const anyZoneChecked = Array.from(zoneCheckboxes).some(cb => cb.checked);
                 if (anyZoneChecked) {
-                    zoneValidationStatus.innerHTML = `<span class="text-green-600 font-medium"><i class="fas fa-check"></i> Cel puțin o zonă selectată.</span>`;
+                    zoneValidationStatus.innerHTML = '<span class="text-green-600 font-medium"><i class="fas fa-check"></i> Cel puțin o zonă selectată.</span>';
                     zoneCheckboxesContainer.classList.remove('border-red-500');
                     zoneCheckboxesContainer.classList.add('border-gray-300');
                 } else {
-                    zoneValidationStatus.innerHTML = `<span class="text-red-500 font-medium">Selectează cel puțin o zonă.</span>`;
+                    zoneValidationStatus.innerHTML = '<span class="text-red-500 font-medium">Selectează cel puțin o zonă.</span>';
                     zoneCheckboxesContainer.classList.add('border-red-500');
                     zoneCheckboxesContainer.classList.remove('border-gray-300');
                     allValid = false;
@@ -620,9 +619,9 @@
 
                 const isInterestSelected = Array.from(interestCheckboxes).some(cb => cb.checked);
                 if (isInterestSelected) {
-                    interestsValidationStatus.innerHTML = `<span class="text-green-600 font-medium"><i class="fas fa-check"></i> Cel puțin un interes selectat.</span>`;
+                    interestsValidationStatus.innerHTML = '<span class="text-green-600 font-medium"><i class="fas fa-check"></i> Cel puțin un interes selectat.</span>';
                 } else {
-                    interestsValidationStatus.innerHTML = `<span class="text-red-500 font-medium">Selectează cel puțin un interes.</span>`;
+                    interestsValidationStatus.innerHTML = '<span class="text-red-500 font-medium">Selectează cel puțin un interes.</span>';
                     allValid = false;
                 }
 
