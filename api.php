@@ -1,6 +1,6 @@
 <?php
 
-require '/home1/rcfzzwte/secrets.php';
+require __DIR__ . '/api/lib/secrets_loader.php';
 
 require __DIR__ . '/api/lib/bootstrap.php';
 require __DIR__ . '/api/lib/http.php';

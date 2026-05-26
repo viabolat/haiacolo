@@ -1,8 +1,6 @@
 <?php
 
-// E1: secrets.php lives one directory above the web root; load it before bootstrap
-// so $supabaseUrl/$supabaseKey/$supabaseAnonKey are defined when ha_require_secrets runs.
-require __DIR__ . '/../../secrets.php';
+require __DIR__ . '/../api/lib/secrets_loader.php';
 
 require __DIR__ . '/../api/lib/bootstrap.php';
 require __DIR__ . '/../api/lib/http.php';
