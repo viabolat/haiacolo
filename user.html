@@ -542,7 +542,7 @@
                     }
                 } catch (err) {
                     console.error('Fetch error:', err);
-                    feedbackDiv.innerHTML = `<p class="mb-4 p-4 rounded-md bg-red-100 text-red-700">A apărut o eroare neașteptată. Te rugăm să încerci din nou mai târziu. Detalii: ${err.message || err}</p>`;
+                    feedbackDiv.innerHTML = `<p class="mb-4 p-4 rounded-md bg-red-100 text-red-700">A apărut o eroare neașteptată. Te rugăm să încerci din nou mai târziu.</p>`;
                     grecaptcha.reset();
                     window.recaptchaVerified = false;
                     validateForm();
