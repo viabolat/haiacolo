@@ -642,7 +642,13 @@
                 }
 
                 // 6. reCAPTCHA Validation (REQUIRED)
-                const isRecaptchaValid = typeof grecaptcha !== 'undefined' && grecaptcha.getResponse().length > 0;
+                // grecaptcha.getResponse() throws if the widget hasn't rendered yet (async script)
+                let isRecaptchaValid = false;
+                try {
+                    isRecaptchaValid = typeof grecaptcha !== 'undefined' && grecaptcha.getResponse().length > 0;
+                } catch (e) {
+                    isRecaptchaValid = false;
+                }
                 if (!isRecaptchaValid) {
                     allValid = false;
                 }
