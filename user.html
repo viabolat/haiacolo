@@ -444,9 +444,12 @@
     <script src="/includes/loader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1/build/qrcode.min.js"></script>
     <script>
-        // --- RECAPTCHA FIX: Global function called on reCAPTCHA success ---
+        // Track verification state safely
+        window.recaptchaVerified = false;
+
         window.onRecaptchaVerify = function (token) {
-            validateForm(); // Re-run validation to enable button
+            window.recaptchaVerified = true;
+            validateForm();
         };
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -458,7 +461,7 @@
             const emailInput = document.getElementById('email');
             const emailValidationIcon = document.getElementById('email-validation-icon');
             const phoneCountryCodeInput = document.getElementById('phone_country_code');
-            const phoneLocalInput = document.getElementById('phone_number_local'); // Input for local part
+            const phoneLocalInput = document.getElementById('phone_number_local');
             const fullPhoneInput = document.getElementById('phone_number');
             const zoneCheckboxes = signupForm.querySelectorAll('input[name="zone"]');
             const zoneCheckboxesContainer = document.getElementById('zone-checkboxes');
@@ -467,7 +470,6 @@
             const interestsValidationStatus = document.getElementById('interests-validation-status');
             const counterValueElement = document.getElementById('counter-value');
 
-            // Function to scroll to the form when the button is clicked
             document.querySelectorAll('a[href="#signup-form-container"]').forEach(anchor => {
                 anchor.addEventListener('click', function (e) {
                     e.preventDefault();
@@ -477,16 +479,9 @@
                 });
             });
 
-            /**
-             * Renders a check or cross icon next to an input field based on its validity.
-             * @param {HTMLElement} iconElement The span element where the icon should be rendered.
-             * @param {boolean} isValid Whether the input value is valid.
-             * @param {boolean} isOptional Whether the field is optional.
-             */
             function renderValidationIcon(iconElement, isValid, isOptional = false) {
                 if (!iconElement) return;
 
-                // If optional and empty, don't show any icon
                 if (isOptional && !document.getElementById(iconElement.id.replace('-validation-icon', '')).value.trim()) {
                     iconElement.innerHTML = '';
                     return;
@@ -504,8 +499,7 @@
             signupForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
 
-                // Re-validate before final submission
-                if (!validateForm(true)) {
+                if (!validateForm()) {
                     feedbackDiv.innerHTML = `<p class="mb-4 p-4 rounded-md bg-red-100 text-red-700">Te rugăm să completezi toate câmpurile obligatorii corect și să validezi reCAPTCHA. 🤖</p>`;
                     return;
                 }
@@ -529,7 +523,6 @@
                 };
 
                 try {
-                    // This fetch URL should match your API endpoint
                     const response = await fetch('/api.php?route=/api/user-signup', {
                         method: 'POST',
                         headers: {
@@ -545,19 +538,21 @@
                         const errorMessage = responseData.error || 'A apărut o eroare. Te rugăm să încerci din nou mai târziu.';
                         feedbackDiv.innerHTML = `<p class="mb-4 p-4 rounded-md bg-red-100 text-red-700">${errorMessage}</p>`;
                         grecaptcha.reset();
+                        window.recaptchaVerified = false;
+                        validateForm();
                     }
                 } catch (err) {
                     console.error('Fetch error:', err);
-                    feedbackDiv.innerHTML = `<p class="mb-4 p-4 rounded-md bg-red-100 text-red-700">A apărut o eroare neașteptată. Te rugăm să încerci din nou mai târziu. Detalii: ${err.message || err}</p>`;
+                    feedbackDiv.innerHTML = `<p class="mb-4 p-4 rounded-md bg-red-100 text-red-700">A apărut o eroare neașteptată. Te rugăm să încerci din nou mai târziu.</p>`;
                     grecaptcha.reset();
+                    window.recaptchaVerified = false;
+                    validateForm();
                 } finally {
                     submitButton.disabled = false;
                     submitButton.textContent = 'Finalizează Abonarea';
                 }
             });
 
-            // --- Live Form Validation ---
-            // Sanitizes the local phone number input by removing non-digit characters.
             function sanitizePhoneNumber() {
                 const localInput = document.getElementById('phone_number_local');
                 localInput.value = localInput.value.replace(/[^\d]/g, '');
@@ -566,7 +561,6 @@
                 const selectedOption = countryCodeSelect.options[countryCodeSelect.selectedIndex];
                 const expectedLength = selectedOption.getAttribute('data-length');
 
-                // Handle length limits
                 if (expectedLength.includes('-')) {
                     const [, max] = expectedLength.split('-').map(Number);
                     if (localInput.value.length > max) {
@@ -580,17 +574,15 @@
                 }
             }
 
-            window.validateForm = function () { // Made global to be called by reCAPTCHA
+            window.validateForm = function () {
                 let allValid = true;
 
-                // 1. Phone Number Validation (REQUIRED)
                 sanitizePhoneNumber();
                 const selectedOption = phoneCountryCodeInput.options[phoneCountryCodeInput.selectedIndex];
                 const expectedLength = selectedOption.getAttribute('data-length');
                 const localNumber = phoneLocalInput.value;
                 let isPhoneValid = false;
 
-                // Check required length constraints
                 if (expectedLength.includes('-')) {
                     const [min, max] = expectedLength.split('-').map(Number);
                     isPhoneValid = localNumber.length >= min && localNumber.length <= max;
@@ -600,24 +592,20 @@
 
                 if (isPhoneValid) {
                     fullPhoneInput.value = phoneCountryCodeInput.value + localNumber;
-                    // Note: No live icon for required fields in this design, validation happens at the end.
                 } else {
                     fullPhoneInput.value = '';
                     allValid = false;
                 }
 
-                // 2. Email Validation (OPTIONAL)
                 const emailValue = emailInput.value.trim();
                 const emailRegex = /^[^' @]+@[^' @]+\.[^' @]+$/;
                 const isEmailValid = emailValue === '' || emailRegex.test(emailValue);
                 renderValidationIcon(emailValidationIcon, isEmailValid, true);
                 if (!isEmailValid) allValid = false;
 
-                // 3. Full Name Validation (OPTIONAL)
                 const isFullNamePresent = fullNameInput.value.trim().length > 0;
-                renderValidationIcon(fullNameValidationIcon, isFullNamePresent, true); // Always valid if optional
+                renderValidationIcon(fullNameValidationIcon, isFullNamePresent, true);
 
-                // 4. Zone Checkboxes Validation (REQUIRED)
                 const anyZoneChecked = Array.from(zoneCheckboxes).some(cb => cb.checked);
                 if (anyZoneChecked) {
                     zoneValidationStatus.innerHTML = `<span class="text-green-600 font-medium"><i class="fas fa-check"></i> Cel puțin o zonă selectată.</span>`;
@@ -630,26 +618,21 @@
                     allValid = false;
                 }
 
-                // 5. Interests Checkboxes Validation (REQUIRED)
-                const interestsCheckboxesContainer = document.getElementById('interests-checkboxes');
                 const isInterestSelected = Array.from(interestCheckboxes).some(cb => cb.checked);
                 if (isInterestSelected) {
                     interestsValidationStatus.innerHTML = `<span class="text-green-600 font-medium"><i class="fas fa-check"></i> Cel puțin un interes selectat.</span>`;
-                    // Note: Checkbox groups don't typically use borders, but we'll leave the validation text.
                 } else {
                     interestsValidationStatus.innerHTML = `<span class="text-red-500 font-medium">Selectează cel puțin un interes.</span>`;
                     allValid = false;
                 }
 
-                // 6. reCAPTCHA Validation (REQUIRED)
-                const isRecaptchaValid = typeof grecaptcha !== 'undefined' && grecaptcha.getResponse().length > 0;
-                if (!isRecaptchaValid) {
+                // Safe validation without calling the uninitialized API
+                if (!window.recaptchaVerified) {
                     allValid = false;
                 }
 
-                // 7. Scarcity Counter Check
                 if (counterValueElement && counterValueElement.textContent === '0') {
-                    allValid = false; // Form is not valid if no vouchers remain
+                    allValid = false;
                 }
 
                 submitButton.disabled = !allValid;
