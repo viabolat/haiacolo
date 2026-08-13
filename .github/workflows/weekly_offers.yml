@@ -2,9 +2,9 @@ name: Deal Matcher
 
 on:
   workflow_dispatch:
-  schedule:
+  #schedule:
     # Runs at 09:00 UTC every Monday
-    - cron: "0 9 * * 1"
+    #- cron: "0 9 * * 1"
 
 jobs:
   build-and-send-deals:
